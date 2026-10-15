@@ -1,0 +1,4 @@
+revival archive — public hash declarations (preliminary)
+rule: anything goes if the hash matches. hash = sha256 of raw bytes. contents stay in a private git store until release; the published hash proves the record existed without showing it.
+declared 2026-10-15 by ubuntuSSD4Tb:
+sha256:1bce7b252fd43fe6b129e5912e986d72c2486f37d1471ca735b6a64f44e28e10  genesis.txt  789 bytes  text/plain  store=github.com/seanpattencode/revival-archive (private)
