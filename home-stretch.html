@@ -64,7 +64,7 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
 .guide-main { display: flex; align-items: center; gap: 10px; }
 .guide-text { min-width: 0; flex: 1; }
 .client { font: 900 21px/1.05 var(--font-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.addr { font: 600 15px/1.2 var(--font-display); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.addr { font: 600 15px/1.2 var(--font-display); margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .arrow { width: 40px; height: 40px; flex: none; }
 .arrow svg { width: 100%; height: 100%; display: block; transition: transform 0.08s linear; }
 .reason { font: italic 600 12.5px/1.3 var(--font-body); color: var(--muted); }
@@ -97,10 +97,8 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
 .speed .su { font: 800 11px/1 var(--font-display); letter-spacing: 0.14em; }
 .speed.fast .sv { color: var(--sold); }
 
-.stats {
-  left: calc(var(--safe-l) + var(--g)); bottom: calc(var(--safe-b) + var(--g));
-  width: 214px; display: grid; gap: 6px;
-}
+.bl { left: calc(var(--safe-l) + var(--g)); bottom: calc(var(--safe-b) + var(--g)); width: 214px; display: grid; gap: 6px; }
+.stats { display: grid; gap: 6px; }
 .sold { background: var(--paper); color: var(--ink); border-radius: 8px; overflow: hidden; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); }
 .sold-top { display: block; background: var(--sold); color: var(--paper); font: 900 11px/1 var(--font-display); letter-spacing: 0.16em; padding: 6px 10px 4px; }
 .sold-amt { display: block; font: 900 28px/1.1 var(--font-display); padding: 6px 10px 3px; font-variant-numeric: tabular-nums; }
@@ -129,13 +127,14 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
   100% { opacity: 0; transform: translateY(-14px); }
 }
 
-.hint {
-  bottom: calc(var(--safe-b) + var(--g)); left: 50%; transform: translateX(-50%);
-  background: var(--scrim); border-radius: 999px; padding: 8px 14px 6px;
-  font: 600 12.5px/1.3 var(--font-body); text-align: center; transition: opacity 1s ease;
-  max-width: calc(100vw - 2 * var(--g) - 2 * 230px);
+.hint { /* always-on legend: every key that does something right now, the one that matters most on top */
+  margin: 0; padding: 7px 9px 5px; list-style: none; background: var(--scrim); border-radius: 8px;
+  font: 600 12px/1.2 var(--font-body); display: grid; gap: 4px;
 }
-.hint kbd, .keys kbd {
+.hint li { display: flex; align-items: center; gap: 5px; min-height: 17px; }
+.hint .hot { color: var(--oversize); font-weight: 800; }
+.hint .hot kbd { background: var(--oversize); }
+.hint kbd, .keys kbd, .addr kbd {
   font: 700 11px/1 var(--font-mono); background: var(--paper); color: var(--ink);
   border-radius: 4px; padding: 3px 5px 2px; box-shadow: 0 2px 0 var(--key-shadow); white-space: nowrap;
 }
@@ -163,7 +162,7 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
 .is-touch .speed { bottom: auto; top: calc(var(--safe-t) + var(--g) + var(--map) + 62px); width: 70px; }
 .is-touch .speed .sv { font-size: 32px; }
 .is-touch .speed .sl, .is-touch .speed .su { font-size: 9px; }
-.is-touch .stats { bottom: auto; top: calc(var(--safe-t) + var(--g) + 190px); width: 160px; }
+.is-touch .bl { bottom: auto; top: calc(var(--safe-t) + var(--g) + 190px); width: 160px; }
 .is-touch .statline, .is-touch .hint { display: none; }
 .is-touch .sold-amt { font-size: 20px; }
 
@@ -174,9 +173,8 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
   .addr { font-size: 13px; }
   .reason { display: none; }
   .arrow { width: 32px; height: 32px; }
-  .stats { width: 180px; }
+  .bl { width: 180px; }
   .sold-amt { font-size: 22px; }
-  .hint { display: none; }
   .toast { font-size: 16px; }
   .toast.big { font-size: 22px; }
 }
@@ -189,7 +187,7 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
   .is-touch .guide { width: min(280px, calc(100vw - 2 * var(--g) - var(--map) - 96px)); }
   .is-touch .client { font-size: 17px; }
   .is-touch .speed { top: calc(var(--safe-t) + var(--g)); right: calc(var(--safe-r) + var(--g) + var(--map) + 12px); width: 66px; }
-  .is-touch .stats { top: calc(var(--safe-t) + var(--g) + 120px); width: 150px; }
+  .is-touch .bl { top: calc(var(--safe-t) + var(--g) + 120px); width: 150px; }
   .is-touch .pausebtn { top: calc(var(--safe-t) + var(--g) + var(--map) + 10px); }
   .title-card { gap: 12px; }
   .banner h1 { font-size: 42px; }
@@ -294,17 +292,19 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
 
   <div class="speed" id="speed" aria-label="Speed in miles per hour"><div class="speed-in"><span class="sl">SPEED</span><span class="sv" id="spd">0</span><span class="su">MPH</span></div></div>
 
-  <div class="stats">
-    <div class="sold"><span class="sold-top">CASH</span><span class="sold-amt" id="cash">$0</span></div>
-    <div class="statline">
-      <div class="row"><span>Houses moved</span><b id="moves">0</b></div>
-      <div class="row"><span>Curb appeal</span><span class="appeal"><i id="appeal-bar"></i></span><b id="appeal">100%</b></div>
-      <div class="row"><b id="clock">10:30 AM</b><span class="muted" id="camname">Chase cam</span></div>
+  <div class="bl">
+    <div class="stats">
+      <div class="sold"><span class="sold-top">CASH</span><span class="sold-amt" id="cash">$0</span></div>
+      <div class="statline">
+        <div class="row"><span>Houses moved</span><b id="moves">0</b></div>
+        <div class="row"><span>Curb appeal</span><span class="appeal"><i id="appeal-bar"></i></span><b id="appeal">100%</b></div>
+        <div class="row"><b id="clock">10:30 AM</b><span class="muted" id="camname">Chase cam</span></div>
+      </div>
     </div>
+    <ul class="hint" id="hint" aria-label="Controls"></ul>
   </div>
 
   <div class="toasts" id="toasts" aria-live="polite"></div>
-  <div class="hint" id="hint"><kbd>W</kbd> gas · <kbd>S</kbd> brake · <kbd>A</kbd><kbd>D</kbd> steer · <kbd>Space</kbd> handbrake · <kbd>H</kbd> doorbell / set house · <kbd>C</kbd> camera · <kbd>Esc</kbd> pause</div>
 
   <div id="touch" hidden>
     <button class="tbtn" id="t-left" aria-label="Steer left"><svg viewBox="0 0 24 24"><path d="M15 4 L7 12 L15 20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -2427,14 +2427,14 @@ function updatePlayer(dt) {
   P.vx = vf * fx + vl * rx; P.vz = vf * fz + vl * rz;
   P.x += P.vx * dt; P.z += P.vz * dt;
   // vertical: follow the drivable surface, fly off lips, land
-  const gh = surfaceAt(P.x, P.z, P.y);
+  const gh = groundAt(P.x, P.z, P.y, fx, fz);
   if (P.grounded) {
     if (gh < P.y - 0.35) { P.grounded = false; P.air = 0; }
     else { P.vy = lerp(P.vy, (gh - P.y) / dt, 0.8); P.y = gh; }
   }
   if (!P.grounded) {
     P.vy -= PHYS.grav * dt; P.y += P.vy * dt; P.air += dt;
-    const g2 = surfaceAt(P.x, P.z, P.y + 0.6);
+    const g2 = groundAt(P.x, P.z, P.y + 0.6, fx, fz);
     if (P.y <= g2) {
       const impact = Math.max(0, -P.vy);
       P.y = g2; P.vy = 0; P.grounded = true;
@@ -2535,8 +2535,8 @@ function updatePlayerVisual(dt, t) {
   let tp = 0, tr = 0;
   if (P.grounded) {
     const y = P.y, c = (v) => clamp(v, y - 1.4, y + 1.4);
-    const hf = c(surfaceAt(P.x + fx * 3, P.z + fz * 3, y + 1)), hb = c(surfaceAt(P.x - fx * 3, P.z - fz * 3, y + 1));
-    const hl = c(surfaceAt(P.x - rx * 2.5, P.z - rz * 2.5, y + 1)), hr = c(surfaceAt(P.x + rx * 2.5, P.z + rz * 2.5, y + 1));
+    const hf = c(terrainAt(P.x + fx * 3, P.z + fz * 3, y + 1)), hb = c(terrainAt(P.x - fx * 3, P.z - fz * 3, y + 1));
+    const hl = c(terrainAt(P.x - rx * 2.5, P.z - rz * 2.5, y + 1)), hr = c(terrainAt(P.x + rx * 2.5, P.z + rz * 2.5, y + 1));
     tp = Math.atan2(hf - hb, 6); tr = Math.atan2(hl - hr, 5);
   } else tp = clamp(Math.atan2(P.vy, Math.max(8, Math.abs(P.vf))) * 0.6, -0.35, 0.35);
   P.pitch = damp(P.pitch, tp, P.grounded ? 12 : 3, dt); P.roll = damp(P.roll, tr, 10, dt);
@@ -2546,12 +2546,14 @@ function updatePlayerVisual(dt, t) {
   for (const w of PL.wheels) { w.spin.rotation.x = P.wheel; w.steer.rotation.y = w.front ? P.steer * 0.42 : 0; }
   // brake lights
   PL.brakeMat.color.setHex(P.braking ? 0xff2a1a : night > 0.4 ? 0xb01810 : 0x6a1010);
-  // flag
-  const pos = PL.flag.geometry.attributes.position, base = PL.flagBase, wind = clamp(Math.abs(P.vf) / 18, 0.15, 1);
+  // flag: streams back with road speed, hangs limp beside the pole once the house stops (or sits on its jacks)
+  const pos = PL.flag.geometry.attributes.position, base = PL.flagBase;
+  const w = PL.wind = damp(PL.wind || 0, PL.body ? clamp(Math.abs(P.vf) / 9, 0, 1) : 0, 2.5, dt);
   for (let i = 0; i < pos.count; i++) {
-    const bx = base[i * 3], by = base[i * 3 + 1], bz = base[i * 3 + 2], f = -bz / 1.2;
-    const z = bz * (0.25 + 0.75 * wind), droop = (1 - wind) * f * 0.9;
-    pos.setXYZ(i, Math.sin(bz * 5 + t * (6 + wind * 10)) * f * (0.07 + wind * 0.12), by - droop, z);
+    const by = base[i * 3 + 1], bz = base[i * 3 + 2], f = -bz / 1.2, k = smoothstep(0, 1, w * 1.6 - 0.6 * f);
+    const hx = Math.sin(bz * 3.5 + by * 4 + t * 0.8) * 0.05 * f, hy = by + bz * 0.92, hz = -(0.04 - by * 0.2) * Math.min(1, f * 5) * (1 + 0.6 * f); // limp: each strip of cloth hangs straight down
+    const sx = Math.sin(bz * 5 + t * (5 + w * 11)) * f * (0.05 + w * 0.14), sy = by - (1 - w) * f * 0.25, sz = bz * (0.6 + 0.4 * w); // streaming
+    pos.setXYZ(i, lerp(hx, sx, k), lerp(hy, sy, k), lerp(hz, sz, k));
   }
   pos.needsUpdate = true; PL.flag.geometry.computeVertexNormals();
 }
@@ -2677,7 +2679,7 @@ function buildCarMeshes() {
 }
 function newCar(type, mode) {
   const cm = CAR_MESH[type]; if (!cm.free.length) return null;
-  const D = CAR_DEF[type], car = { type, ti: cm.free.pop(), mode, x: 0, y: 0, z: 0, h: 0, v: 0, vMax: 12, halfL: D.L / 2, W: D.W, mass: D.mass, knocked: null, near: 0, hitT: -9, q: new THREE.Quaternion() };
+  const D = CAR_DEF[type], car = { type, ti: cm.free.pop(), mode, x: 0, y: 0, z: 0, h: 0, v: 0, vMax: 12, halfL: D.L / 2, W: D.W, mass: D.mass, knocked: null, crush: 0, near: 0, hitT: -9, q: new THREE.Quaternion() };
   const col = type === 'bus' ? 0xf2b705 : type === 'van' ? 0xf4f4ee : type === 'semi' ? mpick([0xc62f2a, 0x2c4f8a, 0xf4f4ee, 0x2f5a3c, 0x151515, 0xd98a1a]) : mpick(CARCOL);
   cm.meshes[0].setColorAt(car.ti, _c1.setHex(col)); cm.meshes[0].instanceColor.needsUpdate = true;
   allCars.push(car);
@@ -2709,7 +2711,7 @@ function spawnHw(car, near) {
     if (near && tries < 30 && inView(_ro.x, DECK_H, _ro.z)) continue;
     if (!laneFree(lane, s, 30, 40)) continue;
     car.lane = lane; car.s = s; car.d = car.dTarget = HW_LANES[lane]; car.vMax = mr(24, 31) * (car.type === 'semi' ? 0.88 : 1); car.v = car.vMax * 0.9;
-    car.knocked = null; hwPlace(car); return true;
+    car.knocked = null; car.crush = 0; hwPlace(car); return true;
   }
   return false;
 }
@@ -2829,7 +2831,7 @@ function spawnSt(car, near) {
     if (!near && dist < 60) continue;
     if (near && tries < 35 && inView(x, 1, z)) continue;
     if (stCars.some((o) => o !== car && !o.knocked && Math.hypot(o.x - x, o.z - z) < 18)) continue;
-    car.x = x; car.z = z; car.y = 0.1; car.h = Math.atan2(car.ux, car.uz); car.v = car.vMax * 0.7; car.knocked = null;
+    car.x = x; car.z = z; car.y = 0.1; car.h = Math.atan2(car.ux, car.uz); car.v = car.vMax * 0.7; car.knocked = null; car.crush = 0;
     return true;
   }
   return false;
@@ -2859,7 +2861,7 @@ function updateTraffic(dt) {
       if (!ok && c.knocked) { c.knocked = null; c.mode === 'hw' ? spawnHw(c, false) : spawnSt(c, false); }
     }
   }
-  collidePlayerCars();
+  collidePlayerCars(dt);
 }
 function knockCar(c, vx, vz, power) {
   if (c.mode === 'st' && nodes[c.to] && nodes[c.to].occ === c) nodes[c.to].occ = null;
@@ -2889,7 +2891,7 @@ function updateKnocked(c, dt) {
 }
 function writeCarMatrices() {
   for (const c of allCars) {
-    if (c.knocked) _m4.compose(_v1.set(c.x, c.y, c.z), c.q, _v2.set(1, 1, 1));
+    if (c.knocked) { _m4.makeRotationFromQuaternion(c.q); if (c.crush) _m4.premultiply(_m5.makeScale(1 + 0.12 * c.crush, 1 - 0.72 * c.crush, 1 + 0.12 * c.crush)); _m4.setPosition(c.x, c.y, c.z); }
     else { _q2.setFromAxisAngle(_v2.set(0, 1, 0), c.h); _m4.compose(_v1.set(c.x, c.y, c.z), _q2, _v3.set(1, 1, 1)); }
     for (const m of CAR_MESH[c.type].meshes) m.setMatrixAt(c.ti, _m4);
   }
@@ -2901,9 +2903,38 @@ function carCircles(c, out) {
   for (let i = 0; i < n; i++) { const o = n === 1 ? 0 : lerp(-(c.halfL - r), c.halfL - r, i / (n - 1)); out.push(c.x + fx * o, c.z + fz * o); }
   return r;
 }
-const _cc = [];
-function collidePlayerCars() {
+// ----- riding over cars -----
+const _cc = [], underCars = [], CAR_H = { sedan: 1.6, suv: 1.9, pickup: 1.8, van: 3.3, bus: 3.1, semi: 3.9 };
+const carH = (c) => CAR_H[c.type] * (1 - 0.72 * c.crush);
+function carTopAt(c, x, z) { // roof height under a point, ramping up over 1.3 m from the car's edge
+  const fx = Math.sin(c.h), fz = Math.cos(c.h), dx = x - c.x, dz = z - c.z;
+  const e = Math.min(c.halfL + 0.9 - Math.abs(dx * fx + dz * fz), c.W / 2 + 0.9 - Math.abs(dx * fz - dz * fx));
+  return e <= 0 ? -1e9 : c.y + carH(c) * clamp(e / 1.3, 0, 1);
+}
+function terrainAt(x, z, yRef) { let h = surfaceAt(x, z, yRef); for (const c of underCars) h = Math.max(h, carTopAt(c, x, z)); return h; }
+function groundAt(x, z, yRef, fx, fz) { // what the rig stands on: the drivable surface, or the roof of a car it is riding over (mean of the axle samples)
+  const g = surfaceAt(x, z, yRef); if (!underCars.length) return g;
+  const rib = surfOnRibbon, h = (terrainAt(x + fx * 3, z + fz * 3, yRef + 1) + terrainAt(x - fx * 3, z - fz * 3, yRef + 1)) / 2;
+  surfOnRibbon = rib; return Math.max(g, h);
+}
+function rideOver(c, dt) { // the rig climbs on instead of bouncing off; its weight presses the car flat
+  if (!c.crush) { // first contact: the car becomes a wreck where it stands
+    if (c.mode === 'st' && nodes[c.to] && nodes[c.to].occ === c) nodes[c.to].occ = null;
+    if (!c.knocked) c.q.setFromAxisAngle(_v1.set(0, 1, 0), c.h);
+    c.knocked = { vx: 0, vz: 0, vy: 0, wx: 0, wy: 0, wz: 0, t: 0, rest: true }; c.v = 0; c.crush = 0.001;
+    SFX.crash(12); shake = Math.max(shake, 0.7); P.spv += 0.3; sparksAt(c.x, c.y + 1, c.z, 16);
+  }
+  underCars.push(c);
+  const fx = Math.sin(P.h), fz = Math.cos(P.h), ch = carH(c);
+  if (!PCIRC.some((o) => carTopAt(c, P.x + fx * o, P.z + fz * o) >= c.y + ch * 0.6)) return; // no axle on it yet: just climbing the edge
+  const prev = c.crush, rate = 1.6 * (PL.body ? 0.6 + PL.house.mass : 0.5) / c.mass;
+  c.crush = Math.min(1, prev + rate * dt);
+  if (Math.floor(c.crush * 4) > Math.floor(prev * 4)) { SFX.crunch(); shake = Math.max(shake, 0.5); P.spv += 0.12; P.srv += mr(-0.12, 0.12); sparksAt(c.x, c.y + ch, c.z, 8); puff(c.x, c.y + 0.3, c.z, 4, 0x9aa0a6, 1, 3, 1.2, c.halfL * 0.6, 0.6, 0.35); }
+  if (prev < 1 && c.crush >= 1) { addCash(100); toast(`CRUSHED A ${c.type.toUpperCase()} +$100`, '', 'Monster truck rules'); }
+}
+function collidePlayerCars(dt) {
   const fx = Math.sin(P.h), fz = Math.cos(P.h);
+  underCars.length = 0;
   for (const c of allCars) {
     if (Math.abs(c.y - P.y) > 3.5) continue;
     const dx0 = c.x - P.x, dz0 = c.z - P.z;
@@ -2918,7 +2949,9 @@ function collidePlayerCars() {
       }
     }
     const cvx = c.knocked ? c.knocked.vx : Math.sin(c.h) * c.v, cvz = c.knocked ? c.knocked.vz : Math.cos(c.h) * c.v;
-    if (best) {
+    if (best && (c.crush > 0 || ((!c.knocked || c.knocked.rest) && (P.y > c.y + carH(c) * 0.5 || (P.grounded && P.vx * best.nx + P.vz * best.nz > 3.5))))) {
+      rideOver(c, dt); c.near = 0; c.hitT = simTime;
+    } else if (best) {
       const { nx, nz, pen } = best, M = 9, m = c.mass, share = m / (M + m);
       P.x -= nx * pen * share; P.z -= nz * pen * share;
       c.x += nx * pen * (1 - share); c.z += nz * pen * (1 - share);
@@ -3204,6 +3237,7 @@ const SFX = {
   doorbell() { for (const [f, d] of [[659.25, 0], [523.25, 0.45]]) { tone(f, d, 1.7, 'sine', 0.3); tone(f * 2, d, 0.9, 'sine', 0.06); tone(f * 3.01, d, 0.5, 'sine', 0.025); } },
   crash(v) { v = clamp(v / 18, 0.15, 1); noiseHit(0, 0.5, 0.7 * v, 'lowpass', 2200, 260, 0.8); tone(85, 0, 0.32, 'sine', 0.55 * v, 38); for (let i = 0; i < 3; i++) tone(mr(320, 900), mr(0, 0.05), 0.16, 'square', 0.04 * v); },
   clank(p) { tone(p, 0, 0.14, 'triangle', 0.12); noiseHit(0, 0.09, 0.15, 'bandpass', 2600, 0, 3); },
+  crunch() { noiseHit(0, 0.32, 0.45, 'lowpass', 1400, 180, 1.1); tone(mr(62, 84), 0, 0.26, 'sine', 0.4, 28); for (let i = 0; i < 2; i++) tone(mr(1800, 3600), mr(0, 0.08), 0.06, 'square', 0.025); },
   jingle() { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, i * 0.1, 0.35, 'triangle', 0.16)); tone(2093, 0.48, 0.6, 'sine', 0.1); tone(2637, 0.52, 0.7, 'sine', 0.08); },
   whoosh() { noiseHit(0, 0.42, 0.22, 'bandpass', 380, 2600, 2); },
   thud(v) { v = clamp(v / 16, 0.2, 1); tone(95, 0, 0.36, 'sine', 0.6 * v, 40); noiseHit(0, 0.22, 0.25 * v, 'lowpass', 500, 120); },
@@ -3254,9 +3288,20 @@ function showPadMark(d) { // foundation outline, house footprint in truck frame,
   padMark.geometry.dispose(); padMark.geometry = b.geo(); padMark.position.set(d.x, 0.14, d.z); padMark.rotation.y = d.ry - H.front; padMark.visible = true;
 }
 function setPhaseHUD() {
-  const m = mission, T = { haul: [m.client, m.dest.label, m.reason], place: ['SET THE HOUSE', `Line up on the outline, then ${IS_TOUCH ? 'tap SET' : 'press H'}`, 'Front door toward the street'], lift: ['PULL OUT', 'Drive the rig clear of the house', ''], set: ['EASY DOES IT', 'Lowering onto the foundation', ''] }[m.phase];
-  $('m-client').textContent = T[0]; $('m-addr').textContent = T[1]; $('m-reason').textContent = T[2];
+  const m = mission, T = { haul: [m.client, m.dest.label, m.reason], place: ['SET THE HOUSE', `Line up on the outline, then ${IS_TOUCH ? 'tap SET' : 'press <kbd>H</kbd>'}`, 'Front door toward the street'], lift: ['PULL OUT', 'Drive the rig clear of the house', ''], set: ['EASY DOES IT', 'Lowering onto the foundation', ''] }[m.phase];
+  $('m-client').textContent = T[0]; $('m-addr').innerHTML = T[1]; $('m-reason').textContent = T[2];
   if (IS_TOUCH) $('t-ding').textContent = m.phase === 'place' ? 'SET' : 'DING';
+}
+function setKeyHUD() { // bottom-left legend, re-rendered whenever the state or mission phase changes
+  if (IS_TOUCH) return;
+  const ph = mission ? mission.phase : '', D = [['W ↑', 'gas'], ['S ↓', 'brake · reverse'], ['A D', 'steer'], ['Space', 'handbrake'], ['C', 'camera'], ['R', 'back on the road'], ['Esc', 'pause']];
+  const rows = state === 'shop' ? [['Enter', 'LOAD UP · next level', 1], ['click', 'buy an upgrade · pick a house']]
+    : state === 'pause' ? [['Esc', 'RESUME', 1], ['C', 'next camera'], ['N', 'night / day'], ['R', 'back on the road'], ['M', 'sound']]
+    : ph === 'place' ? [['H', 'SET THE HOUSE · stop on the outline', 1], ...D]
+    : ph === 'lift' ? [['W ↑', 'PULL OUT · drive clear of the house', 1], ...D.slice(1)]
+    : ph === 'set' ? [['', 'HANDS OFF · lowering the house', 1], ...D.slice(4)]
+    : [...D.slice(0, 4), ['H', 'doorbell'], ...D.slice(4)];
+  $('hint').innerHTML = rows.map(([k, a, hot]) => `<li${hot ? ' class="hot"' : ''}>${k.split(' ').map((x) => x && `<kbd>${x}</kbd>`).join('')}<span>${a}</span></li>`).join('');
 }
 function newMission() {
   if (!DESTS.length) { toast('HOMETOWN IS FULL', 'big green', 'Every lot has a house on it. You win.'); return; }
@@ -3570,7 +3615,7 @@ function bindHold(id, key) {
 }
 
 // ---------------- game state ----------------
-let state = 'loading', simTime = 0, lastT = 0, titleA = 0, hintT = 0;
+let state = 'loading', simTime = 0, lastT = 0, titleA = 0, keySig = '';
 function startGame() {
   if (state !== 'title') return;
   audioInit();
@@ -3580,7 +3625,6 @@ function startGame() {
   const c = CAMS[camMode];
   if (camMode <= 2) camera.position.set(P.x - Math.sin(camYaw) * c.dist, P.y + c.height, P.z - Math.cos(camYaw) * c.dist);
   if (!mission && missionTimer <= 0) missionTimer = 1.2;
-  hintT = 14; $('hint').style.opacity = 1;
   renderer.domElement.focus();
 }
 function togglePause() {
@@ -3682,10 +3726,8 @@ function frame(now) {
     }
     clouds.position.x = ((simTime * 1.5) % 600) - 300;
   }
-  if (state === 'play') {
-    updateHUD(dt);
-    if (hintT > 0) { hintT -= dt; if (hintT <= 0) $('hint').style.opacity = 0; }
-  }
+  const sig = state + (mission ? mission.phase : ''); if (sig !== keySig) { keySig = sig; setKeyHUD(); }
+  if (state === 'play') updateHUD(dt);
   audioUpdate();
   adaptQuality(dt);
   renderer.render(scene, camera);
@@ -3732,7 +3774,7 @@ async function init() {
     sim: (sec, inp) => { Object.assign(input, { steer: 0, throttle: 0, brake: 0, hand: false }, inp || {}); const n = Math.round(sec * 60); for (let i = 0; i < n; i++) step(1 / 60); return { x: +P.x.toFixed(2), y: +P.y.toFixed(2), z: +P.z.toFixed(2), h: +P.h.toFixed(3), vf: +P.vf.toFixed(2), surf: P.surface, grounded: P.grounded }; },
     near: (r = 8) => { const out = []; queryCols(P.x - r, P.x + r, P.z - r, P.z + r, (c) => out.push(c.t === 0 ? `circle ${c.x.toFixed(1)},${c.z.toFixed(1)} r${c.r.toFixed(2)} top${c.y1}` : c.t === 1 ? `box x${c.x0.toFixed(1)}..${c.x1.toFixed(1)} z${c.z0.toFixed(1)}..${c.z1.toFixed(1)} top${c.y1.toFixed(1)}` : `wall ${c.ax.toFixed(1)},${c.az.toFixed(1)}->${(c.ax + c.ux * c.len).toFixed(1)},${(c.az + c.uz * c.len).toFixed(1)} base${c.ay} h${c.ha.toFixed(1)}`)); return out; },
     ringLocate, surfaceAt, get cash() { return cash; }, get appeal() { return appeal; }, props: () => flyingProps.length + ' flying, ' + propsFlattened + ' flattened',
-    cars: () => allCars.map((c) => ({ t: c.type, m: c.mode, x: +c.x.toFixed(1), z: +c.z.toFixed(1), y: +c.y.toFixed(1), v: +c.v.toFixed(1), k: !!c.knocked, h: c.h })), setTod: (t) => { tod = t; }, cam: (m) => { camMode = m; }, teleport: (x, z, h, y = 0) => { Object.assign(P, { x, z, h, y, vx: 0, vz: 0, vy: 0 }); camYaw = h; camY = y; }, input, DESTS, stats: () => ({ tris: staticTris, calls: renderer.info.render.calls, frameTris: renderer.info.render.triangles, cars: allCars.length, dests: DESTS.length }), get mission() { return mission; },
+    cars: () => allCars.map((c) => ({ t: c.type, m: c.mode, x: +c.x.toFixed(1), z: +c.z.toFixed(1), y: +c.y.toFixed(1), v: +c.v.toFixed(1), k: !!c.knocked, cr: +c.crush.toFixed(2), h: c.h })), allCars, setTod: (t) => { tod = t; }, cam: (m) => { camMode = m; }, teleport: (x, z, h, y = 0) => { Object.assign(P, { x, z, h, y, vx: 0, vz: 0, vy: 0 }); camYaw = h; camY = y; }, input, DESTS, stats: () => ({ tris: staticTris, calls: renderer.info.render.calls, frameTris: renderer.info.render.triangles, cars: allCars.length, dests: DESTS.length }), get mission() { return mission; },
     setHouse, closeShop, rig, HOUSES, PHYS, PL, pickHouse: (i) => { nextHouse = i; }, get phase() { return mission && mission.phase; }, get level() { return levelsDone; } };
   $('loading').hidden = true; $('title').hidden = false;
   state = 'title';
