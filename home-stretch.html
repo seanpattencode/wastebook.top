@@ -232,7 +232,7 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
 .is-touch .keys { display: none; }
 .is-touch .touch-note { display: block; }
 
-#pause { background: rgba(12, 16, 18, 0.55); justify-items: center; }
+#pause, #shop { background: rgba(12, 16, 18, 0.55); justify-items: center; }
 .pause-card { background: var(--guide); border-radius: 12px; padding: 5px; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45); width: min(340px, 100%); }
 .pause-in { border: 2.5px solid var(--paper); border-radius: 8px; padding: 18px; display: grid; gap: 12px; text-align: center; }
 .pause-in h2 { margin: 0; font: 900 32px/1 var(--font-display); letter-spacing: 0.06em; }
@@ -241,6 +241,17 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
 .pbtn { pointer-events: auto; background: transparent; color: var(--paper); border: 2px solid var(--paper); border-radius: 7px; padding: 10px 8px 8px; font: 800 13px/1 var(--font-display); letter-spacing: 0.04em; cursor: pointer; }
 .pbtn:hover { background: var(--guide-hi); }
 .pbtn.wide { grid-column: 1 / -1; background: var(--paper); color: var(--guide); font-size: 17px; }
+.shop-card { width: min(680px, 100%); }
+.pause-in h3 { margin: 6px 0 -4px; font: 800 12px/1 var(--font-display); letter-spacing: 0.22em; color: var(--oversize); display: flex; justify-content: space-between; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+.card { pointer-events: auto; display: grid; gap: 5px; text-align: left; background: transparent; color: var(--paper); border: 2px solid var(--paper); border-radius: 7px; padding: 9px 10px 8px; font: 600 12px/1.3 var(--font-body); cursor: pointer; }
+.card b { font: 800 14px/1.1 var(--font-display); letter-spacing: 0.03em; }
+.card .pips { font: 700 13px/1 var(--font-mono); letter-spacing: 3px; color: var(--oversize); }
+.card .cost { font: 700 11px/1.2 var(--font-mono); color: var(--oversize); }
+.card:not(:disabled):hover { background: var(--guide-hi); }
+.card.on { background: var(--paper); color: var(--guide); }
+.card.on .pips, .card.on .cost { color: var(--sold); }
+.card:disabled { opacity: 0.45; cursor: default; }
 
 #loading { justify-items: center; background: var(--asphalt); }
 .load-in { display: grid; gap: 14px; justify-items: center; text-align: center; }
@@ -263,7 +274,7 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
 <div id="hud" class="hud" hidden>
   <section class="guide" aria-label="Current moving job">
     <div class="guide-in">
-      <div class="guide-top"><span class="tab" id="m-tab">JOB 1</span><span class="dist" id="m-dist">0.0 MI</span></div>
+      <div class="guide-top"><span class="tab" id="m-tab">LEVEL 1</span><span class="dist" id="m-dist">0.0 MI</span></div>
       <div class="guide-main">
         <div class="guide-text">
           <div class="client" id="m-client">Finding a buyer</div>
@@ -284,7 +295,7 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
   <div class="speed" id="speed" aria-label="Speed in miles per hour"><div class="speed-in"><span class="sl">SPEED</span><span class="sv" id="spd">0</span><span class="su">MPH</span></div></div>
 
   <div class="stats">
-    <div class="sold"><span class="sold-top">EARNED</span><span class="sold-amt" id="cash">$0</span></div>
+    <div class="sold"><span class="sold-top">CASH</span><span class="sold-amt" id="cash">$0</span></div>
     <div class="statline">
       <div class="row"><span>Houses moved</span><b id="moves">0</b></div>
       <div class="row"><span>Curb appeal</span><span class="appeal"><i id="appeal-bar"></i></span><b id="appeal">100%</b></div>
@@ -293,7 +304,7 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
   </div>
 
   <div class="toasts" id="toasts" aria-live="polite"></div>
-  <div class="hint" id="hint"><kbd>W</kbd> gas · <kbd>S</kbd> brake · <kbd>A</kbd><kbd>D</kbd> steer · <kbd>Space</kbd> handbrake · <kbd>H</kbd> doorbell · <kbd>C</kbd> camera · <kbd>Esc</kbd> pause</div>
+  <div class="hint" id="hint"><kbd>W</kbd> gas · <kbd>S</kbd> brake · <kbd>A</kbd><kbd>D</kbd> steer · <kbd>Space</kbd> handbrake · <kbd>H</kbd> doorbell / set house · <kbd>C</kbd> camera · <kbd>Esc</kbd> pause</div>
 
   <div id="touch" hidden>
     <button class="tbtn" id="t-left" aria-label="Steer left"><svg viewBox="0 0 24 24"><path d="M15 4 L7 12 L15 20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -309,13 +320,13 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
   <div class="title-card">
     <div class="banner"><small>OVERSIZE LOAD</small><h1>Home<br>Stretch</h1></div>
     <p class="tag">Your house. On wheels. On the interstate.</p>
-    <p class="brief">A blue three-bedroom house is bolted to a six-wheel flatbed, and families all over Hometown just bought new lots. Haul the house to each SOLD sign. The elevated loop is the fast way around town. Every dent costs curb appeal, and curb appeal sets your pay.</p>
+    <p class="brief">A blue three-bedroom house is bolted to a six-wheel flatbed, and families all over Hometown just bought new lots. Haul the house to the SOLD sign, line it up on the foundation, jack it up and pull the rig out from under it. Each level ends at the shop: upgrade the platform and pick the next house. Every dent costs curb appeal, and curb appeal sets your pay.</p>
     <ul class="keys">
       <li><span class="k"><kbd>W</kbd><kbd>↑</kbd></span>Gas</li>
       <li><span class="k"><kbd>S</kbd><kbd>↓</kbd></span>Brake, then reverse</li>
       <li><span class="k"><kbd>A</kbd><kbd>D</kbd></span>Steer</li>
       <li><span class="k"><kbd>Space</kbd></span>Handbrake slide</li>
-      <li><span class="k"><kbd>H</kbd></span>Doorbell horn</li>
+      <li><span class="k"><kbd>H</kbd></span>Doorbell · set the house on the lot</li>
       <li><span class="k"><kbd>C</kbd></span>Change camera</li>
       <li><span class="k"><kbd>N</kbd></span>Jump to night or day</li>
       <li><span class="k"><kbd>R</kbd></span>Back onto the road</li>
@@ -338,6 +349,18 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
         <button class="pbtn" id="p-reset">Back on road</button>
       </div>
       <p>Press Esc to keep driving.</p>
+    </div>
+  </div>
+</div>
+
+<div id="shop" class="overlay" hidden>
+  <div class="pause-card shop-card" role="dialog" aria-label="Level complete">
+    <div class="pause-in">
+      <h2 id="s-title">LEVEL 1 COMPLETE</h2>
+      <p id="s-sum"></p>
+      <h3>PLATFORM <span id="s-cash"></span></h3><div class="cards" id="s-rig"></div>
+      <h3>NEXT HOUSE</h3><div class="cards" id="s-house"></div>
+      <button class="pbtn wide" id="s-go">LOAD UP</button>
     </div>
   </div>
 </div>
@@ -1043,7 +1066,9 @@ function buildMaterials() {
 
 const CHUNK = 320;
 const BATCHES = new Map();
+let BOVR = null; // when set, B() builds into these local batches (player house bodies)
 function B(key, x = 0, z = 0) {
+  if (BOVR) return BOVR[key] || (BOVR[key] = new Batch());
   let m = BATCHES.get(key); if (!m) BATCHES.set(key, (m = new Map()));
   const k = Math.floor(x / CHUNK) * 100 + Math.floor(z / CHUNK);
   let b = m.get(k); if (!b) m.set(k, (b = new Batch()));
@@ -1686,7 +1711,7 @@ function buildLot(L) {
     placeBreak('mailbox', sub(LT, 3, 0, hd + 2.6).x, 0.16, sub(LT, 3, 0, hd + 2.6).z, LT.ry);
     for (const [cx, cz] of [[-5, hd - 4], [5, hd - 4], [5, hd - 15], [-5, hd - 15]]) { const c = sub(LT, cx, 0, cz); placeBreak('cone', c.x, 0.05, c.z, 0); }
     const dest = sub(LT, 0, 0, hd - 10);
-    DESTS.push({ x: dest.x, z: dest.z, label: `${L.num} ${L.street}`, kind: 'lot' });
+    DESTS.push({ x: dest.x, z: dest.z, label: `${L.num} ${L.street}`, kind: 'lot', ry: LT.ry });
     tryTree(sub(LT, -7, 0, -hd + 4).x, sub(LT, -7, 0, -hd + 4).z, 0, rnd(0.9, 1.2));
     return;
   }
@@ -2031,7 +2056,7 @@ function outerDest(x, z, label, ry = 0) {
   noBuild.push({ x0: x - 14, x1: x + 14, z0: z - 14, z1: z + 14 });
   soldSign(TY(x + Math.sin(ry) * 9, 0, z + Math.cos(ry) * 9, ry));
   for (const [cx, cz] of [[-6, -6], [6, -6], [6, 6], [-6, 6]]) placeBreak('cone', x + cx, 0.05, z + cz, 0);
-  DESTS.push({ x, z, label, kind: 'outer' });
+  DESTS.push({ x, z, label, kind: 'outer', ry });
 }
 
 // ---------------- outskirts ----------------
@@ -2209,10 +2234,10 @@ const P = {
 const PL = {}; // player meshes
 
 function buildPlayerHouse() {
-  const root = new THREE.Group(), chassis = new THREE.Group(), body = new THREE.Group();
-  root.add(chassis); chassis.add(body); body.position.y = 1.45;
-  const cbk = {}, bbk = {};
-  const cb = (k) => cbk[k] || (cbk[k] = new Batch()), bb = (k) => bbk[k] || (bbk[k] = new Batch());
+  const root = new THREE.Group(), chassis = new THREE.Group();
+  root.add(chassis);
+  const cbk = {};
+  const cb = (k) => cbk[k] || (cbk[k] = new Batch());
   const O = TY(0, 0, 0, 0);
   const SIDE = 0x9cbad1, ROOF = 0x6c7179, WHITE = 0xf6f6f1, DOOR = 0xb8312f, SHUT = 0x283238, BRICK = 0xa5533c;
 
@@ -2241,6 +2266,51 @@ function buildPlayerHouse() {
       cb('flagOr').box(sub(O, sx * 2.82 + sx * 0.28, 2.25, sz * 4.5), 0.5, 0.42, 0.02, 0xff7a1a);
     }
   }
+  PL.mk = (bk, parent) => {
+    for (const k in bk) {
+      const mat = k === 'head' ? PL.headMat : k === 'brake' ? PL.brakeMat : k === 'flagOr' ? PL.orangeMat : MAT[k].m;
+      const m = new THREE.Mesh(bk[k].geo(), mat);
+      m.castShadow = k !== 'winLit' && k !== 'signs' && k !== 'glow'; m.receiveShadow = true; parent.add(m);
+    }
+  };
+  PL.headMat = new THREE.MeshBasicMaterial({ color: 0xcfcabd });
+  PL.brakeMat = new THREE.MeshBasicMaterial({ color: 0x6a1010 });
+  PL.orangeMat = lam({ color: 0xff7a1a, side: THREE.DoubleSide });
+  PL.mk(cbk, chassis);
+
+  // wheels
+  const wb = new Batch(), WR = 0.75;
+  _m4.makeRotationZ(Math.PI / 2); _m4.setPosition(0.3, 0, 0);
+  wb.cyl(TMat(_m4), WR, WR, 0.6, 18, 0x1c1d1f, { cap: true, capBottom: true, capColor: 0x1c1d1f });
+  _m4.setPosition(0.32, 0, 0); wb.cyl(TMat(_m4), 0.44, 0.44, 0.64, 10, 0xc9ccd1, { cap: true, capBottom: true });
+  _m4.setPosition(0.34, 0, 0); wb.cyl(TMat(_m4), 0.14, 0.14, 0.68, 6, 0x4a4d52, { cap: true, capBottom: true });
+  for (let k = 0; k < 5; k++) { const a = (k / 5) * TAU; wb.box(TY(0, Math.sin(a) * 0.27, Math.cos(a) * 0.27), 0.7, 0.08, 0.08, 0x8f9399); }
+  const wgeo = wb.geo();
+  PL.wheels = [];
+  for (const z of [3.1, 0, -3.1]) for (const sx of [-1, 1]) {
+    const steer = new THREE.Group(), spin = new THREE.Group();
+    steer.position.set(sx * 2.95, WR, z); steer.add(spin);
+    const m = new THREE.Mesh(wgeo, MAT.plain.m); m.castShadow = true; spin.add(m);
+    chassis.add(steer); PL.wheels.push({ steer, spin, front: z > 1 });
+  }
+  // flag on the porch corner (streams backward when moving)
+  const fp = new THREE.Group(); PL.fp = fp;
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.5, 6), lam({ color: 0xd8d8d8 })); pole.position.y = 0.75; fp.add(pole);
+  const fg = new THREE.PlaneGeometry(1.2, 0.68, 12, 4); fg.rotateY(Math.PI / 2); fg.translate(0, -0.34, -0.6);
+  const flag = new THREE.Mesh(fg, lam({ map: TEX.flag, side: THREE.DoubleSide })); flag.position.y = 1.48; flag.castShadow = true; fp.add(flag);
+  PL.flag = flag; PL.flagBase = Float32Array.from(fg.attributes.position.array);
+  // lights
+  const spot = new THREE.SpotLight(0xfff1d0, 0, 90, 0.62, 0.55, 1.2); spot.position.set(0, 1.4, 4.8);
+  spot.target.position.set(0, -2, 32); chassis.add(spot); chassis.add(spot.target);
+  const porch = new THREE.PointLight(0xffc98a, 0, 14, 1.5);
+  PL.spot = spot; PL.porch = porch;
+  PL.root = root; PL.chassis = chassis;
+  root.rotation.order = 'YXZ'; chassis.rotation.order = 'YXZ';
+  scene.add(root);
+}
+function buildBungalow(bb) { // the hand-built blue house; returns body-local furniture
+  const O = TY(0, 0, 0, 0);
+  const SIDE = 0x9cbad1, ROOF = 0x6c7179, WHITE = 0xf6f6f1, DOOR = 0xb8312f, SHUT = 0x283238, BRICK = 0xa5533c;
   // ----- the house -----
   const hz = 0.75, W = 5.2, D = 6.9, H = 3.2, rise = 2.3, fz = hz - D / 2;
   bb('plain').box(sub(O, 0, 0.2, hz), 5.4, 0.4, D + 0.15, 0xb6b2a8);
@@ -2287,53 +2357,39 @@ function buildPlayerHouse() {
   { const T = sub(O, -1.5, 0.4 + H + 1.45, hz + 2.2); bb('plain').boxB(T, 0.06, 0.45, 0.06, 0xd8d8d8);
     _m4.makeRotationFromEuler(_e1.set(0.9, 0.6, 0, 'YXZ')); _m4.setPosition(T.x, T.y + 0.45, T.z); bb('plain').cyl(TMat(_m4), 0.38, 0.42, 0.06, 12, 0xeeeeea, { cap: true }); }
 
-  const mk = (bk, parent) => {
-    for (const k in bk) {
-      const mat = k === 'head' ? PL.headMat : k === 'brake' ? PL.brakeMat : k === 'flagOr' ? PL.orangeMat : MAT[k].m;
-      const m = new THREE.Mesh(bk[k].geo(), mat);
-      m.castShadow = k !== 'winLit' && k !== 'signs' && k !== 'glow'; m.receiveShadow = true; parent.add(m);
-    }
-  };
-  PL.headMat = new THREE.MeshBasicMaterial({ color: 0xcfcabd });
-  PL.brakeMat = new THREE.MeshBasicMaterial({ color: 0x6a1010 });
-  PL.orangeMat = lam({ color: 0xff7a1a, side: THREE.DoubleSide });
-  mk(cbk, chassis); mk(bbk, body);
-
-  // wheels
-  const wb = new Batch(), WR = 0.75;
-  _m4.makeRotationZ(Math.PI / 2); _m4.setPosition(0.3, 0, 0);
-  wb.cyl(TMat(_m4), WR, WR, 0.6, 18, 0x1c1d1f, { cap: true, capBottom: true, capColor: 0x1c1d1f });
-  _m4.setPosition(0.32, 0, 0); wb.cyl(TMat(_m4), 0.44, 0.44, 0.64, 10, 0xc9ccd1, { cap: true, capBottom: true });
-  _m4.setPosition(0.34, 0, 0); wb.cyl(TMat(_m4), 0.14, 0.14, 0.68, 6, 0x4a4d52, { cap: true, capBottom: true });
-  for (let k = 0; k < 5; k++) { const a = (k / 5) * TAU; wb.box(TY(0, Math.sin(a) * 0.27, Math.cos(a) * 0.27), 0.7, 0.08, 0.08, 0x8f9399); }
-  const wgeo = wb.geo();
-  PL.wheels = [];
-  for (const z of [3.1, 0, -3.1]) for (const sx of [-1, 1]) {
-    const steer = new THREE.Group(), spin = new THREE.Group();
-    steer.position.set(sx * 2.95, WR, z); steer.add(spin);
-    const m = new THREE.Mesh(wgeo, MAT.plain.m); m.castShadow = true; spin.add(m);
-    chassis.add(steer); PL.wheels.push({ steer, spin, front: z > 1 });
+  return { chimney: new V3(3.0, 7.75, hz + 1.0), porch: [0.45, 2.5, fz - 0.6], flag: [2.5, 3.08, fz - 1.62], fp: { w: 5.4, d: 7.05 }, top: 7.7 };
+}
+// house catalog: bungalow = hand-built; the rest reuse the town's buildHouse at scale s, turned to `front` (yaw of the front door in truck frame)
+const HOUSES = [
+  { n: 'BLUE BUNGALOW', d: 'The classic. Light and nimble.', mass: 1, sway: 1, pay: 1, front: Math.PI },
+  { n: 'PORCH COTTAGE', d: 'Front gable, deep porch. Pays more.', mass: 1.2, sway: 1.15, pay: 1.35, type: 2, s: 0.7, front: 0, chim: [-3.2, 7.1, -1.5], o: { siding: 0xf2e3a6, roof: 0x8f5f4c, door: 0x2f5d3a, shutter: 0x2f4a36, chimney: true } },
+  { n: 'TWO-STORY COLONIAL', d: 'Tall and heavy. It sways. Big tip.', mass: 1.5, sway: 1.5, pay: 1.8, type: 1, s: 0.6, front: Math.PI / 2, chim: [5.6, 9.8, 0], o: { siding: 0xe9dfc7, roof: 0x5f6f60, door: 0x2c2c2c, shutter: 0x2b2f33, garage: false, flip: false } },
+  { n: 'RANCH + GARAGE', d: 'Long, wide, slow. The biggest payday.', mass: 1.8, sway: 1.3, pay: 2.4, type: 0, s: 0.52, front: Math.PI / 2, chim: [-5.5, 6.5, -1.2], o: { siding: 0xc3d2b8, roof: 0x7a685a, door: 0xb03a2e, shutter: 0x5a4636, chimney: true, flip: false } },
+];
+function buildBody(hi) {
+  const H = HOUSES[hi], body = new THREE.Group(), bbk = {};
+  body.position.y = 1.45; body.rotation.order = 'YXZ';
+  let fur, parent = body;
+  if (H.type === undefined) fur = buildBungalow((k) => bbk[k] || (bbk[k] = new Batch()));
+  else {
+    BOVR = bbk; const ext = buildHouse(TY(0, 0, 0, 0), H.type, H.o); BOVR = null;
+    const g = new THREE.Group(); g.scale.setScalar(H.s); g.rotation.y = H.front; g.updateMatrix();
+    const q = _v1.set((ext.x0 + ext.x1) / 2, 0, (ext.z0 + ext.z1) / 2).applyMatrix4(g.matrix);
+    g.position.set(-q.x, 0, 0.75 - q.z); g.updateMatrix(); body.add(g); parent = g;
+    const L = (x, y, z) => _v1.set(x, y, z).applyMatrix4(g.matrix).toArray();
+    const sw = H.front ? ext.z1 - ext.z0 : ext.x1 - ext.x0, sd = H.front ? ext.x1 - ext.x0 : ext.z1 - ext.z0;
+    fur = { chimney: new V3(...L(...H.chim)), porch: L(ext.door.x, 2.3, ext.door.z - 0.3), flag: L(ext.door.x + 2, 3, ext.door.z + 0.2), fp: { w: sw * H.s, d: sd * H.s }, top: Math.max(ext.top, H.chim[1]) * H.s };
   }
-  // flag on the porch corner (streams backward when moving)
-  const fp = new THREE.Group(); fp.position.set(2.5, 0.32 + 2.66 + 0.1, fz - 1.62); body.add(fp);
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.5, 6), lam({ color: 0xd8d8d8 })); pole.position.y = 0.75; fp.add(pole);
-  const fg = new THREE.PlaneGeometry(1.2, 0.68, 12, 4); fg.rotateY(Math.PI / 2); fg.translate(0, -0.34, -0.6);
-  const flag = new THREE.Mesh(fg, lam({ map: TEX.flag, side: THREE.DoubleSide })); flag.position.y = 1.48; flag.castShadow = true; fp.add(flag);
-  PL.flag = flag; PL.flagBase = Float32Array.from(fg.attributes.position.array);
-  // lights
-  const spot = new THREE.SpotLight(0xfff1d0, 0, 90, 0.62, 0.55, 1.2); spot.position.set(0, 1.4, 4.8);
-  spot.target.position.set(0, -2, 32); chassis.add(spot); chassis.add(spot.target);
-  const porch = new THREE.PointLight(0xffc98a, 0, 14, 1.5); porch.position.set(0.45, 2.5, fz - 0.6); body.add(porch);
-  PL.spot = spot; PL.porch = porch;
-  PL.root = root; PL.chassis = chassis; PL.body = body;
-  PL.chimney = new V3(3.0, 7.75, hz + 1.0); // body-local
-  root.rotation.order = 'YXZ'; chassis.rotation.order = 'YXZ'; body.rotation.order = 'YXZ';
-  scene.add(root);
+  PL.mk(bbk, parent);
+  PL.fp.position.set(...fur.flag); body.add(PL.fp);
+  PL.porch.position.set(...fur.porch); body.add(PL.porch);
+  PL.chassis.add(body); PL.body = body; PL.house = H; PL.chimney = fur.chimney;
+  H.fp = fur.fp; H.top = fur.top;
 }
 
 // ---------------- driving physics ----------------
 const input = { steer: 0, throttle: 0, brake: 0, hand: false };
-const PHYS = { accel: 8.2, brake: 24, rev: 6.5, vrev: 9, grav: 20 };
+const PHYS = { accel: 8.2, brake: 24, rev: 6.5, vrev: 9, grav: 20, grip: 1, sway: 1, dmg: 1 };
 const PCIRC = [1.7, -1.7], PR = 2.95;
 
 function updatePlayer(dt) {
@@ -2357,7 +2413,7 @@ function updatePlayer(dt) {
     vf -= Math.sign(vf) * Math.min(Math.abs(vf), (roll + 0.0016 * vf * vf) * dt);
     if (Math.abs(vf) > vmax + 0.5) vf = damp(vf, Math.sign(vf) * vmax, 1.3, dt);
     if (input.hand) { vf -= Math.sign(vf) * Math.min(Math.abs(vf), 6 * dt); P.braking = true; }
-    const grip = input.hand ? 1.3 : P.surface === 'road' ? 8.5 : P.surface === 'grass' ? 4.5 : 2.2;
+    const grip = (input.hand ? 1.3 : P.surface === 'road' ? 8.5 : P.surface === 'grass' ? 4.5 : 2.2) * PHYS.grip;
     P.slip = Math.abs(vl);
     vl *= Math.exp(-grip * dt);
     const curv = 1 / (7.5 + 0.9 * spd);
@@ -2403,7 +2459,7 @@ function updatePlayer(dt) {
   const vfNow = P.vx * Math.sin(P.h) + P.vz * Math.cos(P.h);
   const aLong = clamp((vfNow - P.vfPrev) / dt, -40, 40); P.vfPrev = vfNow; P.vf = vfNow;
   const aLat = clamp(vfNow * P.yaw, -30, 30);
-  const tP = clamp(aLong * 0.0042, -0.09, 0.09), tR = clamp(aLat * 0.0042, -0.11, 0.11);
+  const tP = clamp(aLong * 0.0042 * PHYS.sway, -0.09, 0.12), tR = clamp(aLat * 0.0042 * PHYS.sway, -0.14, 0.14);
   P.spv += (-90 * (P.sp - tP) - 8 * P.spv) * dt; P.sp += P.spv * dt;
   P.srv += (-90 * (P.sr - tR) - 8 * P.srv) * dt; P.sr += P.srv * dt;
   if (P.surface === 'grass' && P.grounded && spd > 4) { P.hvv += (Math.random() - 0.5) * spd * 0.09; P.spv += (Math.random() - 0.5) * spd * 0.012; }
@@ -2486,7 +2542,7 @@ function updatePlayerVisual(dt, t) {
   P.pitch = damp(P.pitch, tp, P.grounded ? 12 : 3, dt); P.roll = damp(P.roll, tr, 10, dt);
   PL.chassis.rotation.x = -P.pitch; PL.chassis.rotation.z = P.roll;
   PL.chassis.position.y = P.inWater ? -0.55 + Math.sin(t * 2) * 0.05 : 0;
-  PL.body.rotation.x = P.sp; PL.body.rotation.z = P.sr; PL.body.position.y = 1.45 + P.hv;
+  if (PL.body) { PL.body.rotation.x = P.sp; PL.body.rotation.z = P.sr; PL.body.position.y = 1.45 + P.hv; }
   for (const w of PL.wheels) { w.spin.rotation.x = P.wheel; w.steer.rotation.y = w.front ? P.steer * 0.42 : 0; }
   // brake lights
   PL.brakeMat.color.setHex(P.braking ? 0xff2a1a : night > 0.4 ? 0xb01810 : 0x6a1010);
@@ -2511,11 +2567,16 @@ const CAMS = [
 let camMode = 0, camYaw = START.h, camY = 0, shake = 0, camFov = 60;
 const camTarget = new V3(), camLook = new V3();
 function updateCamera(dt, mode) {
+  if (mode === 3 && !PL.body) mode = 0;
   const c = CAMS[mode];
   camYaw += wrapA(P.h - camYaw) * (1 - Math.exp(-3.4 * dt));
   camY = damp(camY, P.y, P.grounded ? 7 : 3, dt);
   camera.up.set(0, 1, 0);
-  if (mode <= 2) {
+  if (mission && mission.house) { // jacks are down: side view of the house while the rig pulls out and the house settles
+    const h = mission.house.position, a = mission.pose.h + Math.PI / 2;
+    camTarget.set(h.x + Math.sin(a) * 21, h.y + 7, h.z + Math.cos(a) * 21);
+    camera.position.lerp(camTarget, 1 - Math.exp(-5 * dt)); camLook.set(h.x, h.y + 2.5, h.z);
+  } else if (mode <= 2) {
     const sx = Math.sin(camYaw), sz = Math.cos(camYaw), asp = camera.aspect, dm = asp < 0.8 ? 1.55 : asp < 1.3 ? 1.2 : 1;
     camTarget.set(P.x - sx * c.dist * dm, camY + c.height * (dm > 1 ? 1.15 : 1), P.z - sz * c.dist * dm);
     // keep the camera under an elevated deck when the house is beneath it
@@ -3149,7 +3210,7 @@ const SFX = {
   splash() { noiseHit(0, 0.7, 0.3, 'lowpass', 1100, 260, 0.6); },
   cash() { tone(1568, 0, 0.12, 'square', 0.05); tone(2093, 0.07, 0.25, 'square', 0.05); },
 };
-function honk() { SFX.doorbell(); honkT = 1.2; }
+function honk() { if (setHouse()) return; SFX.doorbell(); honkT = 1.2; }
 let honkT = 0;
 function toggleMute() {
   AUD.muted = !AUD.muted;
@@ -3177,16 +3238,49 @@ function buildBeacon() {
   g.visible = false; scene.add(g);
   Object.assign(beacon, { group: g, beam, ring, icon });
 }
+const RIG = [{ n: 'ENGINE', d: 'Turbo diesel. Pulls harder.', k: 'eng' }, { n: 'BRAKES', d: 'Air brakes. Shorter stops.', k: 'brk' }, { n: 'SUSPENSION', d: 'Air ride. Less sway, fewer dents.', k: 'sus' }, { n: 'TIRES', d: 'Super singles. More grip.', k: 'tyr' }];
+const rig = { eng: 0, brk: 0, sus: 0, tyr: 0 }, rigCost = (l) => [900, 2200, 4500][l];
+let nextHouse = 0, levelsDone = 0, earned = 0, shopT = 0, shopInfo = '';
+function applyRig(loaded) {
+  const H = PL.house, m = loaded ? H.mass : 0.7;
+  PHYS.accel = 8.2 * (1 + 0.22 * rig.eng) / m ** 0.6; PHYS.brake = 24 * (1 + 0.2 * rig.brk) / m ** 0.4;
+  PHYS.grip = 1 + 0.18 * rig.tyr; PHYS.sway = (loaded ? H.sway : 0.5) * (1 - 0.15 * rig.sus); PHYS.dmg = 1 - 0.18 * rig.sus;
+}
+const padMark = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color: 0xffd21f, transparent: true, opacity: 0.9, depthWrite: false, fog: false })); padMark.visible = false; scene.add(padMark);
+function showPadMark(d) { // foundation outline, house footprint in truck frame, door marker on the street side
+  const H = PL.house, b = new Batch(), W = H.fp.w + 0.8, D = H.fp.d + 0.8, O = TY(0, 0, 0, 0), F = TY(0, 0, 0, H.front), c = 0xffffff;
+  for (const sg of [-1, 1]) { b.box(sub(O, 0, 0, sg * D / 2), W + 0.3, 0.1, 0.3, c); b.box(sub(O, sg * W / 2, 0, 0), 0.3, 0.1, D, c); }
+  b.box(sub(F, 0, 0, (Math.abs(Math.cos(H.front)) > 0.5 ? D : W) / 2 + 0.6), 1.6, 0.1, 0.8, c);
+  padMark.geometry.dispose(); padMark.geometry = b.geo(); padMark.position.set(d.x, 0.14, d.z); padMark.rotation.y = d.ry - H.front; padMark.visible = true;
+}
+function setPhaseHUD() {
+  const m = mission, T = { haul: [m.client, m.dest.label, m.reason], place: ['SET THE HOUSE', `Line up on the outline, then ${IS_TOUCH ? 'tap SET' : 'press H'}`, 'Front door toward the street'], lift: ['PULL OUT', 'Drive the rig clear of the house', ''], set: ['EASY DOES IT', 'Lowering onto the foundation', ''] }[m.phase];
+  $('m-client').textContent = T[0]; $('m-addr').textContent = T[1]; $('m-reason').textContent = T[2];
+  if (IS_TOUCH) $('t-ding').textContent = m.phase === 'place' ? 'SET' : 'DING';
+}
 function newMission() {
+  if (!DESTS.length) { toast('HOMETOWN IS FULL', 'big green', 'Every lot has a house on it. You win.'); return; }
   const cands = DESTS.filter((d) => { const dist = Math.hypot(d.x - P.x, d.z - P.z); return dist > 420 && dist < 1500 && d !== lastDest; });
   const d = mpick(cands.length ? cands : DESTS.filter((x) => x !== lastDest));
   const dist = Math.hypot(d.x - P.x, d.z - P.z);
-  mission = { dest: d, client: mpick(CLIENTS), reason: mpick(REASONS), limit: Math.round(40 + dist / 10.5), left: 0, startDist: dist, slowHint: false };
+  mission = { dest: d, client: mpick(CLIENTS), reason: mpick(REASONS), limit: Math.round(40 + dist / 10.5), left: 0, startDist: dist, phase: 'haul', t: 0 };
   mission.left = mission.limit;
   jobNo++;
-  beacon.group.position.set(d.x, 0, d.z); beacon.group.visible = true;
-  $('m-tab').textContent = 'JOB ' + jobNo; $('m-client').textContent = mission.client; $('m-addr').textContent = d.label; $('m-reason').textContent = mission.reason;
-  toast(`JOB ${jobNo}: ${mission.client.toUpperCase()}`, 'green', `Haul the house to ${d.label}`);
+  beacon.group.position.set(d.x, 0, d.z); beacon.group.visible = true; showPadMark(d);
+  $('m-tab').textContent = 'LEVEL ' + jobNo; setPhaseHUD();
+  toast(`LEVEL ${jobNo}: ${mission.client.toUpperCase()}`, 'green', `Haul the ${PL.house.n.toLowerCase()} to ${d.label}`);
+}
+function setHouse() { // H on the lot: jack the house up off the bed where it stands
+  const m = mission; if (!m || m.phase !== 'place' || state !== 'play') return false;
+  if (Math.abs(P.vf) > 1 || !P.grounded) { toast('COME TO A FULL STOP', ''); return true; }
+  const H = PL.house, fx = Math.sin(P.h), fz = Math.cos(P.h), cx = P.x + fx * 0.75, cz = P.z + fz * 0.75;
+  const off = Math.hypot(cx - m.dest.x, cz - m.dest.z), ang = Math.abs(wrapA(P.h - (m.dest.ry - H.front)));
+  if (off > 8) { toast('NOT OVER THE FOUNDATION', 'red', 'Get the house onto the dirt pad first'); return true; }
+  const b = PL.body; PL.chassis.remove(b); b.position.set(P.x, P.y + 1.45, P.z); b.rotation.set(0, P.h, 0); scene.add(b);
+  Object.assign(m, { phase: 'lift', t: 0, house: b, y0: P.y + 1.45, off, ang, pose: { x: cx, z: cz, h: P.h } });
+  PL.body = null; applyRig(false); SFX.clank(150); setPhaseHUD();
+  toast('JACKS DOWN', 'green', 'Now pull the rig out from under the house');
+  return true;
 }
 let wasInWater = false, wrongWayT = 0, stuckT = 0, stuckHintT = -99;
 function checkWarnings(dt) {
@@ -3203,30 +3297,60 @@ function checkWarnings(dt) {
 }
 function updateMission(dt) {
   checkWarnings(dt);
+  if (shopT > 0) { shopT -= dt; if (shopT <= 0) openShop(); return; }
   if (!mission) { if (missionTimer > 0) { missionTimer -= dt; if (missionTimer <= 0) newMission(); } return; }
-  mission.left -= dt;
-  const d = Math.hypot(mission.dest.x - P.x, mission.dest.z - P.z);
-  if (d < 13 && P.y < 3) {
-    if (Math.abs(P.vf) < 4.5 && P.grounded) completeMission();
-    else if (!mission.slowHint) { mission.slowHint = true; toast('SLOW DOWN TO PARK IT', ''); }
-  } else if (d > 26) mission.slowHint = false;
+  const m = mission;
+  if (m.phase === 'haul' || m.phase === 'place') {
+    m.left -= dt;
+    const on = Math.hypot(m.dest.x - P.x, m.dest.z - P.z) < 15 && P.y < 3;
+    if (on !== (m.phase === 'place')) { m.phase = on ? 'place' : 'haul'; setPhaseHUD(); if (on) toast('ON THE LOT', 'green', `Line up on the yellow outline, then ${IS_TOUCH ? 'tap SET' : 'press H'}`); }
+  } else {
+    m.t += dt;
+    const h = m.house;
+    if (m.phase === 'lift') {
+      h.position.y = m.y0 + 1.3 * smoothstep(0, 1.2, m.t);
+      if (m.t > 1.2 && Math.hypot(h.position.x - P.x, h.position.z - P.z) > 10.5) { m.phase = 'set'; m.t = 0; setPhaseHUD(); }
+    } else {
+      h.position.y = lerp(m.y0 + 1.3, 0.05, smoothstep(0, 1.6, m.t));
+      if (m.t >= 1.6) completeLevel();
+    }
+  }
 }
-function completeMission() {
-  const base = 400 + mission.startDist * 0.9, tip = Math.max(0, mission.left) * 12, a = appeal / 100;
-  const pay = Math.round((base + tip) * (0.4 + 0.6 * a));
-  addCash(pay, false); moves++;
-  toast(`HOME SWEET HOME +${fmtMoney(pay)}`, 'big green', `${mission.client} moved in at ${mission.dest.label}`);
-  SFX.jingle(); confetti();
-  setAppeal(100); saveBest();
-  lastDest = mission.dest; mission = null; beacon.group.visible = false;
-  $('m-client').textContent = 'Finding the next buyer…'; $('m-addr').textContent = 'Stand by'; $('m-reason').textContent = ''; $('m-tip').textContent = '$0';
-  missionTimer = 3;
+const GRADES = [['PERFECT', 1.3, 1.2, 0.1], ['GREAT', 1.05, 2.5, 0.25], ['CLOSE ENOUGH', 0.85, 4.5, 0.55], ['CROOKED', 0.6, 99, 99]];
+function completeLevel() {
+  const m = mission, H = PL.house, g = GRADES.find((G) => m.off <= G[2] && m.ang <= G[3]);
+  const base = 400 + m.startDist * 0.9, tip = Math.max(0, m.left) * 12;
+  const pay = Math.round((base + tip) * (0.4 + 0.6 * appeal / 100) * H.pay * g[1]);
+  addCash(pay, false); moves++; levelsDone++;
+  colBoxR(m.pose.x, m.pose.z, H.fp.w, H.fp.d, m.pose.h, H.top);
+  DESTS.splice(DESTS.indexOf(m.dest), 1); lastDest = m.dest;
+  padMark.visible = false; beacon.group.visible = false;
+  const fx = Math.sin(m.pose.h), fz = Math.cos(m.pose.h);
+  for (const o of [-3, 3]) puff(m.pose.x + fx * o, 0.4, m.pose.z + fz * o, 8, 0xc9b896, 1.5, 5, 1.4, 2.5, 0.5, 0.4);
+  SFX.thud(14); SFX.jingle(); confetti(m.pose.x, 0, m.pose.z);
+  toast(`${g[0]}! +${fmtMoney(pay)}`, 'big green', `${m.client} moved in at ${m.dest.label}`);
+  shopInfo = `${g[0]} placement: ${Math.round(m.off * 3.28)} ft off center, ${Math.round(m.ang * 180 / Math.PI)}° crooked. The ${H.n.toLowerCase()} paid ${fmtMoney(pay)}, tip ${fmtMoney(tip)}, curb appeal ${Math.round(appeal)}%.`;
+  setAppeal(100); saveBest(); mission = null; shopT = 1.8;
+  $('m-client').textContent = 'Level complete'; $('m-addr').textContent = 'Heading to the shop'; $('m-reason').textContent = '';
 }
-function addCash(n, sound = true) { cash += n; if (sound) SFX.cash(); }
+function renderShop() {
+  $('s-title').textContent = `LEVEL ${levelsDone} COMPLETE`; $('s-sum').textContent = shopInfo; $('s-cash').textContent = 'CASH ' + fmtMoney(cash);
+  $('s-rig').innerHTML = RIG.map((r, i) => { const l = rig[r.k], c = rigCost(l); return `<button class="card" data-r="${i}"${l >= 3 || cash < c ? ' disabled' : ''}><b>${r.n}</b><span class="pips">${'●'.repeat(l)}${'○'.repeat(3 - l)}</span><span>${r.d}</span><span class="cost">${l >= 3 ? 'MAXED OUT' : 'UPGRADE ' + fmtMoney(c)}</span></button>`; }).join('');
+  $('s-house').innerHTML = HOUSES.map((h, i) => `<button class="card${i === nextHouse ? ' on' : ''}" data-h="${i}"${i > levelsDone ? ' disabled' : ''}><b>${h.n}</b><span>${h.d}</span><span class="cost">${i > levelsDone ? 'UNLOCKS AFTER LEVEL ' + i : `PAY ×${h.pay} · WEIGHT ×${h.mass}`}</span></button>`).join('');
+  $('s-go').textContent = `LOAD UP · LEVEL ${levelsDone + 1}`;
+}
+function openShop() { state = 'shop'; for (const k in keys) keys[k] = false; for (const k in touchIn) touchIn[k] = false; renderShop(); $('shop').hidden = false; setTimeout(() => $('s-go').focus(), 0); }
+function closeShop() {
+  if (state !== 'shop') return;
+  $('shop').hidden = true; buildBody(nextHouse); applyRig(true);
+  state = 'play'; lastT = performance.now(); renderer.domElement.focus();
+  newMission(); toast('LOADED UP', 'green', `${HOUSES[nextHouse].n} is strapped to the bed`);
+}
+function addCash(n, sound = true) { cash += n; earned += n; if (sound) SFX.cash(); }
 function setAppeal(v) { appeal = clamp(v, 25, 100); }
 let best = { cash: 0, moves: 0 };
 function loadBest() { try { const b = JSON.parse(localStorage.getItem('homestretch.best') || 'null'); if (b && typeof b.cash === 'number') best = b; } catch (e) { /* storage unavailable */ } }
-function saveBest() { if (cash > best.cash) { best = { cash: Math.round(cash), moves }; try { localStorage.setItem('homestretch.best', JSON.stringify(best)); } catch (e) { /* ignore */ } } }
+function saveBest() { if (earned > best.cash) { best = { cash: Math.round(earned), moves }; try { localStorage.setItem('homestretch.best', JSON.stringify(best)); } catch (e) { /* ignore */ } } }
 
 // ---------------- effects ----------------
 let lastImpactT = -9, lastToastHit = -9;
@@ -3238,7 +3362,7 @@ function onImpact(imp, x, z) {
   P.spv += imp * 0.025 * (Math.random() < 0.5 ? 1 : -1); P.srv += imp * 0.03 * (Math.random() < 0.5 ? 1 : -1); P.hvv += imp * 0.03;
   sparksAt(x, P.y + 1.2, z, Math.min(30, Math.round(imp * 1.6)));
   if (imp > 5) {
-    const loss = Math.min(12, imp * 0.5); setAppeal(appeal - loss);
+    const loss = Math.min(12, imp * 0.5) * PHYS.dmg; setAppeal(appeal - loss);
     if (imp > 10 && simTime - lastToastHit > 1.2) { lastToastHit = simTime; toast(`CRUNCH! −${Math.round(loss)}% CURB APPEAL`, 'red'); }
   }
 }
@@ -3247,7 +3371,7 @@ function onCarHit(c, rel, x, z) {
   SFX.crash(rel * 1.2); shake = Math.max(shake, Math.min(1.6, rel * 0.08));
   P.spv += rel * 0.02; P.srv += rel * 0.03 * (Math.random() < 0.5 ? 1 : -1);
   sparksAt(x, P.y + 1.0, z, Math.min(36, Math.round(rel * 2)));
-  const loss = Math.min(14, rel * 0.45); setAppeal(appeal - loss);
+  const loss = Math.min(14, rel * 0.45) * PHYS.dmg; setAppeal(appeal - loss);
   if (rel > 6 && simTime - lastToastHit > 1.2) { lastToastHit = simTime; toast(rel > 14 ? 'MAJOR FENDER BENDER' : 'BUMPED A CAR', 'red', `−${Math.round(loss)}% curb appeal`); }
 }
 function onNearMiss() { addCash(50); SFX.whoosh(); toast('NEAR MISS +$50', ''); }
@@ -3266,18 +3390,17 @@ function onLand(impact, air) {
     SFX.thud(impact); shake = Math.max(shake, Math.min(1.4, impact * 0.06)); P.hvv -= impact * 0.11; P.spv += impact * 0.01;
     const fx = Math.sin(P.h), fz = Math.cos(P.h);
     for (const o of [-3, 3]) puff(P.x + fx * o, P.y + 0.4, P.z + fz * o, 6, 0xc9b896, 1.5, 5, 1.2, 2.5, 0.5, 0.4);
-    if (impact > 15) { const loss = Math.min(10, (impact - 15) * 0.8); setAppeal(appeal - loss); }
+    if (impact > 15) { const loss = Math.min(10, (impact - 15) * 0.8) * PHYS.dmg; setAppeal(appeal - loss); }
   }
 }
-function confetti() {
+function confetti(x = P.x, y = P.y, z = P.z) {
   const cols = [0xc62f2a, 0xffd21f, 0x2c7fc4, 0x2f9a5a, 0xf4f4ee, 0xff7a1a];
-  for (let i = 0; i < 160; i++) smoke.spawn(P.x + mr(-3, 3), P.y + 8, P.z + mr(-3, 3), mr(-8, 8), mr(6, 16), mr(-8, 8), mr(1.8, 2.8), mr(0.35, 0.6), 0.3, 1, mpick(cols), 9, 1.4);
+  for (let i = 0; i < 160; i++) smoke.spawn(x + mr(-3, 3), y + 8, z + mr(-3, 3), mr(-8, 8), mr(6, 16), mr(-8, 8), mr(1.8, 2.8), mr(0.35, 0.6), 0.3, 1, mpick(cols), 9, 1.4);
 }
 let smokeT = 0, dustT = 0;
 function emitters(dt) {
-  if (!PL.body) return;
   smokeT -= dt;
-  if (smokeT <= 0) {
+  if (smokeT <= 0 && PL.body) {
     smokeT = 0.11;
     PL.body.updateWorldMatrix(true, false);
     const p = _v3.copy(PL.chimney); PL.body.localToWorld(p);
@@ -3433,6 +3556,7 @@ window.addEventListener('keydown', (e) => {
   else if (e.code === 'KeyR' && state === 'play') resetToRoad();
   else if (e.code === 'Escape' || e.code === 'KeyP') togglePause();
   else if (e.code === 'Enter' && state === 'title') startGame();
+  else if (e.code === 'Enter' && state === 'shop') closeShop();
 });
 window.addEventListener('keyup', (e) => { keys[e.code] = false; });
 window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
@@ -3477,6 +3601,12 @@ function setupUI() {
   $('p-night').addEventListener('click', skipTime);
   $('p-cam').addEventListener('click', cycleCam);
   $('p-reset').addEventListener('click', () => { togglePause(); resetToRoad(); });
+  $('shop').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b || b.disabled) return;
+    if (b.dataset.r !== undefined) { const r = RIG[+b.dataset.r]; cash -= rigCost(rig[r.k]); rig[r.k]++; SFX.cash(); renderShop(); }
+    else if (b.dataset.h !== undefined) { nextHouse = +b.dataset.h; renderShop(); }
+    else if (b.id === 's-go') closeShop();
+  });
   if (IS_TOUCH) {
     document.body.classList.add('is-touch'); $('touch').hidden = false;
     bindHold('t-left', 'left'); bindHold('t-right', 'right'); bindHold('t-gas', 'gas'); bindHold('t-brake', 'brake');
@@ -3525,7 +3655,7 @@ function frame(now) {
   } else if (state === 'title') {
     let rem = dt; while (rem > 1e-6) { const h = Math.min(rem, 1 / 60); simTime += h; updateTraffic(h); updateProps(h); rem -= h; }
   }
-  const live = state !== 'pause';
+  const live = state !== 'pause' && state !== 'shop';
   if (live) updateSky(dt);
   updatePlayerVisual(live ? dt : 0, simTime);
   writeCarMatrices();
@@ -3582,7 +3712,7 @@ async function init() {
   setLoad('Planting maples and oaks…'); await wait(16);
   buildRingside(); buildOutskirts();
   setLoad('Hitching the house to the flatbed…'); await wait(16);
-  flushBatches(); buildLampGlow(); buildBreakables(); buildSky(); buildBeacon(); buildPlayerHouse();
+  flushBatches(); buildLampGlow(); buildBreakables(); buildSky(); buildBeacon(); buildPlayerHouse(); buildBody(0); applyRig(true);
   smoke = new Particles(1100, false); sparks = new Particles(420, true);
   setupUI();
   // restore after a live update of the page
@@ -3602,7 +3732,8 @@ async function init() {
     sim: (sec, inp) => { Object.assign(input, { steer: 0, throttle: 0, brake: 0, hand: false }, inp || {}); const n = Math.round(sec * 60); for (let i = 0; i < n; i++) step(1 / 60); return { x: +P.x.toFixed(2), y: +P.y.toFixed(2), z: +P.z.toFixed(2), h: +P.h.toFixed(3), vf: +P.vf.toFixed(2), surf: P.surface, grounded: P.grounded }; },
     near: (r = 8) => { const out = []; queryCols(P.x - r, P.x + r, P.z - r, P.z + r, (c) => out.push(c.t === 0 ? `circle ${c.x.toFixed(1)},${c.z.toFixed(1)} r${c.r.toFixed(2)} top${c.y1}` : c.t === 1 ? `box x${c.x0.toFixed(1)}..${c.x1.toFixed(1)} z${c.z0.toFixed(1)}..${c.z1.toFixed(1)} top${c.y1.toFixed(1)}` : `wall ${c.ax.toFixed(1)},${c.az.toFixed(1)}->${(c.ax + c.ux * c.len).toFixed(1)},${(c.az + c.uz * c.len).toFixed(1)} base${c.ay} h${c.ha.toFixed(1)}`)); return out; },
     ringLocate, surfaceAt, get cash() { return cash; }, get appeal() { return appeal; }, props: () => flyingProps.length + ' flying, ' + propsFlattened + ' flattened',
-    cars: () => allCars.map((c) => ({ t: c.type, m: c.mode, x: +c.x.toFixed(1), z: +c.z.toFixed(1), y: +c.y.toFixed(1), v: +c.v.toFixed(1), k: !!c.knocked, h: c.h })), setTod: (t) => { tod = t; }, cam: (m) => { camMode = m; }, teleport: (x, z, h, y = 0) => { Object.assign(P, { x, z, h, y, vx: 0, vz: 0, vy: 0 }); camYaw = h; camY = y; }, input, DESTS, stats: () => ({ tris: staticTris, calls: renderer.info.render.calls, frameTris: renderer.info.render.triangles, cars: allCars.length, dests: DESTS.length }), get mission() { return mission; } };
+    cars: () => allCars.map((c) => ({ t: c.type, m: c.mode, x: +c.x.toFixed(1), z: +c.z.toFixed(1), y: +c.y.toFixed(1), v: +c.v.toFixed(1), k: !!c.knocked, h: c.h })), setTod: (t) => { tod = t; }, cam: (m) => { camMode = m; }, teleport: (x, z, h, y = 0) => { Object.assign(P, { x, z, h, y, vx: 0, vz: 0, vy: 0 }); camYaw = h; camY = y; }, input, DESTS, stats: () => ({ tris: staticTris, calls: renderer.info.render.calls, frameTris: renderer.info.render.triangles, cars: allCars.length, dests: DESTS.length }), get mission() { return mission; },
+    setHouse, closeShop, rig, HOUSES, PHYS, PL, pickHouse: (i) => { nextHouse = i; }, get phase() { return mission && mission.phase; }, get level() { return levelsDone; } };
   $('loading').hidden = true; $('title').hidden = false;
   state = 'title';
   lastT = performance.now();
