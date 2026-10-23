@@ -1,0 +1,35 @@
+<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,interactive-widget=resizes-content"><title>Call</title>
+<style>body{margin:0;background:#000;color:#fff;font:16px monospace;display:flex;flex-flow:column;height:100dvh}#log{flex:1;display:flex;flex-flow:column-reverse;overflow:auto;padding:12px;white-space:pre-wrap;overflow-wrap:anywhere}iframe{flex:3;min-height:0;width:100%;border:0}#bar{padding:12px;display:flex;gap:8px;flex-wrap:wrap}input,button,select{font:inherit;background:#111;color:inherit;border:1px solid #777;padding:10px;min-width:0}details{width:100%}button:disabled{opacity:.4}video{width:48%;max-height:35vh}</style>
+<div><video id=far autoplay playsinline controls hidden></video><video id=near autoplay playsinline muted hidden></video></div><div id=log></div>
+<div id=bar><details id=pair open><summary>Pair devices</summary><p>Scan or enter code within 90s. Disconnect cancels.</p><img id=qr width=232 height=232 alt=QR hidden><br><button id=offer>Create code</button><input id=peer placeholder=Code aria-label=Code maxlength=6 autocapitalize=characters><button id=scan>Scan QR</button><button id=use>Connect</button><button id=copy disabled>Copy</button><button id=quit>Disconnect</button></details><input id=cmd placeholder="Message"><button id=send disabled>Send</button><button id=audio disabled>Microphone</button><button id=video disabled>Camera</button><input id=file type=file disabled aria-label="Send file"><span id=ms></span></div>
+<script>
+const media=['audio','video'];
+const L=m=>log.append('\n'+m);
+let p,d,C,A,ok=false,seq=0;
+const help=(e,b)=>L(e+'\n'+(media.includes(b?.id)||b==scan?'Use HTTPS/localhost; allow camera/mic. For QR use Android Chrome or enter the code.':'Check internet, Nearby permission and a serve. Retry a new code or the same Wi-Fi (no relay).'));
+const on=(b,f,e='onpointerdown')=>b[e]=async()=>{const t=performance.now();try{const r=f();if(r)await r}catch(e){if(e.name!='AbortError'){if(b==offer||b==use||b==scan)close();help(e,b)}}ms.textContent=(performance.now()-t).toFixed(3)+' ms'};
+const tx=m=>d?.readyState=='open'&&d.send(JSON.stringify(m)),ui=()=>audio.disabled=video.disabled=send.disabled=file.disabled=!ok;
+function unscan(){seq++;near.srcObject?.getTracks().forEach(t=>t.stop());near.srcObject=null;near.hidden=true;scan.disabled=false}
+function close(){unscan();qr.hidden=true;A?.abort();p?.getSenders().forEach(s=>s.track?.stop());far.srcObject=null;far.hidden=true;p?.close();p=d=null;ok=false;ui();copy.disabled=true;pair.open=true;offer.disabled=use.disabled=scan.disabled=false;L('Disconnected')}
+function start(c=crypto.randomUUID().slice(0,6).toUpperCase()){unscan();qr.hidden=true;C=c;offer.disabled=use.disabled=scan.disabled=true;L('Pairing…');A=new AbortController;p=new RTCPeerConnection({bundlePolicy:'max-bundle',iceServers:[{urls:'stun:stun.cloudflare.com'}]});p.ontrack=e=>{(far.srcObject??=new MediaStream).addTrack(e.track);e.track.onunmute=()=>far.hidden=false};p.ondatachannel=e=>e.channel.label=='a'?wire(e.channel):receive(e.channel);p.onconnectionstatechange=e=>{const s='Connection: '+e.target.connectionState;if(/failed|disconnected/.test(s)){close();help(s)}else L(s)}}
+async function local(){if(!p.remoteDescription)for(const k of media)p.addTransceiver(k).setCodecPreferences(RTCRtpSender.getCapabilities(k).codecs.filter(c=>/opus|VP8/.test(c.mimeType)));else p.getTransceivers().forEach(t=>t.direction='sendrecv');await p.setLocalDescription();await new Promise(r=>p.onicecandidate=({candidate:c})=>{if(!c||c.type=='srflx'&&!c.address.includes(':'))r()});return p.localDescription}
+qr.onerror=()=>{qr.hidden=true;L('QR unavailable; enter or copy the code.')}
+async function signal(op,s){const r=await fetch('https://demo.seanpatten.com/rtcpair',{method:'POST',signal:A.signal,body:C+'\n'+op+'\n'+(s?JSON.stringify(s):'')});if(!r.ok)throw Error(await r.text());if(!op){peer.value=C;copy.disabled=false;L('Pairing code: '+C);qr.src='https://demo.seanpatten.com/qr?'+C;qr.hidden=false}if(op!=2)return r.json()}
+function wire(c){d=c;d.onopen=()=>tx({code:C});d.onclose=()=>d==c&&(close(),help('Peer disconnected'));
+ d.onmessage=e=>{const m=JSON.parse(e.data),id=m.shell;if(!ok){if(m.code!==C){L('CODE MISMATCH');close();return}ok=true;ui();pair.open=false;L('Connected: '+C);return}
+ if(typeof m.msg=='string')L('Peer: '+m.msg)}}
+on(offer,async()=>{start();wire(p.createDataChannel('a'));await p.setRemoteDescription(await signal(0,await local()))});
+function code(c){c=c.trim().toUpperCase();if(!/^[0-9A-F]{6}$/.test(c))throw Error('Code must be six hex digits');return c}
+on(use,async()=>{start(code(peer.value));await p.setRemoteDescription(await signal(1));await signal(2,await local())});
+on(copy,()=>navigator.clipboard.writeText(C));on(quit,close);
+on(scan,async()=>{
+ const id=++seq;scan.disabled=true;
+ const reader=new BarcodeDetector({formats:['qr_code']}),s=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+ if(id!=seq){s.getTracks().forEach(t=>t.stop());return}near.srcObject=s;near.hidden=false;
+ while(id==seq){await new Promise(r=>near.requestVideoFrameCallback(r));const [b]=await reader.detect(near);if(b&&id==seq){unscan();peer.value=code(b.rawValue);L('QR read: '+peer.value+'; press Connect')}}
+});
+for(const k of media)on(window[k],async()=>{const pc=p,s=p.getTransceivers().find(t=>t.receiver.track.kind==k).sender,t=s.track?null:(await navigator.mediaDevices.getUserMedia({[k]:true})).getTracks()[0];s.track?.stop();if(p!=pc){t?.stop();return}await s.replaceTrack(t).catch(e=>{t?.stop();throw e});if(k=='video'){near.hidden=!t;near.srcObject=t?new MediaStream([t]):null}L(k+(t?' on':' off'))});
+on(send,()=>{if(!send.disabled&&cmd.value.trim()){tx({msg:cmd.value});L('You: '+cmd.value);cmd.value=''}});
+function receive(c){let b=[];c.binaryType='arraybuffer';c.onmessage=e=>{if(typeof e.data=='string'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(b));a.download=a.textContent=e.data;log.append(a);c.close()}else b.push(e.data)}}
+on(file,()=>{const f=file.files[0],c=p.createDataChannel('file');c.bufferedAmountLowThreshold=65536;on(c,async()=>{for(let i=0;i<f.size;i+=16384){if(c.bufferedAmount>65536)await new Promise(r=>c.onbufferedamountlow=r);c.send(await f.slice(i,i+16384).arrayBuffer())}c.send(f.name);L('Sent: '+f.name)},'onopen')},'onchange');
+</script>
