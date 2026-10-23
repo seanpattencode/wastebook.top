@@ -4,10 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Home Stretch</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,400;0,600;0,700;0,800;0,900;1,600&family=Overpass+Mono:wght@600;700&display=swap">
 <style>
+@font-face { font-family: "Overpass"; font-style: normal; font-weight: 400 900; src: url(data:font/woff2;base64,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) format("woff2"); }
 /* Layout: full-bleed 3D canvas with a road-sign HUD pinned to the corners:
    the job is a green interstate guide sign, speed is a speed-limit sign, earnings are a SOLD sign. */
 :root {
@@ -26,7 +24,7 @@
   --key-shadow: #8e9590;
   --font-display: "Overpass", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
   --font-body: "Overpass", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "Overpass Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --font-mono: "Overpass", "Arial Narrow", Arial, sans-serif;
   --g: 16px;
   --safe-t: env(safe-area-inset-top, 0px);
   --safe-b: env(safe-area-inset-bottom, 0px);
@@ -60,7 +58,7 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
 .guide-in { border: 2.5px solid var(--paper); border-radius: 7px; padding: 9px 11px 9px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 5px; }
 .guide-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .tab { border: 2px solid var(--paper); border-radius: 5px; padding: 3px 6px 1px; font: 800 11px/1 var(--font-display); letter-spacing: 0.1em; }
-.dist { font: 700 13px/1 var(--font-mono); letter-spacing: 0.04em; }
+.dist { font: 700 13px/1 var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
 .guide-main { display: flex; align-items: center; gap: 10px; }
 .guide-text { min-width: 0; flex: 1; }
 .client { font: 900 21px/1.05 var(--font-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -69,7 +67,7 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
 .arrow svg { width: 100%; height: 100%; display: block; transition: transform 0.08s linear; }
 .reason { font: italic 600 12.5px/1.3 var(--font-body); color: var(--muted); }
 .tip { display: flex; align-items: center; gap: 8px; font: 800 11px/1 var(--font-display); letter-spacing: 0.1em; }
-.tip b { font: 700 13px/1 var(--font-mono); letter-spacing: 0; min-width: 52px; }
+.tip b { font: 700 13px/1 var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: 0; min-width: 52px; }
 .tipbar { flex: 1; height: 6px; border-radius: 3px; background: rgba(244, 244, 238, 0.22); overflow: hidden; }
 .tipbar i { display: block; height: 100%; width: 100%; background: var(--oversize); transform-origin: left center; }
 
@@ -104,7 +102,7 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
 .sold-amt { display: block; font: 900 28px/1.1 var(--font-display); padding: 6px 10px 3px; font-variant-numeric: tabular-nums; }
 .statline { background: var(--scrim); border-radius: 8px; padding: 8px 10px; display: grid; gap: 6px; font: 600 12px/1.2 var(--font-body); }
 .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.row b { font: 700 12px/1 var(--font-mono); }
+.row b { font: 700 12px/1 var(--font-mono); font-variant-numeric: tabular-nums; }
 .appeal { flex: 1; height: 6px; background: rgba(244, 244, 238, 0.2); border-radius: 3px; overflow: hidden; }
 .appeal i { display: block; height: 100%; width: 100%; background: var(--oversize); transform-origin: left center; }
 .muted { color: var(--muted); }
@@ -135,7 +133,7 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
 .hint .hot { color: var(--oversize); font-weight: 800; }
 .hint .hot kbd { background: var(--oversize); }
 .hint kbd, .keys kbd, .addr kbd {
-  font: 700 11px/1 var(--font-mono); background: var(--paper); color: var(--ink);
+  font: 700 11px/1 var(--font-mono); font-variant-numeric: tabular-nums; background: var(--paper); color: var(--ink);
   border-radius: 4px; padding: 3px 5px 2px; box-shadow: 0 2px 0 var(--key-shadow); white-space: nowrap;
 }
 .pausebtn {
@@ -225,7 +223,7 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
 .go .in { display: flex; align-items: center; gap: 14px; border: 2.5px solid var(--paper); border-radius: 7px; padding: 13px 22px 10px; font: 900 22px/1 var(--font-display); letter-spacing: 0.05em; }
 .go:hover .in, .go:focus-visible .in { background: var(--guide-hi); }
 .go svg { width: 26px; height: 26px; }
-.best { margin: 0; font: 700 13px/1.4 var(--font-mono); color: var(--muted); min-height: 1.4em; }
+.best { margin: 0; font: 700 13px/1.4 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--muted); min-height: 1.4em; }
 .touch-note { display: none; }
 .is-touch .keys { display: none; }
 .is-touch .touch-note { display: block; }
@@ -244,8 +242,8 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
 .card { pointer-events: auto; display: grid; gap: 5px; text-align: left; background: transparent; color: var(--paper); border: 2px solid var(--paper); border-radius: 7px; padding: 9px 10px 8px; font: 600 12px/1.3 var(--font-body); cursor: pointer; }
 .card b { font: 800 14px/1.1 var(--font-display); letter-spacing: 0.03em; }
-.card .pips { font: 700 13px/1 var(--font-mono); letter-spacing: 3px; color: var(--oversize); }
-.card .cost { font: 700 11px/1.2 var(--font-mono); color: var(--oversize); }
+.card .pips { font: 700 13px/1 var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: 3px; color: var(--oversize); }
+.card .cost { font: 700 11px/1.2 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--oversize); }
 .card:not(:disabled):hover { background: var(--guide-hi); }
 .card.on { background: var(--paper); color: var(--guide); }
 .card.on .pips, .card.on .cost { color: var(--sold); }
@@ -371,14 +369,635 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
     <div id="loadmsg">Pouring the foundation…</div>
   </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+// HS3D: a small WebGL2 renderer with a three.js-shaped API, only the parts Home Stretch uses (no dependency).
+const THREE = {};
+class Vector2 {
+  constructor(x = 0, y = 0) { this.x = x; this.y = y; }
+  set(x, y) { this.x = x; this.y = y; return this; }
+  copy(v) { this.x = v.x; this.y = v.y; return this; }
+}
+class Vector3 {
+  constructor(x = 0, y = 0, z = 0) { this.x = x; this.y = y; this.z = z; }
+  set(x, y, z) { this.x = x; this.y = y; this.z = z; return this; }
+  setScalar(s) { this.x = this.y = this.z = s; return this; }
+  copy(v) { this.x = v.x; this.y = v.y; this.z = v.z; return this; }
+  clone() { return new Vector3(this.x, this.y, this.z); }
+  add(v) { this.x += v.x; this.y += v.y; this.z += v.z; return this; }
+  sub(v) { this.x -= v.x; this.y -= v.y; this.z -= v.z; return this; }
+  subVectors(a, b) { this.x = a.x - b.x; this.y = a.y - b.y; this.z = a.z - b.z; return this; }
+  addScaledVector(v, s) { this.x += v.x * s; this.y += v.y * s; this.z += v.z * s; return this; }
+  multiplyScalar(s) { this.x *= s; this.y *= s; this.z *= s; return this; }
+  dot(v) { return this.x * v.x + this.y * v.y + this.z * v.z; }
+  lengthSq() { return this.x * this.x + this.y * this.y + this.z * this.z; }
+  length() { return Math.sqrt(this.lengthSq()); }
+  normalize() { const l = this.length() || 1; return this.multiplyScalar(1 / l); }
+  distanceTo(v) { return Math.sqrt(this.distanceToSquared(v)); }
+  distanceToSquared(v) { const dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z; return dx * dx + dy * dy + dz * dz; }
+  lerp(v, t) { this.x += (v.x - this.x) * t; this.y += (v.y - this.y) * t; this.z += (v.z - this.z) * t; return this; }
+  crossVectors(a, b) { const ax = a.x, ay = a.y, az = a.z, bx = b.x, by = b.y, bz = b.z; this.x = ay * bz - az * by; this.y = az * bx - ax * bz; this.z = ax * by - ay * bx; return this; }
+  cross(v) { return this.crossVectors(this, v); }
+  applyMatrix4(m) { const e = m.elements, x = this.x, y = this.y, z = this.z, w = 1 / (e[3] * x + e[7] * y + e[11] * z + e[15]);
+    this.x = (e[0] * x + e[4] * y + e[8] * z + e[12]) * w; this.y = (e[1] * x + e[5] * y + e[9] * z + e[13]) * w; this.z = (e[2] * x + e[6] * y + e[10] * z + e[14]) * w; return this; }
+  transformDirection(m) { const e = m.elements, x = this.x, y = this.y, z = this.z; this.x = e[0] * x + e[4] * y + e[8] * z; this.y = e[1] * x + e[5] * y + e[9] * z; this.z = e[2] * x + e[6] * y + e[10] * z; return this.normalize(); }
+  applyQuaternion(q) { const x = this.x, y = this.y, z = this.z, qx = q.x, qy = q.y, qz = q.z, qw = q.w;
+    const ix = qw * x + qy * z - qz * y, iy = qw * y + qz * x - qx * z, iz = qw * z + qx * y - qy * x, iw = -qx * x - qy * y - qz * z;
+    this.x = ix * qw + iw * -qx + iy * -qz - iz * -qy; this.y = iy * qw + iw * -qy + iz * -qx - ix * -qz; this.z = iz * qw + iw * -qz + ix * -qy - iy * -qx; return this; }
+  setFromMatrixPosition(m) { const e = m.elements; this.x = e[12]; this.y = e[13]; this.z = e[14]; return this; }
+  toArray(a = [], o = 0) { a[o] = this.x; a[o + 1] = this.y; a[o + 2] = this.z; return a; }
+  fromArray(a, o = 0) { this.x = a[o]; this.y = a[o + 1]; this.z = a[o + 2]; return this; }
+}
+class Quaternion {
+  constructor(x = 0, y = 0, z = 0, w = 1) { this.x = x; this.y = y; this.z = z; this.w = w; }
+  set(x, y, z, w) { this.x = x; this.y = y; this.z = z; this.w = w; return this; }
+  copy(q) { return this.set(q.x, q.y, q.z, q.w); }
+  identity() { return this.set(0, 0, 0, 1); }
+  setFromAxisAngle(axis, a) { const h = a / 2, s = Math.sin(h); return this.set(axis.x * s, axis.y * s, axis.z * s, Math.cos(h)); }
+  setFromEuler(e) { const c1 = Math.cos(e.x / 2), c2 = Math.cos(e.y / 2), c3 = Math.cos(e.z / 2), s1 = Math.sin(e.x / 2), s2 = Math.sin(e.y / 2), s3 = Math.sin(e.z / 2);
+    if (e.order === 'YXZ') return this.set(s1 * c2 * c3 + c1 * s2 * s3, c1 * s2 * c3 - s1 * c2 * s3, c1 * c2 * s3 - s1 * s2 * c3, c1 * c2 * c3 + s1 * s2 * s3);
+    return this.set(s1 * c2 * c3 + c1 * s2 * s3, c1 * s2 * c3 - s1 * c2 * s3, c1 * c2 * s3 + s1 * s2 * c3, c1 * c2 * c3 - s1 * s2 * s3); } // XYZ
+  multiplyQuaternions(a, b) { const qax = a.x, qay = a.y, qaz = a.z, qaw = a.w, qbx = b.x, qby = b.y, qbz = b.z, qbw = b.w;
+    return this.set(qax * qbw + qaw * qbx + qay * qbz - qaz * qby, qay * qbw + qaw * qby + qaz * qbx - qax * qbz, qaz * qbw + qaw * qbz + qax * qby - qay * qbx, qaw * qbw - qax * qbx - qay * qby - qaz * qbz); }
+  multiply(q) { return this.multiplyQuaternions(this, q); }
+  premultiply(q) { return this.multiplyQuaternions(q, this); }
+  normalize() { let l = Math.hypot(this.x, this.y, this.z, this.w); if (l === 0) return this.identity(); l = 1 / l; return this.set(this.x * l, this.y * l, this.z * l, this.w * l); }
+}
+const _clampE = (v) => Math.min(Math.max(v, -1), 1);
+class Euler {
+  constructor(x = 0, y = 0, z = 0, order = 'XYZ') { this.x = x; this.y = y; this.z = z; this.order = order; }
+  set(x, y, z, order) { this.x = x; this.y = y; this.z = z; if (order) this.order = order; return this; }
+  copy(e) { return this.set(e.x, e.y, e.z, e.order); }
+  setFromRotationMatrix(m, order = this.order) { const te = m.elements, m11 = te[0], m12 = te[4], m13 = te[8], m21 = te[1], m22 = te[5], m23 = te[9], m31 = te[2], m32 = te[6], m33 = te[10];
+    if (order === 'YXZ') { this.x = Math.asin(-_clampE(m23)); if (Math.abs(m23) < 0.9999999) { this.y = Math.atan2(m13, m33); this.z = Math.atan2(m21, m22); } else { this.y = Math.atan2(-m31, m11); this.z = 0; } }
+    else { this.y = Math.asin(_clampE(m13)); if (Math.abs(m13) < 0.9999999) { this.x = Math.atan2(-m23, m33); this.z = Math.atan2(-m12, m11); } else { this.x = Math.atan2(m32, m22); this.z = 0; } }
+    this.order = order; return this; }
+  setFromQuaternion(q, order) { return this.setFromRotationMatrix(_mE.makeRotationFromQuaternion(q), order); }
+}
+class Matrix4 {
+  constructor() { this.elements = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]; }
+  set(n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44) { const te = this.elements;
+    te[0] = n11; te[4] = n12; te[8] = n13; te[12] = n14; te[1] = n21; te[5] = n22; te[9] = n23; te[13] = n24; te[2] = n31; te[6] = n32; te[10] = n33; te[14] = n34; te[3] = n41; te[7] = n42; te[11] = n43; te[15] = n44; return this; }
+  identity() { return this.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); }
+  copy(m) { const a = this.elements, b = m.elements; for (let i = 0; i < 16; i++) a[i] = b[i]; return this; }
+  clone() { return new Matrix4().copy(this); }
+  makeRotationX(t) { const c = Math.cos(t), s = Math.sin(t); return this.set(1, 0, 0, 0, 0, c, -s, 0, 0, s, c, 0, 0, 0, 0, 1); }
+  makeRotationY(t) { const c = Math.cos(t), s = Math.sin(t); return this.set(c, 0, s, 0, 0, 1, 0, 0, -s, 0, c, 0, 0, 0, 0, 1); }
+  makeRotationZ(t) { const c = Math.cos(t), s = Math.sin(t); return this.set(c, -s, 0, 0, s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); }
+  makeScale(x, y, z) { return this.set(x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1); }
+  makeTranslation(x, y, z) { return this.set(1, 0, 0, x, 0, 1, 0, y, 0, 0, 1, z, 0, 0, 0, 1); }
+  makeBasis(x, y, z) { return this.set(x.x, y.x, z.x, 0, x.y, y.y, z.y, 0, x.z, y.z, z.z, 0, 0, 0, 0, 1); }
+  setPosition(x, y, z) { const te = this.elements; if (x.x !== undefined) { te[12] = x.x; te[13] = x.y; te[14] = x.z; } else { te[12] = x; te[13] = y; te[14] = z; } return this; }
+  multiplyMatrices(a, b) { const ae = a.elements, be = b.elements, te = this.elements;
+    const a11 = ae[0], a12 = ae[4], a13 = ae[8], a14 = ae[12], a21 = ae[1], a22 = ae[5], a23 = ae[9], a24 = ae[13], a31 = ae[2], a32 = ae[6], a33 = ae[10], a34 = ae[14], a41 = ae[3], a42 = ae[7], a43 = ae[11], a44 = ae[15];
+    const b11 = be[0], b12 = be[4], b13 = be[8], b14 = be[12], b21 = be[1], b22 = be[5], b23 = be[9], b24 = be[13], b31 = be[2], b32 = be[6], b33 = be[10], b34 = be[14], b41 = be[3], b42 = be[7], b43 = be[11], b44 = be[15];
+    te[0] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41; te[4] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42; te[8] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43; te[12] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+    te[1] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41; te[5] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42; te[9] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43; te[13] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
+    te[2] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41; te[6] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42; te[10] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43; te[14] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
+    te[3] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41; te[7] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42; te[11] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43; te[15] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44; return this; }
+  multiply(m) { return this.multiplyMatrices(this, m); }
+  premultiply(m) { return this.multiplyMatrices(m, this); }
+  compose(p, q, s) { const te = this.elements, x = q.x, y = q.y, z = q.z, w = q.w, x2 = x + x, y2 = y + y, z2 = z + z, xx = x * x2, xy = x * y2, xz = x * z2, yy = y * y2, yz = y * z2, zz = z * z2, wx = w * x2, wy = w * y2, wz = w * z2, sx = s.x, sy = s.y, sz = s.z;
+    te[0] = (1 - (yy + zz)) * sx; te[1] = (xy + wz) * sx; te[2] = (xz - wy) * sx; te[3] = 0; te[4] = (xy - wz) * sy; te[5] = (1 - (xx + zz)) * sy; te[6] = (yz + wx) * sy; te[7] = 0;
+    te[8] = (xz + wy) * sz; te[9] = (yz - wx) * sz; te[10] = (1 - (xx + yy)) * sz; te[11] = 0; te[12] = p.x; te[13] = p.y; te[14] = p.z; te[15] = 1; return this; }
+  makeRotationFromQuaternion(q) { return this.compose(_zero, q, _one); }
+  makeRotationFromEuler(e) { const te = this.elements, a = Math.cos(e.x), b = Math.sin(e.x), c = Math.cos(e.y), d = Math.sin(e.y), f = Math.cos(e.z), g = Math.sin(e.z);
+    if (e.order === 'YXZ') { const ce = c * f, cf = c * g, de = d * f, df = d * g; te[0] = ce + df * b; te[4] = de * b - cf; te[8] = a * d; te[1] = a * g; te[5] = a * f; te[9] = -b; te[2] = cf * b - de; te[6] = df + ce * b; te[10] = a * c; }
+    else { const ae = a * f, af = a * g, be = b * f, bf = b * g; te[0] = c * f; te[4] = -c * g; te[8] = d; te[1] = af + be * d; te[5] = ae - bf * d; te[9] = -b * c; te[2] = bf - ae * d; te[6] = be + af * d; te[10] = a * c; }
+    te[3] = te[7] = te[11] = te[12] = te[13] = te[14] = 0; te[15] = 1; return this; }
+  composeEuler(p, e, s) { this.makeRotationFromEuler(e); const te = this.elements; te[0] *= s.x; te[1] *= s.x; te[2] *= s.x; te[4] *= s.y; te[5] *= s.y; te[6] *= s.y; te[8] *= s.z; te[9] *= s.z; te[10] *= s.z; te[12] = p.x; te[13] = p.y; te[14] = p.z; return this; }
+  lookAt(eye, target, up) { const te = this.elements, z = _lz.subVectors(eye, target);
+    if (z.lengthSq() === 0) z.z = 1; z.normalize(); const x = _lx.crossVectors(up, z);
+    if (x.lengthSq() === 0) { if (Math.abs(up.z) === 1) z.x += 0.0001; else z.z += 0.0001; z.normalize(); x.crossVectors(up, z); }
+    x.normalize(); const y = _ly.crossVectors(z, x);
+    te[0] = x.x; te[4] = y.x; te[8] = z.x; te[1] = x.y; te[5] = y.y; te[9] = z.y; te[2] = x.z; te[6] = y.z; te[10] = z.z; return this; }
+  invert() { const te = this.elements, n11 = te[0], n21 = te[1], n31 = te[2], n41 = te[3], n12 = te[4], n22 = te[5], n32 = te[6], n42 = te[7], n13 = te[8], n23 = te[9], n33 = te[10], n43 = te[11], n14 = te[12], n24 = te[13], n34 = te[14], n44 = te[15];
+    const t11 = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44, t12 = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44;
+    const t13 = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44, t14 = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
+    const det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14; if (det === 0) return this.set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); const d = 1 / det;
+    te[0] = t11 * d; te[1] = (n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44) * d; te[2] = (n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44) * d; te[3] = (n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43) * d;
+    te[4] = t12 * d; te[5] = (n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44) * d; te[6] = (n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44) * d; te[7] = (n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43) * d;
+    te[8] = t13 * d; te[9] = (n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44) * d; te[10] = (n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44) * d; te[11] = (n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43) * d;
+    te[12] = t14 * d; te[13] = (n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34) * d; te[14] = (n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34) * d; te[15] = (n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33) * d; return this; }
+  getMaxScaleOnAxis() { const te = this.elements; return Math.sqrt(Math.max(te[0] * te[0] + te[1] * te[1] + te[2] * te[2], te[4] * te[4] + te[5] * te[5] + te[6] * te[6], te[8] * te[8] + te[9] * te[9] + te[10] * te[10])); }
+  makePerspective(left, right, top, bottom, near, far) { const x = 2 * near / (right - left), y = 2 * near / (top - bottom), a = (right + left) / (right - left), b = (top + bottom) / (top - bottom), c = -(far + near) / (far - near), d = -2 * far * near / (far - near);
+    return this.set(x, 0, a, 0, 0, y, b, 0, 0, 0, c, d, 0, 0, -1, 0); }
+  makeOrthographic(left, right, top, bottom, near, far) { const w = 1 / (right - left), h = 1 / (top - bottom), p = 1 / (far - near);
+    return this.set(2 * w, 0, 0, -(right + left) * w, 0, 2 * h, 0, -(top + bottom) * h, 0, 0, -2 * p, -(far + near) * p, 0, 0, 0, 1); }
+}
+const _zero = new Vector3(), _one = new Vector3(1, 1, 1), _lx = new Vector3(), _ly = new Vector3(), _lz = new Vector3(), _mE = new Matrix4();
+class Color {
+  constructor(r, g, b) { this.r = this.g = this.b = 1; if (g === undefined) this.set(r === undefined ? 0xffffff : r); else this.setRGB(r, g, b); }
+  set(c) { return typeof c === 'number' ? this.setHex(c) : this.copy(c); }
+  setHex(h) { this.r = ((h >> 16) & 255) / 255; this.g = ((h >> 8) & 255) / 255; this.b = (h & 255) / 255; return this; }
+  setRGB(r, g, b) { this.r = r; this.g = g; this.b = b; return this; }
+  setScalar(s) { this.r = this.g = this.b = s; return this; }
+  copy(c) { this.r = c.r; this.g = c.g; this.b = c.b; return this; }
+  clone() { return new Color(this.r, this.g, this.b); }
+  lerp(c, t) { this.r += (c.r - this.r) * t; this.g += (c.g - this.g) * t; this.b += (c.b - this.b) * t; return this; }
+  multiplyScalar(s) { this.r *= s; this.g *= s; this.b *= s; return this; }
+  getHex() { return (Math.round(this.r * 255) << 16) ^ (Math.round(this.g * 255) << 8) ^ Math.round(this.b * 255); }
+}
+class Frustum {
+  constructor() { this.planes = [0, 1, 2, 3, 4, 5].map(() => [0, 0, 0, 0]); }
+  setFromProjectionMatrix(m) { const e = m.elements, p = this.planes;
+    const setP = (i, a, b, c, d) => { const l = 1 / Math.hypot(a, b, c); const q = p[i]; q[0] = a * l; q[1] = b * l; q[2] = c * l; q[3] = d * l; };
+    setP(0, e[3] - e[0], e[7] - e[4], e[11] - e[8], e[15] - e[12]); setP(1, e[3] + e[0], e[7] + e[4], e[11] + e[8], e[15] + e[12]);
+    setP(2, e[3] + e[1], e[7] + e[5], e[11] + e[9], e[15] + e[13]); setP(3, e[3] - e[1], e[7] - e[5], e[11] - e[9], e[15] - e[13]);
+    setP(4, e[3] - e[2], e[7] - e[6], e[11] - e[10], e[15] - e[14]); setP(5, e[3] + e[2], e[7] + e[6], e[11] + e[10], e[15] + e[14]); return this; }
+  containsPoint(v) { for (const q of this.planes) if (q[0] * v.x + q[1] * v.y + q[2] * v.z + q[3] < 0) return false; return true; }
+  intersectsSphere(x, y, z, r) { for (const q of this.planes) if (q[0] * x + q[1] * y + q[2] * z + q[3] < -r) return false; return true; }
+}
+Object.assign(THREE, { Vector2, Vector3, Quaternion, Euler, Matrix4, Color, Frustum,
+  FrontSide: 0, BackSide: 1, DoubleSide: 2, NoBlending: 0, NormalBlending: 1, AdditiveBlending: 2, RepeatWrapping: 1000, ClampToEdgeWrapping: 1001, StaticDrawUsage: 35044, DynamicDrawUsage: 35048, PCFSoftShadowMap: 2, PCFShadowMap: 1, BasicShadowMap: 0 });
+// ---- scene graph ----
+let _oid = 1;
+class Object3D {
+  constructor() { this.id = _oid++; this.type = 'Object3D'; this.position = new Vector3(); this.rotation = new Euler(); this.scale = new Vector3(1, 1, 1); this.up = new Vector3(0, 1, 0);
+    this.matrix = new Matrix4(); this.matrixWorld = new Matrix4(); this.matrixAutoUpdate = true; this.children = []; this.parent = null; this.visible = true;
+    this.castShadow = false; this.receiveShadow = false; this.frustumCulled = true; this.renderOrder = 0; }
+  add(...objs) { for (const o of objs) { if (o.parent) o.parent.remove(o); o.parent = this; this.children.push(o); } return this; }
+  remove(o) { const i = this.children.indexOf(o); if (i >= 0) { this.children.splice(i, 1); o.parent = null; } return this; }
+  updateMatrix() { this.matrix.composeEuler(this.position, this.rotation, this.scale); }
+  updateMatrixWorld() { if (this.matrixAutoUpdate) this.updateMatrix(); if (this.parent) this.matrixWorld.multiplyMatrices(this.parent.matrixWorld, this.matrix); else this.matrixWorld.copy(this.matrix); for (const c of this.children) c.updateMatrixWorld(); }
+  updateWorldMatrix(parents, children) { if (parents && this.parent) this.parent.updateWorldMatrix(true, false); if (this.matrixAutoUpdate) this.updateMatrix();
+    if (this.parent) this.matrixWorld.multiplyMatrices(this.parent.matrixWorld, this.matrix); else this.matrixWorld.copy(this.matrix); if (children) for (const c of this.children) c.updateWorldMatrix(false, true); }
+  localToWorld(v) { return v.applyMatrix4(this.matrixWorld); }
+  lookAt(x, y, z) { if (x.x !== undefined) _tv.copy(x); else _tv.set(x, y, z); _mE.lookAt(this.position, _tv, this.up); this.rotation.setFromRotationMatrix(_mE, this.rotation.order); }
+  traverse(fn) { fn(this); for (const c of this.children) c.traverse(fn); }
+}
+const _tv = new Vector3();
+class Group extends Object3D { constructor() { super(); this.type = 'Group'; this.isGroup = true; } }
+class Scene extends Object3D { constructor() { super(); this.type = 'Scene'; this.fog = null; this.background = null; } }
+class Mesh extends Object3D { constructor(geometry, material) { super(); this.type = 'Mesh'; this.isMesh = true; this.geometry = geometry; this.material = material; } }
+class InstancedMesh extends Mesh {
+  constructor(geometry, material, count) { super(geometry, material); this.type = 'InstancedMesh'; this.isInstancedMesh = true; this.count = count;
+    this.instanceMatrix = new BufferAttribute(new Float32Array(count * 16), 16).setUsage(35048); this.instanceColor = null; }
+  setMatrixAt(i, m) { this.instanceMatrix.array.set(m.elements, i * 16); }
+  setColorAt(i, c) { if (!this.instanceColor) this.instanceColor = new BufferAttribute(new Float32Array(this.count * 3), 3).setUsage(35048); const a = this.instanceColor.array; a[i * 3] = c.r; a[i * 3 + 1] = c.g; a[i * 3 + 2] = c.b; }
+}
+class Points extends Object3D { constructor(geometry, material) { super(); this.type = 'Points'; this.isPoints = true; this.geometry = geometry; this.material = material; } }
+class PerspectiveCamera extends Object3D {
+  constructor(fov = 50, aspect = 1, near = 0.1, far = 2000) { super(); this.type = 'PerspectiveCamera'; this.isCamera = true; this.fov = fov; this.aspect = aspect; this.near = near; this.far = far; this.projectionMatrix = new Matrix4(); this.matrixWorldInverse = new Matrix4(); this.updateProjectionMatrix(); }
+  updateProjectionMatrix() { const top = this.near * Math.tan(Math.PI / 360 * this.fov), h = 2 * top, w = this.aspect * h, left = -0.5 * w; this.projectionMatrix.makePerspective(left, left + w, top, top - h, this.near, this.far); }
+}
+class Light extends Object3D { constructor(color, intensity = 1) { super(); this.isLight = true; this.color = new Color(color); this.intensity = intensity; } }
+class HemisphereLight extends Light { constructor(sky, ground, intensity) { super(sky, intensity); this.type = 'HemisphereLight'; this.groundColor = new Color(ground); } }
+class DirectionalLight extends Light {
+  constructor(color, intensity) { super(color, intensity); this.type = 'DirectionalLight'; this.target = new Object3D(); this.position.set(0, 1, 0);
+    this.shadow = { mapSize: new Vector2(512, 512), camera: { left: -5, right: 5, top: 5, bottom: -5, near: 0.5, far: 500 }, bias: 0, normalBias: 0 }; }
+}
+class SpotLight extends Light { constructor(color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 1) { super(color, intensity); this.type = 'SpotLight'; this.distance = distance; this.angle = angle; this.penumbra = penumbra; this.decay = decay; this.target = new Object3D(); } }
+class PointLight extends Light { constructor(color, intensity, distance = 0, decay = 1) { super(color, intensity); this.type = 'PointLight'; this.distance = distance; this.decay = decay; } }
+class Fog { constructor(color, near = 1, far = 1000) { this.color = new Color(color); this.near = near; this.far = far; } }
+
+// ---- materials ----
+let _mid = 1;
+const _col = (v, d) => (v instanceof Color ? v : new Color(v === undefined ? d : v));
+class Material {
+  constructor(p = {}) { this.id = _mid++; this.isMaterial = true; this.transparent = false; this.opacity = 1; this.side = 0; this.blending = 1; this.depthWrite = true; this.depthTest = true; this.fog = true; this.vertexColors = false;
+    this.polygonOffset = false; this.polygonOffsetFactor = 0; this.polygonOffsetUnits = 0; this.visible = true; this.map = null; Object.assign(this, p); this.color = _col(p.color, 0xffffff); }
+}
+class MeshBasicMaterial extends Material { constructor(p) { super(p); this.type = 'MeshBasicMaterial'; } }
+class MeshLambertMaterial extends Material { constructor(p = {}) { super(p); this.type = 'MeshLambertMaterial'; this.lit = true; this.emissive = _col(p.emissive, 0); this.emissiveMap = p.emissiveMap || null; if (p.emissiveIntensity === undefined) this.emissiveIntensity = 1; } }
+class MeshPhongMaterial extends MeshLambertMaterial { constructor(p = {}) { super(p); this.type = 'MeshPhongMaterial'; this.specular = _col(p.specular, 0x111111); if (p.shininess === undefined) this.shininess = 30; } }
+class PointsMaterial extends Material { constructor(p = {}) { super(p); this.type = 'PointsMaterial'; if (p.size === undefined) this.size = 1; if (p.sizeAttenuation === undefined) this.sizeAttenuation = true; } }
+class ShaderMaterial extends Material { constructor(p = {}) { super(p); this.type = 'ShaderMaterial'; this.uniforms = p.uniforms || {}; } }
+
+// ---- textures ----
+let _tid = 1;
+class Texture {
+  constructor(image) { this.id = _tid++; this.isTexture = true; this.image = image; this.wrapS = this.wrapT = 1001; this.repeat = new Vector2(1, 1); this.anisotropy = 1; this.flipY = true; this.version = 0; }
+  set needsUpdate(v) { if (v) this.version++; }
+  clone() { const t = new Texture(this.image); t.wrapS = this.wrapS; t.wrapT = this.wrapT; t.repeat.copy(this.repeat); t.anisotropy = this.anisotropy; return t; }
+}
+class CanvasTexture extends Texture { constructor(c) { super(c); this.version = 1; } }
+
+// ---- geometry ----
+class BufferAttribute {
+  constructor(array, itemSize) { this.array = array; this.itemSize = itemSize; this.count = array.length / itemSize; this.usage = 35044; this.version = 0; }
+  set needsUpdate(v) { if (v) this.version++; }
+  setUsage(u) { this.usage = u; return this; }
+  getX(i) { return this.array[i * this.itemSize]; }
+  getY(i) { return this.array[i * this.itemSize + 1]; }
+  getZ(i) { return this.array[i * this.itemSize + 2]; }
+  setXYZ(i, x, y, z) { const a = this.array, o = i * this.itemSize; a[o] = x; a[o + 1] = y; a[o + 2] = z; return this; }
+}
+class Float32BufferAttribute extends BufferAttribute { constructor(a, n) { super(a instanceof Float32Array ? a : new Float32Array(a), n); } }
+let _gid = 1;
+class BufferGeometry {
+  constructor() { this.id = _gid++; this.isBufferGeometry = true; this.attributes = {}; this.index = null; this.drawRange = { start: 0, count: Infinity }; this.boundingSphere = null; this.gl = null; }
+  setAttribute(name, attr) { this.attributes[name] = attr; return this; }
+  setIndex(ix) { if (ix instanceof BufferAttribute) this.index = ix; else { let big = false; for (let i = 0; i < ix.length; i++) if (ix[i] > 65535) { big = true; break; } this.index = new BufferAttribute(big ? new Uint32Array(ix) : new Uint16Array(ix), 1); } return this; }
+  setDrawRange(start, count) { this.drawRange.start = start; this.drawRange.count = count; }
+  computeBoundingSphere() { if (!this.attributes.position) { this.boundingSphere = { center: new Vector3(), radius: 0 }; return this; } const p = this.attributes.position.array; let x0 = Infinity, y0 = Infinity, z0 = Infinity, x1 = -Infinity, y1 = -Infinity, z1 = -Infinity;
+    for (let i = 0; i < p.length; i += 3) { const x = p[i], y = p[i + 1], z = p[i + 2]; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; if (z < z0) z0 = z; if (z > z1) z1 = z; }
+    const c = new Vector3((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); let r2 = 0;
+    for (let i = 0; i < p.length; i += 3) { const dx = p[i] - c.x, dy = p[i + 1] - c.y, dz = p[i + 2] - c.z; const d = dx * dx + dy * dy + dz * dz; if (d > r2) r2 = d; }
+    this.boundingSphere = { center: c, radius: p.length ? Math.sqrt(r2) : 0 }; return this; }
+  computeVertexNormals() { const pa = this.attributes.position.array, n = pa.length; let na = this.attributes.normal && this.attributes.normal.array;
+    if (!na || na.length !== n) { na = new Float32Array(n); this.setAttribute('normal', new BufferAttribute(na, 3)); } else na.fill(0);
+    const ix = this.index ? this.index.array : null, tri = ix ? ix.length : n / 3;
+    for (let t = 0; t < tri; t += 3) { const a = ix ? ix[t] * 3 : t * 3, b = ix ? ix[t + 1] * 3 : t * 3 + 3, c = ix ? ix[t + 2] * 3 : t * 3 + 6;
+      const ux = pa[b] - pa[a], uy = pa[b + 1] - pa[a + 1], uz = pa[b + 2] - pa[a + 2], vx = pa[c] - pa[a], vy = pa[c + 1] - pa[a + 1], vz = pa[c + 2] - pa[a + 2];
+      const x = uy * vz - uz * vy, y = uz * vx - ux * vz, z = ux * vy - uy * vx;
+      na[a] += x; na[a + 1] += y; na[a + 2] += z; na[b] += x; na[b + 1] += y; na[b + 2] += z; na[c] += x; na[c + 1] += y; na[c + 2] += z; }
+    for (let i = 0; i < n; i += 3) { const l = Math.hypot(na[i], na[i + 1], na[i + 2]) || 1; na[i] /= l; na[i + 1] /= l; na[i + 2] /= l; }
+    this.attributes.normal.needsUpdate = true; return this; }
+  applyMatrix4(m) { const p = this.attributes.position.array; for (let i = 0; i < p.length; i += 3) { _tv.set(p[i], p[i + 1], p[i + 2]).applyMatrix4(m); p[i] = _tv.x; p[i + 1] = _tv.y; p[i + 2] = _tv.z; }
+    const nn = this.attributes.normal; if (nn) { const a = nn.array; for (let i = 0; i < a.length; i += 3) { _tv.set(a[i], a[i + 1], a[i + 2]).transformDirection(m); a[i] = _tv.x; a[i + 1] = _tv.y; a[i + 2] = _tv.z; } }
+    if (this.boundingSphere) this.computeBoundingSphere(); return this; }
+  rotateX(a) { return this.applyMatrix4(_mE.makeRotationX(a)); }
+  rotateY(a) { return this.applyMatrix4(_mE.makeRotationY(a)); }
+  translate(x, y, z) { return this.applyMatrix4(_mE.makeTranslation(x, y, z)); }
+  scale(x, y, z) { return this.applyMatrix4(_mE.makeScale(x, y, z)); }
+  dispose() { if (this.gl) this.gl.dispose(); }
+}
+// generators: build position/normal/uv/index arrays
+function geo(p, n, uv, ix) { const g = new BufferGeometry(); g.setAttribute('position', new Float32BufferAttribute(p, 3)); if (n) g.setAttribute('normal', new Float32BufferAttribute(n, 3)); if (uv) g.setAttribute('uv', new Float32BufferAttribute(uv, 2)); if (ix) g.setIndex(ix); return g; }
+class PlaneGeometry extends BufferGeometry {
+  constructor(w = 1, h = 1, ws = 1, hs = 1) { super(); const p = [], n = [], uv = [], ix = [], gx = ws + 1;
+    for (let iy = 0; iy <= hs; iy++) { const y = iy * h / hs - h / 2; for (let x = 0; x <= ws; x++) { p.push(x * w / ws - w / 2, -y, 0); n.push(0, 0, 1); uv.push(x / ws, 1 - iy / hs); } }
+    for (let iy = 0; iy < hs; iy++) for (let x = 0; x < ws; x++) { const a = x + gx * iy, b = x + gx * (iy + 1), c = x + 1 + gx * (iy + 1), d = x + 1 + gx * iy; ix.push(a, b, d, b, c, d); }
+    Object.assign(this, geo(p, n, uv, ix)); }
+}
+class BoxGeometry extends BufferGeometry {
+  constructor(w = 1, h = 1, d = 1) { super(); const p = [], n = [], uv = [], ix = []; let v = 0;
+    const face = (u, vv, ww, ud, vd, wd, W, H, D) => { const hw = W / 2, hh = H / 2, hd = D / 2; // u,v,w pick axes; three's order and winding
+      for (let iy = 0; iy < 2; iy++) for (let ixx = 0; ixx < 2; ixx++) { const x = (ixx * W - hw) * ud, y = (iy * H - hh) * vd, vec = [0, 0, 0]; vec[u] = x; vec[vv] = y; vec[ww] = hd * wd; p.push(...vec); const nn = [0, 0, 0]; nn[ww] = wd; n.push(...nn); uv.push(ixx, 1 - iy); }
+      ix.push(v, v + 2, v + 1, v + 2, v + 3, v + 1); v += 4; };
+    face(2, 1, 0, -1, -1, 1, d, h, w); face(2, 1, 0, 1, -1, -1, d, h, w); face(0, 2, 1, 1, 1, 1, w, d, h); face(0, 2, 1, 1, -1, -1, w, d, h); face(0, 1, 2, 1, -1, 1, w, h, d); face(0, 1, 2, -1, -1, -1, w, h, d);
+    Object.assign(this, geo(p, n, uv, ix)); }
+}
+class CylinderGeometry extends BufferGeometry {
+  constructor(rt = 1, rb = 1, h = 1, rs = 8, hs = 1, open = false) { super(); const p = [], n = [], uv = [], ix = [], hh = h / 2, slope = (rb - rt) / h, rows = []; let v = 0;
+    for (let y = 0; y <= hs; y++) { const row = [], t = y / hs, r = t * (rb - rt) + rt; for (let x = 0; x <= rs; x++) { const u = x / rs, th = u * Math.PI * 2, s = Math.sin(th), c = Math.cos(th); p.push(r * s, -t * h + hh, r * c); const l = Math.hypot(s, slope, c); n.push(s / l, slope / l, c / l); uv.push(u, 1 - t); row.push(v++); } rows.push(row); }
+    for (let x = 0; x < rs; x++) for (let y = 0; y < hs; y++) { const a = rows[y][x], b = rows[y + 1][x], c = rows[y + 1][x + 1], d = rows[y][x + 1]; ix.push(a, b, d, b, c, d); }
+    if (!open) for (const top of [1, -1]) { const r = top > 0 ? rt : rb; if (r <= 0) continue; const center = v; p.push(0, hh * top, 0); n.push(0, top, 0); uv.push(0.5, 0.5); v++;
+      for (let x = 0; x <= rs; x++) { const u = x / rs, th = u * Math.PI * 2, s = Math.sin(th), c = Math.cos(th); p.push(r * s, hh * top, r * c); n.push(0, top, 0); uv.push(c * 0.5 + 0.5, s * 0.5 * top + 0.5); v++; }
+      for (let x = 0; x < rs; x++) { const i = center + 1 + x; if (top > 0) ix.push(i, i + 1, center); else ix.push(i + 1, i, center); } }
+    Object.assign(this, geo(p, n, uv, ix)); }
+}
+class ConeGeometry extends CylinderGeometry { constructor(r = 1, h = 1, rs = 8) { super(0, r, h, rs, 1, false); } }
+class SphereGeometry extends BufferGeometry {
+  constructor(r = 1, ws = 8, hs = 6) { super(); const p = [], n = [], uv = [], ix = [], grid = []; let v = 0;
+    for (let iy = 0; iy <= hs; iy++) { const row = [], t = iy / hs; for (let ixx = 0; ixx <= ws; ixx++) { const u = ixx / ws, x = -r * Math.cos(u * Math.PI * 2) * Math.sin(t * Math.PI), y = r * Math.cos(t * Math.PI), z = r * Math.sin(u * Math.PI * 2) * Math.sin(t * Math.PI);
+      p.push(x, y, z); const l = Math.hypot(x, y, z) || 1; n.push(x / l, y / l, z / l); uv.push(u, 1 - t); row.push(v++); } grid.push(row); }
+    for (let iy = 0; iy < hs; iy++) for (let ixx = 0; ixx < ws; ixx++) { const a = grid[iy][ixx + 1], b = grid[iy][ixx], c = grid[iy + 1][ixx], d = grid[iy + 1][ixx + 1]; if (iy !== 0) ix.push(a, b, d); if (iy !== hs - 1) ix.push(b, c, d); }
+    Object.assign(this, geo(p, n, uv, ix)); }
+}
+class TorusGeometry extends BufferGeometry {
+  constructor(R = 1, r = 0.4, rs = 8, ts = 6) { super(); const p = [], n = [], uv = [], ix = [];
+    for (let j = 0; j <= rs; j++) for (let i = 0; i <= ts; i++) { const u = i / ts * Math.PI * 2, v = j / rs * Math.PI * 2, cx = R * Math.cos(u), cy = R * Math.sin(u), x = (R + r * Math.cos(v)) * Math.cos(u), y = (R + r * Math.cos(v)) * Math.sin(u), z = r * Math.sin(v);
+      p.push(x, y, z); const l = Math.hypot(x - cx, y - cy, z) || 1; n.push((x - cx) / l, (y - cy) / l, z / l); uv.push(i / ts, j / rs); }
+    for (let j = 1; j <= rs; j++) for (let i = 1; i <= ts; i++) { const a = (ts + 1) * j + i - 1, b = (ts + 1) * (j - 1) + i - 1, c = (ts + 1) * (j - 1) + i, d = (ts + 1) * j + i; ix.push(a, b, d, b, c, d); }
+    Object.assign(this, geo(p, n, uv, ix)); }
+}
+class RingGeometry extends BufferGeometry {
+  constructor(ri = 0.5, ro = 1, ts = 8, ps = 1) { super(); const p = [], n = [], uv = [], ix = [];
+    for (let j = 0; j <= ps; j++) for (let i = 0; i <= ts; i++) { const r = ri + j / ps * (ro - ri), a = i / ts * Math.PI * 2, x = r * Math.cos(a), y = r * Math.sin(a); p.push(x, y, 0); n.push(0, 0, 1); uv.push((x / ro + 1) / 2, (y / ro + 1) / 2); }
+    for (let j = 0; j < ps; j++) for (let i = 0; i < ts; i++) { const a = i + (ts + 1) * j, b = i + (ts + 1) * (j + 1), c = i + 1 + (ts + 1) * (j + 1), d = i + 1 + (ts + 1) * j; ix.push(a, b, d, b, c, d); }
+    Object.assign(this, geo(p, n, uv, ix)); }
+}
+class IcosahedronGeometry extends BufferGeometry {
+  constructor(r = 1) { super(); const t = (1 + Math.sqrt(5)) / 2, V = [-1, t, 0, 1, t, 0, -1, -t, 0, 1, -t, 0, 0, -1, t, 0, 1, t, 0, -1, -t, 0, 1, -t, t, 0, -1, t, 0, 1, -t, 0, -1, -t, 0, 1];
+    const F = [0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11, 1, 5, 9, 5, 11, 4, 11, 10, 2, 10, 7, 6, 7, 1, 8, 3, 9, 4, 3, 4, 2, 3, 2, 6, 3, 6, 8, 3, 8, 9, 4, 9, 5, 2, 4, 11, 6, 2, 10, 8, 6, 7, 9, 8, 1], p = [], n = [];
+    for (const i of F) { const x = V[i * 3], y = V[i * 3 + 1], z = V[i * 3 + 2], l = Math.hypot(x, y, z); p.push(x / l * r, y / l * r, z / l * r); n.push(x / l, y / l, z / l); }
+    Object.assign(this, geo(p, n, null, null)); }
+}
+class Shape { constructor() { this.points = []; } moveTo(x, y) { this.points.push([x, y]); return this; } lineTo(x, y) { this.points.push([x, y]); return this; } closePath() { return this; } }
+class ShapeGeometry extends BufferGeometry { // ear clipping for simple polygons (lakes, ponds): triangles face +z, uv = xy like three
+  constructor(shape) { super(); let pts = shape.points.slice(); if (pts.length > 1 && pts[0][0] === pts[pts.length - 1][0] && pts[0][1] === pts[pts.length - 1][1]) pts.pop();
+    let area = 0; for (let i = 0; i < pts.length; i++) { const a = pts[i], b = pts[(i + 1) % pts.length]; area += a[0] * b[1] - b[0] * a[1]; } if (area < 0) pts.reverse();
+    const p = [], n = [], uv = [], ix = []; for (const [x, y] of pts) { p.push(x, y, 0); n.push(0, 0, 1); uv.push(x, y); }
+    const idx = pts.map((_, i) => i), cross = (a, b, c) => (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+    const inside = (a, b, c, q) => cross(a, b, q) >= 0 && cross(b, c, q) >= 0 && cross(c, a, q) >= 0;
+    let guard = 0; while (idx.length > 3 && guard++ < 10000) { let cut = false;
+      for (let i = 0; i < idx.length; i++) { const i0 = idx[(i + idx.length - 1) % idx.length], i1 = idx[i], i2 = idx[(i + 1) % idx.length], a = pts[i0], b = pts[i1], c = pts[i2]; if (cross(a, b, c) <= 0) continue;
+        let ok = true; for (const j of idx) { if (j === i0 || j === i1 || j === i2) continue; if (inside(a, b, c, pts[j])) { ok = false; break; } } if (!ok) continue;
+        ix.push(i0, i1, i2); idx.splice(i, 1); cut = true; break; }
+      if (!cut) break; }
+    if (idx.length === 3) ix.push(idx[0], idx[1], idx[2]);
+    Object.assign(this, geo(p, n, uv, ix)); }
+}
+Object.assign(THREE, { Object3D, Group, Scene, Mesh, InstancedMesh, Points, PerspectiveCamera, HemisphereLight, DirectionalLight, SpotLight, PointLight, Fog, Material, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, PointsMaterial, ShaderMaterial,
+  Texture, CanvasTexture, BufferAttribute, Float32BufferAttribute, BufferGeometry, PlaneGeometry, BoxGeometry, CylinderGeometry, ConeGeometry, SphereGeometry, TorusGeometry, RingGeometry, IcosahedronGeometry, Shape, ShapeGeometry });
+// ---- WebGL2 renderer ----
+// lights as three r128 does them without physicallyCorrectLights: hemisphere mix, one directional, one spot, one point; MeshLambert sums them per vertex (GOURAUD), MeshPhong per fragment
+const LIGHT_GLSL = `#ifdef LIT
+uniform vec3 uHemiSky, uHemiGround, uDirCol, uDirDir, uSpotPos, uSpotDir, uSpotCol, uPtPos, uPtCol; uniform vec4 uSpotP; uniform vec2 uPtP;
+#ifdef SPEC
+uniform vec3 uSpecular, uCamPos; uniform float uShininess;
+vec3 blinn(vec3 n, vec3 L, vec3 V, vec3 c, float dNL) { vec3 H = normalize(L + V); float dNH = max(dot(n, H), 0.0), dLH = max(dot(L, H), 0.0), fr = exp2((-5.55473 * dLH - 6.98316) * dLH);
+  return c * dNL * ((1.0 - uSpecular) * fr + uSpecular) * 0.25 * (uShininess * 0.5 + 1.0) * pow(dNH, uShininess); }
+#endif
+float att(float d, float cut, float decay) { return cut > 0.0 ? pow(clamp(1.0 - d / cut, 0.0, 1.0), decay) : 1.0; }
+vec3 hemiLight(vec3 n) { return mix(uHemiGround, uHemiSky, n.y * 0.5 + 0.5); }
+vec3 dirLight(vec3 n, vec3 V, inout vec3 spec) { float dNL = max(dot(n, uDirDir), 0.0);
+#ifdef SPEC
+  spec += blinn(n, uDirDir, V, uDirCol, dNL);
+#endif
+  return uDirCol * dNL; }
+vec3 localLights(vec3 n, vec3 wp, vec3 V, inout vec3 spec) { vec3 direct = vec3(0.0);
+  if (dot(uSpotCol, vec3(1.0)) > 0.0) { vec3 L = uSpotPos - wp; float d = length(L); L /= d; float ac = dot(L, uSpotDir);
+    if (ac > uSpotP.z) { vec3 c = uSpotCol * smoothstep(uSpotP.z, uSpotP.w, ac) * att(d, uSpotP.x, uSpotP.y); float dNL = max(dot(n, L), 0.0); direct += c * dNL;
+#ifdef SPEC
+      spec += blinn(n, L, V, c, dNL);
+#endif
+    } }
+  if (dot(uPtCol, vec3(1.0)) > 0.0) { vec3 L = uPtPos - wp; float d = length(L); L /= d; vec3 c = uPtCol * att(d, uPtP.x, uPtP.y); float dNL = max(dot(n, L), 0.0); direct += c * dNL;
+#ifdef SPEC
+    spec += blinn(n, L, V, c, dNL);
+#endif
+  }
+  return direct; }
+#endif`;
+const SURF_VS = `#version 300 es
+precision highp float;
+${LIGHT_GLSL}
+layout(location=0) in vec3 position; layout(location=1) in vec3 normal; layout(location=2) in vec2 uv; layout(location=3) in vec3 color;
+#ifdef INST
+layout(location=4) in vec4 im0; layout(location=5) in vec4 im1; layout(location=6) in vec4 im2; layout(location=7) in vec4 im3;
+#endif
+#ifdef ICOL
+layout(location=8) in vec3 icol;
+#endif
+uniform mat4 uModel, uView, uProj, uShadow; uniform float uNBias; uniform vec2 uRepeat;
+out vec3 vN; out vec3 vWP; out vec2 vUv; out vec3 vC; out vec4 vSh; out float vDepth;
+#ifdef GOURAUD
+out vec3 vLF; out vec3 vLB; out vec3 vHF; out vec3 vHB;
+#endif
+void main() {
+  mat4 M = uModel;
+#ifdef INST
+  M = M * mat4(im0, im1, im2, im3);
+#endif
+  vec4 wp = M * vec4(position, 1.0); vec3 n = normalize(mat3(M) * normal);
+  vN = n; vWP = wp.xyz; vUv = uv * uRepeat; vC = vec3(1.0);
+#ifdef VCOL
+  vC = color;
+#endif
+#ifdef ICOL
+  vC *= icol;
+#endif
+  vSh = uShadow * vec4(wp.xyz + n * uNBias, 1.0);
+#ifdef GOURAUD
+  vec3 sp = vec3(0.0); vLF = dirLight(n, sp, sp) + localLights(n, wp.xyz, sp, sp); vHF = hemiLight(n);
+#ifdef DBL
+  vLB = dirLight(-n, sp, sp) + localLights(-n, wp.xyz, sp, sp); vHB = hemiLight(-n);
+#endif
+#endif
+  vec4 mv = uView * wp; vDepth = -mv.z; gl_Position = uProj * mv;
+}`;
+const SURF_FS = `#version 300 es
+precision highp float; precision highp sampler2DShadow;
+${LIGHT_GLSL}
+in vec3 vN; in vec3 vWP; in vec2 vUv; in vec3 vC; in vec4 vSh; in float vDepth;
+#ifdef GOURAUD
+in vec3 vLF; in vec3 vLB; in vec3 vHF; in vec3 vHB;
+#endif
+uniform vec3 uColor; uniform float uOpacity;
+#ifdef MAP
+uniform sampler2D uMap;
+#endif
+#ifdef LIT
+uniform vec3 uEmissive; uniform vec2 uShadowP; uniform sampler2DShadow uShadowMap;
+#ifdef EMAP
+uniform sampler2D uEMap;
+#endif
+float shadowAt() {
+  vec3 c = vSh.xyz / vSh.w; c.z += uShadowP.y;
+  if (c.x < 0.0 || c.x > 1.0 || c.y < 0.0 || c.y > 1.0 || c.z > 1.0) return 1.0;
+  float s = texture(uShadowMap, c);
+  s += textureOffset(uShadowMap, c, ivec2(-1, -1)); s += textureOffset(uShadowMap, c, ivec2(0, -1)); s += textureOffset(uShadowMap, c, ivec2(1, -1)); s += textureOffset(uShadowMap, c, ivec2(-1, 0));
+  s += textureOffset(uShadowMap, c, ivec2(1, 0)); s += textureOffset(uShadowMap, c, ivec2(-1, 1)); s += textureOffset(uShadowMap, c, ivec2(0, 1)); s += textureOffset(uShadowMap, c, ivec2(1, 1));
+  return s / 9.0;
+}
+#endif
+#ifdef FOG
+uniform vec3 uFogCol; uniform vec2 uFogP;
+#endif
+out vec4 outColor;
+void main() {
+  vec4 base = vec4(uColor * vC, uOpacity);
+#ifdef MAP
+  base *= texture(uMap, vUv);
+#endif
+#ifdef LIT
+  float sh = uShadowP.x > 0.5 ? shadowAt() : 1.0;
+#ifdef GOURAUD
+  vec3 hemi = vHF, lit = vLF * sh; // three's Lambert: direct light summed per vertex, one shadow mask over all of it
+#ifdef DBL
+  if (!gl_FrontFacing) { hemi = vHB; lit = vLB * sh; }
+#endif
+#else
+  vec3 n = normalize(vN);
+#ifdef DBL
+  if (!gl_FrontFacing) n = -n;
+#endif
+  vec3 V = vec3(0.0), specD = vec3(0.0), specL = vec3(0.0);
+#ifdef SPEC
+  V = normalize(uCamPos - vWP);
+#endif
+  vec3 hemi = hemiLight(n), lit = dirLight(n, V, specD) * sh + localLights(n, vWP, V, specL); // three's Phong: per fragment, the shadow only darkens the sun
+#endif
+  vec3 col = base.rgb * (hemi + lit), em = uEmissive;
+#ifdef EMAP
+  em *= texture(uEMap, vUv).rgb;
+#endif
+  col += em;
+#ifdef SPEC
+  col += specD * sh + specL;
+#endif
+#else
+  vec3 col = base.rgb;
+#endif
+#ifdef FOG
+  col = mix(col, uFogCol, smoothstep(uFogP.x, uFogP.y, vDepth));
+#endif
+  outColor = vec4(col, base.a);
+}`;
+const PTS_VS = `#version 300 es
+precision highp float; layout(location=0) in vec3 position; uniform mat4 uModel, uView, uProj; uniform vec2 uSize;
+void main() { vec4 mv = uView * uModel * vec4(position, 1.0); gl_Position = uProj * mv; gl_PointSize = uSize.y > 0.0 ? uSize.x * uSize.y / -mv.z : uSize.x; }`;
+const PTS_FS = `#version 300 es
+precision highp float; uniform vec3 uColor; uniform float uOpacity; out vec4 outColor; void main() { outColor = vec4(uColor, uOpacity); }`;
+const DEPTH_VS = `#version 300 es
+precision highp float; layout(location=0) in vec3 position;
+#ifdef INST
+layout(location=4) in vec4 im0; layout(location=5) in vec4 im1; layout(location=6) in vec4 im2; layout(location=7) in vec4 im3;
+#endif
+uniform mat4 uModel, uVP;
+void main() { mat4 M = uModel;
+#ifdef INST
+  M = M * mat4(im0, im1, im2, im3);
+#endif
+  gl_Position = uVP * M * vec4(position, 1.0); }`;
+const DEPTH_FS = `#version 300 es
+precision highp float; void main() {}`;
+const SM_VS_PRE = 'precision highp float; uniform mat4 modelViewMatrix; uniform mat4 projectionMatrix; uniform mat4 modelMatrix; uniform mat4 viewMatrix; uniform vec3 cameraPosition; attribute vec3 position; attribute vec3 normal; attribute vec2 uv;\n';
+const SM_FS_PRE = 'precision highp float;\n';
+const STD_ATTR = { position: 0, normal: 1, uv: 2, color: 3 };
+const _p = new Vector3(), _p2 = new Vector3(), _mv = new Matrix4(), _lm = new Matrix4(), _lp = new Matrix4(), _vp = new Matrix4(), _shm = new Matrix4(), _bias = new Matrix4().set(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
+let _pid = 1;
+
+class WebGLRenderer {
+  constructor(opts = {}) {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl2', { antialias: opts.antialias !== false, powerPreference: opts.powerPreference || 'default', alpha: false, stencil: false, premultipliedAlpha: true });
+    if (!gl) throw new Error('WebGL 2 is not available');
+    this.gl = gl; this.domElement = canvas; this.pixelRatio = 1; this.shadowMap = { enabled: false, type: 2 };
+    this.info = { render: { calls: 0, triangles: 0, frame: 0 }, programs: [], memory: { geometries: 0, textures: 0 } };
+    const aniso = gl.getExtension('EXT_texture_filter_anisotropic'); this.aniso = aniso;
+    this.capabilities = { getMaxAnisotropy: () => (aniso ? gl.getParameter(aniso.MAX_TEXTURE_MAX_ANISOTROPY_EXT) : 1) };
+    this.programs = new Map(); this.textures = new Map(); this.frame = 0; this.frustum = new Frustum(); this.shadowFrustum = new Frustum(); this.items = []; this.shadowFB = null;
+    this.state = { prog: null, blend: -1, dw: null, dt: null, cull: -1, po: null, tex: [], vao: null };
+    gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL); gl.frontFace(gl.CCW); gl.clearColor(0, 0, 0, 1);
+    gl.vertexAttrib3f(1, 0, 1, 0); gl.vertexAttrib2f(2, 0, 0); gl.vertexAttrib3f(3, 1, 1, 1); gl.vertexAttrib3f(8, 1, 1, 1);
+  }
+  setPixelRatio(r) { this.pixelRatio = r; }
+  setSize(w, h) { const c = this.domElement; c.width = Math.floor(w * this.pixelRatio); c.height = Math.floor(h * this.pixelRatio); c.style.width = w + 'px'; c.style.height = h + 'px'; }
+
+  // --- programs ---
+  compile(vs, fs, attribs) {
+    const gl = this.gl, sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error('HS3D shader', gl.getShaderInfoLog(s), src); return s; };
+    const prog = gl.createProgram(); gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
+    for (const n in attribs) gl.bindAttribLocation(prog, attribs[n], n);
+    gl.linkProgram(prog); if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) console.error('HS3D link', gl.getProgramInfoLog(prog));
+    const P = { id: _pid++, prog, u: {}, attribs, frame: -1, units: 3 }; const n = gl.getProgramParameter(prog, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < n; i++) { const info = gl.getActiveUniform(prog, i); P.u[info.name.replace('[0]', '')] = gl.getUniformLocation(prog, info.name); }
+    this.info.programs.push(P); return P;
+  }
+  programFor(m, obj) {
+    if (m.type === 'ShaderMaterial') { let P = this.programs.get(m); if (!P) { const attribs = Object.assign({}, STD_ATTR); let loc = 9; for (const mm of m.vertexShader.matchAll(/attribute\s+\w+\s+(\w+)/g)) if (!(mm[1] in attribs)) attribs[mm[1]] = loc++;
+      P = this.compile(SM_VS_PRE + m.vertexShader, SM_FS_PRE + m.fragmentShader, attribs); P.layout = P.id; this.programs.set(m, P); } return P; }
+    if (m.type === 'PointsMaterial') { let P = this.programs.get('pts'); if (!P) { P = this.compile(PTS_VS, PTS_FS, {}); P.layout = 0; this.programs.set('pts', P); } return P; }
+    const lit = !!m.lit, key = (lit ? 'L' : 'B') + (m.map ? 'M' : '') + (lit && m.emissiveMap ? 'E' : '') + (m.vertexColors ? 'V' : '') + (obj.isInstancedMesh ? (obj.instanceColor ? 'IC' : 'I') : '') + (m.specular ? 'S' : '') + (lit && !m.specular ? 'G' : '') + (m.side === 2 ? 'D' : '') + (m.fog ? 'F' : '');
+    let P = this.programs.get(key);
+    if (!P) { const d = (lit ? '#define LIT\n' : '') + (m.map ? '#define MAP\n' : '') + (lit && m.emissiveMap ? '#define EMAP\n' : '') + (m.vertexColors ? '#define VCOL\n' : '') + (obj.isInstancedMesh ? '#define INST\n' : '') + (obj.isInstancedMesh && obj.instanceColor ? '#define ICOL\n' : '') + (m.specular ? '#define SPEC\n' : '') + (lit && !m.specular ? '#define GOURAUD\n' : '') + (m.side === 2 ? '#define DBL\n' : '') + (m.fog ? '#define FOG\n' : '');
+      const ins = (s) => s.replace('precision highp float;', 'precision highp float;\n' + d); P = this.compile(ins(SURF_VS), ins(SURF_FS), {}); P.layout = 0; this.programs.set(key, P); }
+    return P;
+  }
+  depthProgram(inst) { const k = inst ? 'depthI' : 'depth'; let P = this.programs.get(k); if (!P) { P = this.compile(inst ? DEPTH_VS.replace('precision highp float;', 'precision highp float;\n#define INST\n') : DEPTH_VS, DEPTH_FS, {}); P.layout = 0; this.programs.set(k, P); } return P; }
+  use(P) { if (this.state.prog !== P) { this.gl.useProgram(P.prog); this.state.prog = P; } return P.u; }
+
+  // --- GL state ---
+  setBlend(b) { const gl = this.gl, s = this.state; if (s.blend === b) return; s.blend = b; if (!b) gl.disable(gl.BLEND); else { gl.enable(gl.BLEND); if (b === 2) gl.blendFunc(gl.SRC_ALPHA, gl.ONE); else gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA); } }
+  setDepth(test, write) { const gl = this.gl, s = this.state; if (s.dt !== test) { s.dt = test; test ? gl.enable(gl.DEPTH_TEST) : gl.disable(gl.DEPTH_TEST); } if (s.dw !== write) { s.dw = write; gl.depthMask(write); } }
+  setCull(side) { const gl = this.gl, s = this.state; if (s.cull === side) return; s.cull = side; if (side === 2) gl.disable(gl.CULL_FACE); else { gl.enable(gl.CULL_FACE); gl.cullFace(side === 1 ? gl.FRONT : gl.BACK); } }
+  setPO(m) { const gl = this.gl, s = this.state, k = m.polygonOffset ? m.polygonOffsetFactor + ',' + m.polygonOffsetUnits : null; if (s.po === k) return; s.po = k; if (k === null) gl.disable(gl.POLYGON_OFFSET_FILL); else { gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(m.polygonOffsetFactor, m.polygonOffsetUnits); } }
+  bindTex(unit, glTex) { const gl = this.gl, s = this.state; if (s.tex[unit] === glTex) return; s.tex[unit] = glTex; gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, glTex); }
+  glTexture(t) { const gl = this.gl; let r = this.textures.get(t.image);
+    if (!r) { r = gl.createTexture(); this.textures.set(t.image, r); this.info.memory.textures++; this.state.tex[0] = null; gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, r);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, t.flipY); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false); gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, t.image); gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, t.wrapS === 1000 ? gl.REPEAT : gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, t.wrapT === 1000 ? gl.REPEAT : gl.CLAMP_TO_EDGE);
+      if (this.aniso && t.anisotropy > 1) gl.texParameterf(gl.TEXTURE_2D, this.aniso.TEXTURE_MAX_ANISOTROPY_EXT, t.anisotropy); }
+    return r; }
+
+  // --- geometry buffers ---
+  geoRes(g) { const gl = this.gl; if (g.gl) return g.gl; this.info.memory.geometries++;
+    const R = g.gl = { bufs: {}, vaos: new Map(), ibuf: null, itype: 0, dispose: () => { for (const k in R.bufs) gl.deleteBuffer(R.bufs[k].buf); if (R.ibuf) gl.deleteBuffer(R.ibuf); for (const v of R.vaos.values()) gl.deleteVertexArray(v); g.gl = null; this.info.memory.geometries--; } };
+    if (g.index) { R.ibuf = gl.createBuffer(); gl.bindVertexArray(null); this.state.vao = null; gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, R.ibuf); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, g.index.array, gl.STATIC_DRAW); R.itype = g.index.array instanceof Uint32Array ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT; }
+    return R; }
+  attrBuf(R, name, a) { const gl = this.gl; let b = R.bufs[name];
+    if (!b) { b = R.bufs[name] = { buf: gl.createBuffer(), version: a.version, len: a.array.length }; gl.bindBuffer(gl.ARRAY_BUFFER, b.buf); gl.bufferData(gl.ARRAY_BUFFER, a.array, a.usage === 35048 ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW); }
+    else if (b.version !== a.version) { b.version = a.version; gl.bindBuffer(gl.ARRAY_BUFFER, b.buf); if (b.len !== a.array.length) { b.len = a.array.length; gl.bufferData(gl.ARRAY_BUFFER, a.array, gl.DYNAMIC_DRAW); } else gl.bufferSubData(gl.ARRAY_BUFFER, 0, a.array); }
+    return b.buf; }
+  bindGeometry(g, P, obj) { const gl = this.gl, R = this.geoRes(g), inst = obj.isInstancedMesh, key = P.layout + (inst ? ':' + obj.id : '');
+    let vao = R.vaos.get(key);
+    if (!vao) { vao = gl.createVertexArray(); R.vaos.set(key, vao); gl.bindVertexArray(vao); this.state.vao = vao;
+      for (const name in g.attributes) { const loc = P.attribs[name] !== undefined ? P.attribs[name] : STD_ATTR[name]; if (loc === undefined) continue; const a = g.attributes[name];
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.attrBuf(R, name, a)); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, a.itemSize, gl.FLOAT, false, 0, 0); }
+      if (inst) { const ib = this.instBuf(obj, 'instanceMatrix'); gl.bindBuffer(gl.ARRAY_BUFFER, ib); for (let i = 0; i < 4; i++) { gl.enableVertexAttribArray(4 + i); gl.vertexAttribPointer(4 + i, 4, gl.FLOAT, false, 64, i * 16); gl.vertexAttribDivisor(4 + i, 1); }
+        if (obj.instanceColor) { gl.bindBuffer(gl.ARRAY_BUFFER, this.instBuf(obj, 'instanceColor')); gl.enableVertexAttribArray(8); gl.vertexAttribPointer(8, 3, gl.FLOAT, false, 0, 0); gl.vertexAttribDivisor(8, 1); } }
+      if (R.ibuf) gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, R.ibuf); }
+    else { if (this.state.vao !== vao) { gl.bindVertexArray(vao); this.state.vao = vao; }
+      for (const name in g.attributes) { const a = g.attributes[name], b = R.bufs[name]; if (b && b.version !== a.version) this.attrBuf(R, name, a); }
+      if (inst) { this.instBuf(obj, 'instanceMatrix'); if (obj.instanceColor) this.instBuf(obj, 'instanceColor'); } }
+    return R; }
+  instBuf(obj, name) { const a = obj[name]; if (!obj.glb) obj.glb = {}; let b = obj.glb[name]; const gl = this.gl;
+    if (!b) { b = obj.glb[name] = { buf: gl.createBuffer(), version: a.version }; gl.bindBuffer(gl.ARRAY_BUFFER, b.buf); gl.bufferData(gl.ARRAY_BUFFER, a.array, gl.DYNAMIC_DRAW); }
+    else if (b.version !== a.version) { b.version = a.version; gl.bindBuffer(gl.ARRAY_BUFFER, b.buf); gl.bufferSubData(gl.ARRAY_BUFFER, 0, a.array); }
+    return b.buf; }
+  draw(g, R, obj, mode) { const gl = this.gl, dr = g.drawRange; let count, start = dr.start;
+    if (g.index) { count = Math.min(g.index.count - start, dr.count); gl.drawElementsInstanced && obj.isInstancedMesh ? gl.drawElementsInstanced(mode, count, R.itype, start * (R.itype === gl.UNSIGNED_INT ? 4 : 2), obj.count) : gl.drawElements(mode, count, R.itype, start * (R.itype === gl.UNSIGNED_INT ? 4 : 2)); }
+    else { count = Math.min(g.attributes.position.count - start, dr.count); obj.isInstancedMesh ? gl.drawArraysInstanced(mode, start, count, obj.count) : gl.drawArrays(mode, start, count); }
+    this.info.render.calls++; this.info.render.triangles += (mode === gl.TRIANGLES ? count / 3 : 0) * (obj.isInstancedMesh ? obj.count : 1); }
+
+  // --- frame ---
+  visible(obj, fr) { if (!obj.frustumCulled) return true; const g = obj.geometry; if (!g.boundingSphere) g.computeBoundingSphere(); const s = g.boundingSphere; _p.copy(s.center).applyMatrix4(obj.matrixWorld); return fr.intersectsSphere(_p.x, _p.y, _p.z, s.radius * obj.matrixWorld.getMaxScaleOnAxis()); }
+  render(scene, camera) {
+    const gl = this.gl, L = this.L = { hemi: null, dir: null, spot: null, pt: null }, items = this.items; items.length = 0; this.frame++; this.info.render.calls = this.info.render.triangles = 0;
+    scene.updateMatrixWorld(); camera.matrixWorldInverse.copy(camera.matrixWorld).invert(); _vp.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); this.frustum.setFromProjectionMatrix(_vp);
+    const walk = (o) => { if (!o.visible) return; if (o.isMesh || o.isPoints) { if (o.material.visible) items.push(o); } else if (o.isLight) { if (o.type === 'HemisphereLight') L.hemi = o; else if (o.type === 'DirectionalLight') L.dir = o; else if (o.type === 'SpotLight') L.spot = o; else L.pt = o; } for (const c of o.children) walk(c); };
+    walk(scene);
+    this.shadowOn = !!(this.shadowMap.enabled && L.dir && L.dir.castShadow);
+    if (this.shadowOn) this.renderShadow(L.dir);
+    this.info.render.calls = this.info.render.triangles = 0; // like three: counts are the main pass only
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, this.domElement.width, this.domElement.height); this.setDepth(true, true); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    const opaque = [], trans = [], ce = camera.matrixWorldInverse.elements;
+    for (const o of items) { if (!this.visible(o, this.frustum)) continue; const m = o.material, e = o.matrixWorld.elements; o.z = ce[2] * e[12] + ce[6] * e[13] + ce[10] * e[14] + ce[14]; o.P = this.programFor(m, o); (m.transparent ? trans : opaque).push(o); }
+    opaque.sort((a, b) => a.renderOrder - b.renderOrder || a.P.id - b.P.id || a.material.id - b.material.id || b.z - a.z || a.id - b.id);
+    trans.sort((a, b) => a.renderOrder - b.renderOrder || a.z - b.z || a.id - b.id);
+    this.cam = camera; this.scene = scene; this.lastMat = null;
+    for (const o of opaque) this.drawItem(o); for (const o of trans) this.drawItem(o);
+    gl.bindVertexArray(null); this.state.vao = null;
+  }
+  frameUniforms(P, u) { const gl = this.gl, cam = this.cam, L = this.L, fog = this.scene.fog; if (P.frame === this.frame) return; P.frame = this.frame;
+    if (u.uView) gl.uniformMatrix4fv(u.uView, false, cam.matrixWorldInverse.elements); if (u.uProj) gl.uniformMatrix4fv(u.uProj, false, cam.projectionMatrix.elements);
+    if (u.viewMatrix) gl.uniformMatrix4fv(u.viewMatrix, false, cam.matrixWorldInverse.elements); if (u.projectionMatrix) gl.uniformMatrix4fv(u.projectionMatrix, false, cam.projectionMatrix.elements);
+    if (u.cameraPosition || u.uCamPos) { _p.setFromMatrixPosition(cam.matrixWorld); if (u.cameraPosition) gl.uniform3f(u.cameraPosition, _p.x, _p.y, _p.z); if (u.uCamPos) gl.uniform3f(u.uCamPos, _p.x, _p.y, _p.z); }
+    if (u.uFogCol && fog) { gl.uniform3f(u.uFogCol, fog.color.r, fog.color.g, fog.color.b); gl.uniform2f(u.uFogP, fog.near, fog.far); }
+    if (!u.uHemiSky) return;
+    const h = L.hemi, d = L.dir, s = L.spot, pt = L.pt;
+    if (h) { const i = h.intensity; gl.uniform3f(u.uHemiSky, h.color.r * i, h.color.g * i, h.color.b * i); gl.uniform3f(u.uHemiGround, h.groundColor.r * i, h.groundColor.g * i, h.groundColor.b * i); } else { gl.uniform3f(u.uHemiSky, 0, 0, 0); gl.uniform3f(u.uHemiGround, 0, 0, 0); }
+    if (d) { const i = d.intensity; gl.uniform3f(u.uDirCol, d.color.r * i, d.color.g * i, d.color.b * i); _p.setFromMatrixPosition(d.matrixWorld); _p2.setFromMatrixPosition(d.target.matrixWorld); _p.sub(_p2).normalize(); gl.uniform3f(u.uDirDir, _p.x, _p.y, _p.z); } else { gl.uniform3f(u.uDirCol, 0, 0, 0); gl.uniform3f(u.uDirDir, 0, 1, 0); }
+    if (s && s.intensity > 0) { const i = s.intensity; gl.uniform3f(u.uSpotCol, s.color.r * i, s.color.g * i, s.color.b * i); _p.setFromMatrixPosition(s.matrixWorld); gl.uniform3f(u.uSpotPos, _p.x, _p.y, _p.z); _p2.setFromMatrixPosition(s.target.matrixWorld); _p.sub(_p2).normalize(); gl.uniform3f(u.uSpotDir, _p.x, _p.y, _p.z); gl.uniform4f(u.uSpotP, s.distance, s.decay, Math.cos(s.angle), Math.cos(s.angle * (1 - s.penumbra))); } else gl.uniform3f(u.uSpotCol, 0, 0, 0);
+    if (pt && pt.intensity > 0) { const i = pt.intensity; gl.uniform3f(u.uPtCol, pt.color.r * i, pt.color.g * i, pt.color.b * i); _p.setFromMatrixPosition(pt.matrixWorld); gl.uniform3f(u.uPtPos, _p.x, _p.y, _p.z); gl.uniform2f(u.uPtP, pt.distance, pt.decay); } else gl.uniform3f(u.uPtCol, 0, 0, 0);
+    gl.uniform2f(u.uShadowP, this.shadowOn ? 1 : 0, d ? d.shadow.bias : 0); gl.uniform1f(u.uNBias, d ? d.shadow.normalBias : 0); gl.uniformMatrix4fv(u.uShadow, false, _shm.elements);
+    if (this.shadowFB) { this.bindTex(2, this.shadowFB.tex); gl.uniform1i(u.uShadowMap, 2); } }
+  drawItem(o) { const gl = this.gl, m = o.material, g = o.geometry, P = o.P, u = this.use(P); this.frameUniforms(P, u);
+    if (this.lastMat !== m || this.lastProg !== P) { this.lastMat = m; this.lastProg = P; this.setBlend(m.blending === 1 && !m.transparent ? 0 : m.blending); this.setDepth(m.depthTest, m.depthWrite); this.setCull(m.side); this.setPO(m);
+      if (m.type === 'ShaderMaterial') { let unit = 3; for (const name in m.uniforms) { const loc = u[name]; if (!loc) continue; const v = m.uniforms[name].value;
+          if (typeof v === 'number') gl.uniform1f(loc, v); else if (v.isTexture) { this.bindTex(unit, this.glTexture(v)); gl.uniform1i(loc, unit++); } else if (v.elements) gl.uniformMatrix4fv(loc, false, v.elements); else if (v.r !== undefined) gl.uniform3f(loc, v.r, v.g, v.b); else if (v.z !== undefined) gl.uniform3f(loc, v.x, v.y, v.z); else gl.uniform2f(loc, v.x, v.y); } }
+      else { gl.uniform3f(u.uColor, m.color.r, m.color.g, m.color.b); gl.uniform1f(u.uOpacity, m.opacity);
+        if (m.type === 'PointsMaterial') gl.uniform2f(u.uSize, m.size * this.pixelRatio, m.sizeAttenuation ? this.domElement.height * 0.5 : 0);
+        else { if (m.map) { this.bindTex(0, this.glTexture(m.map)); gl.uniform1i(u.uMap, 0); gl.uniform2f(u.uRepeat, m.map.repeat.x, m.map.repeat.y); } else gl.uniform2f(u.uRepeat, 1, 1);
+          if (m.lit) { const k = m.emissiveIntensity; gl.uniform3f(u.uEmissive, m.emissive.r * k, m.emissive.g * k, m.emissive.b * k); if (m.emissiveMap) { this.bindTex(1, this.glTexture(m.emissiveMap)); gl.uniform1i(u.uEMap, 1); }
+            if (m.specular) { gl.uniform3f(u.uSpecular, m.specular.r, m.specular.g, m.specular.b); gl.uniform1f(u.uShininess, m.shininess); } } } } }
+    if (m.type === 'ShaderMaterial') { _mv.multiplyMatrices(this.cam.matrixWorldInverse, o.matrixWorld); if (u.modelViewMatrix) gl.uniformMatrix4fv(u.modelViewMatrix, false, _mv.elements); if (u.modelMatrix) gl.uniformMatrix4fv(u.modelMatrix, false, o.matrixWorld.elements); }
+    else gl.uniformMatrix4fv(u.uModel, false, o.matrixWorld.elements);
+    const R = this.bindGeometry(g, P, o); this.draw(g, R, o, o.isPoints ? gl.POINTS : gl.TRIANGLES); }
+  renderShadow(light) { const gl = this.gl, sz = light.shadow.mapSize.x, c = light.shadow.camera; let F = this.shadowFB;
+    if (!F || F.size !== sz) { if (F) { gl.deleteTexture(F.tex); gl.deleteFramebuffer(F.fb); } const tex = gl.createTexture(); this.state.tex[2] = null; gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT24, sz, sz, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT, null);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_MODE, gl.COMPARE_REF_TO_TEXTURE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_FUNC, gl.LEQUAL);
+      const fb = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, fb); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, tex, 0); gl.drawBuffers([gl.NONE]); gl.readBuffer(gl.NONE);
+      F = this.shadowFB = { tex, fb, size: sz }; this.state.tex[2] = tex; }
+    _p.setFromMatrixPosition(light.matrixWorld); _p2.setFromMatrixPosition(light.target.matrixWorld); _lm.lookAt(_p, _p2, light.up).setPosition(_p).invert();
+    _lp.makeOrthographic(c.left, c.right, c.top, c.bottom, c.near, c.far); _vp.multiplyMatrices(_lp, _lm); _shm.multiplyMatrices(_bias, _vp); this.shadowFrustum.setFromProjectionMatrix(_vp);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, F.fb); gl.viewport(0, 0, sz, sz); this.setDepth(true, true); this.setBlend(0); this.setPO({ polygonOffset: false }); gl.clear(gl.DEPTH_BUFFER_BIT);
+    let P = null;
+    for (const o of this.items) { if (!o.castShadow || !o.isMesh || !this.visible(o, this.shadowFrustum)) continue; const m = o.material, inst = !!o.isInstancedMesh, Q = this.depthProgram(inst);
+      if (Q !== P) { P = Q; this.use(P); gl.uniformMatrix4fv(P.u.uVP, false, _vp.elements); }
+      this.setCull(m.side === 2 ? 2 : m.side === 1 ? 0 : 1); gl.uniformMatrix4fv(P.u.uModel, false, o.matrixWorld.elements);
+      const R = this.bindGeometry(o.geometry, P, o); this.draw(o.geometry, R, o, gl.TRIANGLES); }
+    gl.bindVertexArray(null); this.state.vao = null; }
+}
+THREE.WebGLRenderer = WebGLRenderer;
+window.THREE = THREE;
+})();
+</script>
 <script>
 /* Home Stretch: drive an average American house around Hometown and its elevated interstate loop.
-   Everything (textures, town, traffic, sound) is generated in code; the only dependency is three.js r128. */
+   Everything (textures, town, traffic, sound, font, the WebGL renderer above) is in this one file; no external requests. */
 (function () {
 'use strict';
 function start(saved) {
-if (typeof THREE === 'undefined') { var m = document.getElementById('loadmsg'); if (m) m.textContent = 'The 3D engine could not load. Check your internet connection, then reload.'; return; }
+if (typeof THREE === 'undefined' || !document.createElement('canvas').getContext('webgl2')) { var m = document.getElementById('loadmsg'); if (m) m.textContent = 'This game needs WebGL 2. Try a current Chrome, Firefox, Safari or Edge.'; return; }
 saved = saved || {};
 // ============================================================
 // Core helpers, constants, renderer
@@ -771,8 +1390,8 @@ function buildAtlas() {
   add('price', 128, 192, (g, w, h) => {
     g.fillStyle = '#f4f4ee'; g.fillRect(0, 0, w, h); g.fillStyle = '#c62f2a'; g.fillRect(0, 0, w, 40); txt(g, 'GAS & GO', w / 2, 21, 18, '#fff', 900);
     g.fillStyle = '#151515'; g.fillRect(10, 54, w - 20, 56); g.fillRect(10, 122, w - 20, 56);
-    txt(g, '3.49', w / 2 - 6, 83, 34, '#ffb347', 800, 'center', 90, '"Overpass Mono", monospace'); txt(g, '9', w - 22, 72, 14, '#ffb347', 800);
-    txt(g, '3.89', w / 2 - 6, 151, 34, '#ffb347', 800, 'center', 90, '"Overpass Mono", monospace'); txt(g, '9', w - 22, 140, 14, '#ffb347', 800);
+    txt(g, '3.49', w / 2 - 6, 83, 34, '#ffb347', 800, 'center', 90); txt(g, '9', w - 22, 72, 14, '#ffb347', 800);
+    txt(g, '3.89', w / 2 - 6, 151, 34, '#ffb347', 800, 'center', 90); txt(g, '9', w - 22, 140, 14, '#ffb347', 800);
   });
   add('motel', 160, 288, (g, w, h) => {
     g.fillStyle = '#1e2a36'; rrect(g, 0, 0, w, h, 14); g.fill(); g.strokeStyle = '#ff5a5a'; g.lineWidth = 5; rrect(g, 8, 8, w - 16, h - 16, 10); g.stroke();
@@ -3742,7 +4361,7 @@ async function init() {
   setLoad('Pouring the foundation…');
   try {
     await Promise.race([
-      Promise.all(['600 20px Overpass', '700 20px Overpass', '800 20px Overpass', '900 20px Overpass', '700 20px "Overpass Mono"'].map((f) => document.fonts.load(f))),
+      Promise.all(['600 20px Overpass', '900 20px Overpass'].map((f) => document.fonts.load(f))),
       wait(2500),
     ]);
   } catch (e) { /* fall back to system fonts */ }
