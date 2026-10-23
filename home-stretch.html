@@ -2848,7 +2848,7 @@ const P = {
   x: START.x, y: 0, z: START.z, h: START.h, vx: 0, vz: 0, vy: 0, yaw: 0, steer: 0,
   grounded: true, air: 0, pitch: 0, roll: 0, sp: 0, spv: 0, sr: 0, srv: 0, hv: 0, hvv: 0,
   wheel: 0, vf: 0, vfPrev: 0, slope: 0, surface: 'road', onRib: false, slip: 0, braking: false,
-  safe: { x: START.x, y: 0, z: START.z, h: START.h }, safeT: 0, bump: 0, inWater: false,
+  safe: { x: START.x, y: 0, z: START.z, h: START.h }, safeT: 0, bump: 0, inWater: false, cap: 0,
 };
 const PL = {}; // player meshes
 
@@ -2984,14 +2984,34 @@ const HOUSES = [
   { n: 'PORCH COTTAGE', d: 'Front gable, deep porch. Pays more.', mass: 1.2, sway: 1.15, pay: 1.35, type: 2, s: 0.7, front: 0, chim: [-3.2, 7.1, -1.5], o: { siding: 0xf2e3a6, roof: 0x8f5f4c, door: 0x2f5d3a, shutter: 0x2f4a36, chimney: true } },
   { n: 'TWO-STORY COLONIAL', d: 'Tall and heavy. It sways. Big tip.', mass: 1.5, sway: 1.5, pay: 1.8, type: 1, s: 0.6, front: Math.PI / 2, chim: [5.6, 9.8, 0], o: { siding: 0xe9dfc7, roof: 0x5f6f60, door: 0x2c2c2c, shutter: 0x2b2f33, garage: false, flip: false } },
   { n: 'RANCH + GARAGE', d: 'Long, wide, slow. The biggest payday.', mass: 1.8, sway: 1.3, pay: 2.4, type: 0, s: 0.52, front: Math.PI / 2, chim: [-5.5, 6.5, -1.2], o: { siding: 0xc3d2b8, roof: 0x7a685a, door: 0xb03a2e, shutter: 0x5a4636, chimney: true, flip: false } },
+  { n: 'APARTMENT BLOCK', d: 'Seven floors of tenants. Top-heavy: take corners slow.', mass: 2.4, sway: 1.8, tall: 2.2, pay: 3.2, type: 't', floors: 7, fh: 3.1, w: 18, d: 12, s: 0.55, front: Math.PI / 2, chim: [7.5, 23.2, 4.5] },
+  { n: 'SKYSCRAPER', d: 'Twenty-four floors of glass. Sways like a reed and CAN capsize.', mass: 3.2, sway: 2.4, tall: 4, pay: 6, type: 't', floors: 24, fh: 3.5, w: 15, d: 15, s: 0.5, front: 0, glass: true, chim: [5.5, 85.6, 5.5] },
 ];
+function buildTower(T, H) { // apartment block or glass skyscraper: slab, window grid, parapet, bulkhead (+ spire); returns buildHouse-style extents
+  const { w: W, d: D, fh } = H, Ht = H.floors * fh, b = (k) => B(k, T.x, T.z);
+  b('plain').boxB(T, W + 0.4, 0.5, D + 0.4, 0x8f9396, { skip: NOBOT });
+  if (H.glass) b('facade').boxB(sub(T, 0, 0.5, 0), W, Ht, D, 0xe8eef2, { tu: 24, tv: 28, skip: NOBOT });
+  else {
+    b('brick').boxB(sub(T, 0, 0.5, 0), W, Ht, D, pick(BRICKS), { tu: 2, skip: NOBOT });
+    for (let f = 0; f < H.floors; f++) {
+      const y = 0.5 + f * fh + 1.75;
+      for (let x = -W / 2 + 1.9; x < W / 2 - 1.5; x += 2.8) { houseWindow(T, x, y, D / 2 + 0.05, 'F', 1.2, 1.5); houseWindow(T, x, y, -D / 2 - 0.05, 'K', 1.2, 1.5); if (f) b('plain').box(sub(T, x, y - 1.1, D / 2 + 0.6), 2.2, 0.14, 1.2, 0xd6d2c8); }
+      for (let z = -D / 2 + 2; z < D / 2 - 1.5; z += 2.8) { houseWindow(T, W / 2 + 0.05, y, z, 'E', 1.2, 1.5); houseWindow(T, -W / 2 - 0.05, y, z, 'W', 1.2, 1.5); }
+    }
+  }
+  b('plain').boxB(sub(T, 0, Ht + 0.5, 0), W + 0.3, 0.6, D + 0.3, 0x8a8178, { skip: NOBOT });
+  b('plain').boxB(sub(T, 0, Ht + 1.1, 0), 5, 2.6, 4, 0x9ea3a8);
+  if (H.glass) b('plain').cyl(sub(T, 0, Ht + 1.1, 0), 0.3, 0.06, 12, 6, 0xb8bcc0);
+  frontDoor(T, 0, D / 2, 0x2c2c2c); b('plain').box(sub(T, 0, 2.9, D / 2 + 1.2), 4.2, 0.2, 2.6, 0x55595e);
+  return { x0: -W / 2 - 0.4, x1: W / 2 + 0.4, z0: -D / 2 - 0.4, z1: D / 2 + 1.2, top: Ht + 1.1 + (H.glass ? 12 : 2.6), door: { x: 0, z: D / 2 } };
+}
 function buildBody(hi) {
   const H = HOUSES[hi], body = new THREE.Group(), bbk = {};
   body.position.y = 1.45; body.rotation.order = 'YXZ';
   let fur, parent = body;
   if (H.type === undefined) fur = buildBungalow((k) => bbk[k] || (bbk[k] = new Batch()));
   else {
-    BOVR = bbk; const ext = buildHouse(TY(0, 0, 0, 0), H.type, H.o); BOVR = null;
+    BOVR = bbk; const ext = H.floors ? buildTower(TY(0, 0, 0, 0), H) : buildHouse(TY(0, 0, 0, 0), H.type, H.o); BOVR = null;
     const g = new THREE.Group(); g.scale.setScalar(H.s); g.rotation.y = H.front; g.updateMatrix();
     const q = _v1.set((ext.x0 + ext.x1) / 2, 0, (ext.z0 + ext.z1) / 2).applyMatrix4(g.matrix);
     g.position.set(-q.x, 0, 0.75 - q.z); g.updateMatrix(); body.add(g); parent = g;
@@ -3012,6 +3032,7 @@ const PHYS = { accel: 8.2, brake: 24, rev: 6.5, vrev: 9, grav: 20, grip: 1, sway
 const PCIRC = [1.7, -1.7], PR = 2.95;
 
 function updatePlayer(dt) {
+  if (P.cap) { input.steer = input.throttle = input.brake = 0; input.hand = true; } // on its side: dead until R
   const fx = Math.sin(P.h), fz = Math.cos(P.h), rx = -fz, rz = fx;
   let vf = P.vx * fx + P.vz * fz, vl = P.vx * rx + P.vz * rz;
   const st = input.steer;
@@ -3078,10 +3099,13 @@ function updatePlayer(dt) {
   const vfNow = P.vx * Math.sin(P.h) + P.vz * Math.cos(P.h);
   const aLong = clamp((vfNow - P.vfPrev) / dt, -40, 40); P.vfPrev = vfNow; P.vf = vfNow;
   const aLat = clamp(vfNow * P.yaw, -30, 30);
-  const tP = clamp(aLong * 0.0042 * PHYS.sway, -0.09, 0.12), tR = clamp(aLat * 0.0042 * PHYS.sway, -0.14, 0.14);
+  // roll: a tall load (H.tall) rides a softer, under-damped spring that gravity amplifies; past 0.42 rad the straps give and the rig goes over
+  const T = PL.body && PL.house.tall || 1, kR = 90 / (T * T), kE = kR * (1 - 0.68 * (1 - 1 / T));
+  const tP = clamp(aLong * 0.0042 * PHYS.sway, -0.09, 0.12), tR = clamp(aLat * 0.0042 * PHYS.sway, -0.14 * T, 0.14 * T) * (kR / kE);
   P.spv += (-90 * (P.sp - tP) - 8 * P.spv) * dt; P.sp += P.spv * dt;
-  P.srv += (-90 * (P.sr - tR) - 8 * P.srv) * dt; P.sr += P.srv * dt;
-  if (P.surface === 'grass' && P.grounded && spd > 4) { P.hvv += (Math.random() - 0.5) * spd * 0.09; P.spv += (Math.random() - 0.5) * spd * 0.012; }
+  if (P.cap) { P.sr = damp(P.sr, P.cap * 0.35, 6, dt); P.srv = 0; }
+  else { P.srv += (-kE * (P.sr - tR) - 8 / (T * T) * P.srv) * dt; P.sr += P.srv * dt; if (PL.body && Math.abs(P.sr) > 0.42) capsize(); }
+  if (P.surface === 'grass' && P.grounded && spd > 4) { P.hvv += (Math.random() - 0.5) * spd * 0.09; P.spv += (Math.random() - 0.5) * spd * 0.012; if (T > 1) P.srv += (Math.random() - 0.5) * spd * 0.004 * (T - 1); }
   P.hvv += (-160 * P.hv - 10 * P.hvv) * dt; P.hv += P.hvv * dt;
   P.wheel += (vfNow * dt) / 0.75;
   // remember a safe spot on the road
@@ -3141,6 +3165,7 @@ function resetToRoad() {
   if (blockedAt(P.x, P.z, 3)) { // nudge along the heading until clear
     for (let k = 1; k < 30 && blockedAt(P.x, P.z, 3); k++) { P.x = s.x + Math.sin(s.h) * k * 2; P.z = s.z + Math.cos(s.h) * k * 2; }
   }
+  if (P.cap) { P.cap = 0; P.sr = P.srv = P.roll = 0; setKeyHUD(); }
   camYaw = P.h; camY = P.y; toast('BACK ON THE ROAD', '');
 }
 
@@ -3158,9 +3183,10 @@ function updatePlayerVisual(dt, t) {
     const hl = c(terrainAt(P.x - rx * 2.5, P.z - rz * 2.5, y + 1)), hr = c(terrainAt(P.x + rx * 2.5, P.z + rz * 2.5, y + 1));
     tp = Math.atan2(hf - hb, 6); tr = Math.atan2(hl - hr, 5);
   } else tp = clamp(Math.atan2(P.vy, Math.max(8, Math.abs(P.vf))) * 0.6, -0.35, 0.35);
-  P.pitch = damp(P.pitch, tp, P.grounded ? 12 : 3, dt); P.roll = damp(P.roll, tr, 10, dt);
+  if (P.cap) tr += P.cap * 1.25; // capsized: the chassis lies on its side, pivoting on the outer wheels
+  P.pitch = damp(P.pitch, tp, P.grounded ? 12 : 3, dt); P.roll = damp(P.roll, tr, P.cap ? 2.5 : 10, dt);
   PL.chassis.rotation.x = -P.pitch; PL.chassis.rotation.z = P.roll;
-  PL.chassis.position.y = P.inWater ? -0.55 + Math.sin(t * 2) * 0.05 : 0;
+  PL.chassis.position.y = (P.inWater ? -0.55 + Math.sin(t * 2) * 0.05 : 0) + (P.cap ? 1.3 * Math.abs(Math.sin(P.roll)) : 0);
   if (PL.body) { PL.body.rotation.x = P.sp; PL.body.rotation.z = P.sr; PL.body.position.y = 1.45 + P.hv; }
   for (const w of PL.wheels) { w.spin.rotation.x = P.wheel; w.steer.rotation.y = w.front ? P.steer * 0.42 : 0; }
   // brake lights
@@ -3918,6 +3944,7 @@ function setKeyHUD() { // bottom-left legend, re-rendered whenever the state or 
   const ph = mission ? mission.phase : '', D = [['W ↑', 'gas'], ['S ↓', 'brake · reverse'], ['A D', 'steer'], ['Space', 'handbrake'], ['C', 'camera'], ['R', 'back on the road'], ['Esc', 'pause']];
   const rows = state === 'shop' ? [['Enter', 'LOAD UP · next level', 1], ['click', 'buy an upgrade · pick a house']]
     : state === 'pause' ? [['Esc', 'RESUME', 1], ['C', 'next camera'], ['N', 'night / day'], ['R', 'back on the road'], ['M', 'sound']]
+    : P.cap ? [['R', 'RIGHT THE RIG · it capsized', 1], ['C', 'camera'], ['Esc', 'pause']]
     : ph === 'place' ? [['H', 'SET THE HOUSE · stop on the outline', 1], ...D]
     : ph === 'lift' ? [['W ↑', 'PULL OUT · drive clear of the house', 1], ...D.slice(1)]
     : ph === 'set' ? [['', 'HANDS OFF · lowering the house', 1], ...D.slice(4)]
@@ -3948,10 +3975,11 @@ function setHouse() { // H on the lot: jack the house up off the bed where it st
   toast('JACKS DOWN', 'green', 'Now pull the rig out from under the house');
   return true;
 }
-let wasInWater = false, wrongWayT = 0, stuckT = 0, stuckHintT = -99;
+let wasInWater = false, wrongWayT = 0, stuckT = 0, stuckHintT = -99, tipT = -99;
 function checkWarnings(dt) {
   if (input.throttle > 0 && !input.brake && Math.abs(P.vf) < 0.6 && P.grounded) stuckT += dt; else stuckT = 0;
   if (stuckT > 2.2 && simTime - stuckHintT > 12) { stuckHintT = simTime; toast('STUCK?', '', IS_TOUCH ? 'Hold BRAKE to back up, or use Back on road in the pause menu' : 'Hold S to back up, or press R to get back on the road'); }
+  if (PL.body && !P.cap && Math.abs(P.sr) > 0.26 && simTime - tipT > 5) { tipT = simTime; toast('TIPPING!', 'red', 'Slow down and straighten out'); }
   if (P.inWater && !wasInWater && Math.abs(P.vf) > 2) { SFX.splash(); toast('MAKING A SPLASH', ''); }
   wasInWater = P.inWater;
   wrongWayT -= dt;
@@ -4022,6 +4050,12 @@ function saveBest() { if (earned > best.cash) { best = { cash: Math.round(earned
 let lastImpactT = -9, lastToastHit = -9;
 function sparksAt(x, y, z, n) { for (let i = 0; i < n; i++) sparks.spawn(x, y, z, mr(-7, 7), mr(2, 9), mr(-7, 7), mr(0.25, 0.6), mr(0.25, 0.5), 0.05, 1, Math.random() < 0.5 ? 0xffc44a : 0xff8a2a, 22, 1); }
 function puff(x, y, z, n, col, s0, s1, life, spread, up, alpha = 0.4) { for (let i = 0; i < n; i++) smoke.spawn(x + mr(-spread, spread), y, z + mr(-spread, spread), mr(-1.5, 1.5), up + mr(0, 1.5), mr(-1.5, 1.5), life * mr(0.7, 1.2), s0, s1, alpha, col, 0, 1.2); }
+function capsize() { // the straps gave: the rig goes over on its side; R (resetToRoad) rights it
+  P.cap = Math.sign(P.sr) || 1; P.srv = 0;
+  SFX.crash(40); shake = 2; setAppeal(appeal - 35 * PHYS.dmg);
+  sparksAt(P.x, P.y + 1, P.z, 30); puff(P.x, P.y + 0.5, P.z, 20, 0xb8ad98, 2, 7, 1.8, 5, 1.2, 0.5);
+  toast('CAPSIZED!', 'big red', `The ${PL.house.n.toLowerCase()} went over. ${IS_TOUCH ? 'Use Back on road in the pause menu' : 'Press R to right the rig'}`); setKeyHUD();
+}
 function onImpact(imp, x, z) {
   if (simTime - lastImpactT < 0.22) return; lastImpactT = simTime;
   SFX.crash(imp); shake = Math.max(shake, Math.min(1.5, imp * 0.07));
@@ -4396,7 +4430,7 @@ async function init() {
     near: (r = 8) => { const out = []; queryCols(P.x - r, P.x + r, P.z - r, P.z + r, (c) => out.push(c.t === 0 ? `circle ${c.x.toFixed(1)},${c.z.toFixed(1)} r${c.r.toFixed(2)} top${c.y1}` : c.t === 1 ? `box x${c.x0.toFixed(1)}..${c.x1.toFixed(1)} z${c.z0.toFixed(1)}..${c.z1.toFixed(1)} top${c.y1.toFixed(1)}` : `wall ${c.ax.toFixed(1)},${c.az.toFixed(1)}->${(c.ax + c.ux * c.len).toFixed(1)},${(c.az + c.uz * c.len).toFixed(1)} base${c.ay} h${c.ha.toFixed(1)}`)); return out; },
     ringLocate, surfaceAt, get cash() { return cash; }, get appeal() { return appeal; }, props: () => flyingProps.length + ' flying, ' + propsFlattened + ' flattened',
     cars: () => allCars.map((c) => ({ t: c.type, m: c.mode, x: +c.x.toFixed(1), z: +c.z.toFixed(1), y: +c.y.toFixed(1), v: +c.v.toFixed(1), k: !!c.knocked, cr: +c.crush.toFixed(2), h: c.h })), allCars, setTod: (t) => { tod = t; }, camera, get camS() { return camS; }, cam: (m) => { camMode = m; }, teleport: (x, z, h, y = 0) => { Object.assign(P, { x, z, h, y, vx: 0, vz: 0, vy: 0 }); camYaw = h; camY = y; }, input, DESTS, stats: () => ({ tris: staticTris, calls: renderer.info.render.calls, frameTris: renderer.info.render.triangles, cars: allCars.length, dests: DESTS.length }), get mission() { return mission; },
-    setHouse, closeShop, rig, HOUSES, PHYS, PL, pickHouse: (i) => { nextHouse = i; }, get phase() { return mission && mission.phase; }, get level() { return levelsDone; } };
+    setHouse, closeShop, rig, HOUSES, PHYS, PL, pickHouse: (i) => { nextHouse = i; }, load: (i) => { if (PL.body) PL.chassis.remove(PL.body); buildBody(i); applyRig(true); }, get phase() { return mission && mission.phase; }, get level() { return levelsDone; } };
   $('loading').hidden = true; $('title').hidden = false;
   state = 'title';
   lastT = performance.now();
