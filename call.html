@@ -6,7 +6,7 @@
 const media=['audio','video'];
 const L=m=>log.append('\n'+m);
 let p,d,C,A,ok=false,seq=0;
-const help=(e,b)=>L(e+'\n'+(media.includes(b?.id)||b==scan?'Use HTTPS/localhost; allow camera/mic. For QR use Android Chrome or enter the code.':'Check internet, Nearby permission and a serve. Retry a new code or the same Wi-Fi (no relay).'));
+const help=(e,b)=>L(e+'\n'+(media.includes(b?.id)||b==scan?'Use HTTPS/localhost; allow camera/mic. For QR use Android Chrome or enter the code.':'Check internet. Retry a new code or use the same Wi-Fi; this demo has no relay.'));
 const on=(b,f,e='onpointerdown')=>b[e]=async()=>{const t=performance.now();try{const r=f();if(r)await r}catch(e){if(e.name!='AbortError'){if(b==offer||b==use||b==scan)close();help(e,b)}}ms.textContent=(performance.now()-t).toFixed(3)+' ms'};
 const tx=m=>d?.readyState=='open'&&d.send(JSON.stringify(m)),ui=()=>audio.disabled=video.disabled=send.disabled=file.disabled=!ok;
 function unscan(){seq++;near.srcObject?.getTracks().forEach(t=>t.stop());near.srcObject=null;near.hidden=true;scan.disabled=false}
