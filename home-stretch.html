@@ -224,6 +224,17 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
 .go:hover .in, .go:focus-visible .in { background: var(--guide-hi); }
 .go svg { width: 26px; height: 26px; }
 .best { margin: 0; font: 700 13px/1.4 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--muted); min-height: 1.4em; }
+.opts { display: grid; gap: 10px; max-width: 460px; }
+.opt { display: grid; gap: 5px; }
+.opt2 { display: grid; grid-template-columns: 3fr 2fr; gap: 10px; }
+.opt small { font: 800 11px/1 var(--font-display); letter-spacing: 0.3em; color: var(--oversize); }
+.opts .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.opts .card { padding: 6px 8px 5px; gap: 2px; }
+.opts .card b { font-size: 12px; }
+.seg { display: flex; gap: 6px; }
+.seg button { pointer-events: auto; flex: 1; background: transparent; color: var(--paper); border: 2px solid var(--paper); border-radius: 7px; padding: 8px 0 6px; font: 800 12px/1 var(--font-display); letter-spacing: 0.08em; cursor: pointer; }
+.seg button:hover { background: var(--guide-hi); }
+.seg button.on { background: var(--paper); color: var(--guide); }
 .touch-note { display: none; }
 .is-touch .keys { display: none; }
 .is-touch .touch-note { display: block; }
@@ -329,6 +340,11 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
       <li><span class="k"><kbd>N</kbd></span>Jump to night or day</li>
       <li><span class="k"><kbd>R</kbd></span>Back onto the road</li>
     </ul>
+    <div class="opts">
+      <div class="opt"><small>START WITH</small><div class="cards" id="o-house"></div></div>
+      <div class="opt2"><div class="opt"><small>TIME</small><div class="seg" id="o-tod"><button class="on" data-t="10.4">DAY</button><button data-t="17.9">DUSK</button><button data-t="21.5">NIGHT</button></div></div>
+      <div class="opt"><small>RIG</small><div class="seg" id="o-rig"><button class="on" data-r="0">STOCK</button><button data-r="3">MAXED</button></div></div></div>
+    </div>
     <p class="brief touch-note">Steer with the arrows on the left. Gas and brake are on the right. DING rings the doorbell.</p>
     <button class="go" id="start"><span class="in">START DRIVING <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12 H18 M12 5 L19 12 L12 19" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
     <p class="best" id="best"></p>
@@ -3025,6 +3041,7 @@ function buildBody(hi) {
   PL.chassis.add(body); PL.body = body; PL.house = H; PL.chimney = fur.chimney;
   H.fp = fur.fp; H.top = fur.top;
 }
+function loadBody(i) { if (PL.body) PL.chassis.remove(PL.body); buildBody(i); applyRig(true); } // swap the load on the bed (title menu, test hook)
 
 // ---------------- driving physics ----------------
 const input = { steer: 0, throttle: 0, brake: 0, hand: false };
@@ -3921,7 +3938,7 @@ function buildBeacon() {
 }
 const RIG = [{ n: 'ENGINE', d: 'Turbo diesel. Pulls harder.', k: 'eng' }, { n: 'BRAKES', d: 'Air brakes. Shorter stops.', k: 'brk' }, { n: 'SUSPENSION', d: 'Air ride. Less sway, fewer dents.', k: 'sus' }, { n: 'TIRES', d: 'Super singles. More grip.', k: 'tyr' }];
 const rig = { eng: 0, brk: 0, sus: 0, tyr: 0 }, rigCost = (l) => [900, 2200, 4500][l];
-let nextHouse = 0, levelsDone = 0, earned = 0, shopT = 0, shopInfo = '';
+let nextHouse = 0, levelsDone = 0, earned = 0, shopT = 0, shopInfo = '', arcade = false;
 function applyRig(loaded) {
   const H = PL.house, m = loaded ? H.mass : 0.7;
   PHYS.accel = 8.2 * (1 + 0.22 * rig.eng) / m ** 0.6; PHYS.brake = 24 * (1 + 0.2 * rig.brk) / m ** 0.4;
@@ -4030,7 +4047,7 @@ function completeLevel() {
 function renderShop() {
   $('s-title').textContent = `LEVEL ${levelsDone} COMPLETE`; $('s-sum').textContent = shopInfo; $('s-cash').textContent = 'CASH ' + fmtMoney(cash);
   $('s-rig').innerHTML = RIG.map((r, i) => { const l = rig[r.k], c = rigCost(l); return `<button class="card" data-r="${i}"${l >= 3 || cash < c ? ' disabled' : ''}><b>${r.n}</b><span class="pips">${'●'.repeat(l)}${'○'.repeat(3 - l)}</span><span>${r.d}</span><span class="cost">${l >= 3 ? 'MAXED OUT' : 'UPGRADE ' + fmtMoney(c)}</span></button>`; }).join('');
-  $('s-house').innerHTML = HOUSES.map((h, i) => `<button class="card${i === nextHouse ? ' on' : ''}" data-h="${i}"${i > levelsDone ? ' disabled' : ''}><b>${h.n}</b><span>${h.d}</span><span class="cost">${i > levelsDone ? 'UNLOCKS AFTER LEVEL ' + i : `PAY ×${h.pay} · WEIGHT ×${h.mass}`}</span></button>`).join('');
+  $('s-house').innerHTML = HOUSES.map((h, i) => `<button class="card${i === nextHouse ? ' on' : ''}" data-h="${i}"${i > levelsDone && !arcade ? ' disabled' : ''}><b>${h.n}</b><span>${h.d}</span><span class="cost">${i > levelsDone && !arcade ? 'UNLOCKS AFTER LEVEL ' + i : `PAY ×${h.pay} · WEIGHT ×${h.mass}`}</span></button>`).join('');
   $('s-go').textContent = `LOAD UP · LEVEL ${levelsDone + 1}`;
 }
 function openShop() { state = 'shop'; for (const k in keys) keys[k] = false; for (const k in touchIn) touchIn[k] = false; renderShop(); $('shop').hidden = false; setTimeout(() => $('s-go').focus(), 0); }
@@ -4044,7 +4061,7 @@ function addCash(n, sound = true) { cash += n; earned += n; if (sound) SFX.cash(
 function setAppeal(v) { appeal = clamp(v, 25, 100); }
 let best = { cash: 0, moves: 0 };
 function loadBest() { try { const b = JSON.parse(localStorage.getItem('homestretch.best') || 'null'); if (b && typeof b.cash === 'number') best = b; } catch (e) { /* storage unavailable */ } }
-function saveBest() { if (earned > best.cash) { best = { cash: Math.round(earned), moves }; try { localStorage.setItem('homestretch.best', JSON.stringify(best)); } catch (e) { /* ignore */ } } }
+function saveBest() { if (!arcade && earned > best.cash) { best = { cash: Math.round(earned), moves }; try { localStorage.setItem('homestretch.best', JSON.stringify(best)); } catch (e) { /* ignore */ } } }
 
 // ---------------- effects ----------------
 let lastImpactT = -9, lastToastHit = -9;
@@ -4256,6 +4273,7 @@ window.addEventListener('keydown', (e) => {
   else if (e.code === 'KeyR' && state === 'play') resetToRoad();
   else if (e.code === 'Escape' || e.code === 'KeyP') togglePause();
   else if (e.code === 'Enter' && state === 'title') startGame();
+  else if (state === 'title' && /^Digit[1-6]$/.test(e.code)) $('o-house').children[+e.key - 1].click();
   else if (e.code === 'Enter' && state === 'shop') closeShop();
 });
 window.addEventListener('keyup', (e) => { keys[e.code] = false; });
@@ -4294,6 +4312,10 @@ function setupUI() {
   el.mmg = el.mm.getContext('2d');
   renderer.domElement.tabIndex = -1;
   $('start').addEventListener('click', startGame);
+  // title menu: any pick switches to arcade (every load open in the shop, no best score)
+  $('o-house').innerHTML = HOUSES.map((h, i) => `<button class="card${i ? '' : ' on'}" data-h="${i}"><b>${h.n}</b><span class="cost">PAY ×${h.pay} · WEIGHT ×${h.mass}</span></button>`).join('');
+  const opt = (id, f) => $(id).addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b || state !== 'title') return; for (const x of $(id).children) x.classList.toggle('on', x === b); f(b.dataset); arcade = true; });
+  opt('o-house', (d) => loadBody(nextHouse = +d.h)); opt('o-tod', (d) => { tod = +d.t; }); opt('o-rig', (d) => { for (const k in rig) rig[k] = +d.r; applyRig(true); });
   $('pausebtn').addEventListener('click', togglePause);
   $('resume').addEventListener('click', togglePause);
   $('p-sound').addEventListener('click', toggleMute);
@@ -4430,7 +4452,7 @@ async function init() {
     near: (r = 8) => { const out = []; queryCols(P.x - r, P.x + r, P.z - r, P.z + r, (c) => out.push(c.t === 0 ? `circle ${c.x.toFixed(1)},${c.z.toFixed(1)} r${c.r.toFixed(2)} top${c.y1}` : c.t === 1 ? `box x${c.x0.toFixed(1)}..${c.x1.toFixed(1)} z${c.z0.toFixed(1)}..${c.z1.toFixed(1)} top${c.y1.toFixed(1)}` : `wall ${c.ax.toFixed(1)},${c.az.toFixed(1)}->${(c.ax + c.ux * c.len).toFixed(1)},${(c.az + c.uz * c.len).toFixed(1)} base${c.ay} h${c.ha.toFixed(1)}`)); return out; },
     ringLocate, surfaceAt, get cash() { return cash; }, get appeal() { return appeal; }, props: () => flyingProps.length + ' flying, ' + propsFlattened + ' flattened',
     cars: () => allCars.map((c) => ({ t: c.type, m: c.mode, x: +c.x.toFixed(1), z: +c.z.toFixed(1), y: +c.y.toFixed(1), v: +c.v.toFixed(1), k: !!c.knocked, cr: +c.crush.toFixed(2), h: c.h })), allCars, setTod: (t) => { tod = t; }, camera, get camS() { return camS; }, cam: (m) => { camMode = m; }, teleport: (x, z, h, y = 0) => { Object.assign(P, { x, z, h, y, vx: 0, vz: 0, vy: 0 }); camYaw = h; camY = y; }, input, DESTS, stats: () => ({ tris: staticTris, calls: renderer.info.render.calls, frameTris: renderer.info.render.triangles, cars: allCars.length, dests: DESTS.length }), get mission() { return mission; },
-    setHouse, closeShop, rig, HOUSES, PHYS, PL, pickHouse: (i) => { nextHouse = i; }, load: (i) => { if (PL.body) PL.chassis.remove(PL.body); buildBody(i); applyRig(true); }, get phase() { return mission && mission.phase; }, get level() { return levelsDone; } };
+    setHouse, closeShop, rig, HOUSES, PHYS, PL, pickHouse: (i) => { nextHouse = i; }, load: loadBody, shop: openShop, get phase() { return mission && mission.phase; }, get level() { return levelsDone; } };
   $('loading').hidden = true; $('title').hidden = false;
   state = 'title';
   lastT = performance.now();
