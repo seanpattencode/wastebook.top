@@ -321,7 +321,7 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
   </div>
 
   <div class="toasts" id="toasts" aria-live="polite"></div>
-  <div class="winch" id="winch" hidden><div class="wl"><span>WINCH</span><b id="w-pct">0%</b></div><div class="wbar"><i class="wband"></i><i class="wten" id="w-ten"></i></div><div class="wsub" id="w-sub">Hold Space · keep the needle in the green</div></div>
+  <div class="winch" id="winch" hidden><div class="wl"><span>TOW CABLE</span><b id="w-pct">0%</b></div><div class="wbar"><i class="wband" id="w-band"></i><i class="wten" id="w-ten"></i></div><div class="wsub" id="w-sub">Creep away · keep the needle in the green</div></div>
 
   <div id="touch" hidden>
     <button class="tbtn" id="t-left" aria-label="Steer left"><svg viewBox="0 0 24 24"><path d="M15 4 L7 12 L15 20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -3052,12 +3052,12 @@ function buildBody(hi) {
 function loadBody(i) { clearLost(); if (PL.body) PL.chassis.remove(PL.body); buildBody(i); applyRig(true); } // swap the load on the bed (title menu, test hook)
 
 // ---------------- driving physics ----------------
-const input = { steer: 0, throttle: 0, brake: 0, hand: false, winch: false };
+const input = { steer: 0, throttle: 0, brake: 0, hand: false };
 const PHYS = { accel: 8.2, brake: 24, rev: 6.5, vrev: 9, grav: 20, grip: 1, sway: 1, dmg: 1 };
 const PCIRC = [1.7, -1.7], PR = 2.95;
 
 function updatePlayer(dt) {
-  if (lost && (lost.ph === 'fall' || lost.hold)) { input.steer = input.throttle = input.brake = 0; input.hand = true; } // the load is going over, or the winch is reeling: the rig holds still
+  if (lost && HOLD.has(lost.ph)) { input.steer = input.throttle = input.brake = 0; input.hand = true; } // the load is going over, standing up, or settling onto the bed: the rig holds still
   const fx = Math.sin(P.h), fz = Math.cos(P.h), rx = -fz, rz = fx;
   let vf = P.vx * fx + P.vz * fz, vl = P.vx * rx + P.vz * rz;
   const st = input.steer;
@@ -3078,6 +3078,10 @@ function updatePlayer(dt) {
     vf -= Math.sign(vf) * Math.min(Math.abs(vf), (roll + 0.0016 * vf * vf) * dt);
     if (Math.abs(vf) > vmax + 0.5) vf = damp(vf, Math.sign(vf) * vmax, 1.3, dt);
     if (input.hand) { vf -= Math.sign(vf) * Math.min(Math.abs(vf), 6 * dt); P.braking = true; }
+    if (cab.on && cab.ten > 0) { // the taut tow cable hauls the rig back toward its anchor and tugs its rear sideways: the throttle has to balance it, and flat out overpowers it (snap)
+      const dx = cab.ax - P.x, dz = cab.az - P.z, dd = Math.hypot(dx, dz) || 1, fa = (dx * fx + dz * fz) / dd, la = (dx * rx + dz * rz) / dd;
+      vf += (0.6 * PHYS.accel * cab.ten + 3 * Math.max(0, -vf * fa)) * fa * dt; P.h = wrapA(P.h + 0.3 * cab.ten * la * dt);
+    }
     const grip = (input.hand ? 1.3 : P.surface === 'road' ? 8.5 : P.surface === 'grass' ? 4.5 : 2.2) * PHYS.grip;
     P.slip = Math.abs(vl);
     vl *= Math.exp(-grip * dt);
@@ -3184,12 +3188,13 @@ function collideStatic() {
 }
 
 function resetToRoad() {
+  if (lost && HOLD.has(lost.ph)) return;
   const s = P.safe;
   P.x = s.x; P.y = s.y + 0.05; P.z = s.z; P.h = s.h; P.vx = P.vz = P.vy = 0; P.yaw = 0; P.grounded = true;
   if (blockedAt(P.x, P.z, 3)) { // nudge along the heading until clear
     for (let k = 1; k < 30 && blockedAt(P.x, P.z, 3); k++) { P.x = s.x + Math.sin(s.h) * k * 2; P.z = s.z + Math.cos(s.h) * k * 2; }
   }
-  if (lost && lost.hook) unhook(0.55);
+  if (cab.on) unhook(); if (lost) cab.cool = 1.5; // back on the road beside the house: give the player a moment before the cable catches again
   camYaw = P.h; camY = P.y; toast('BACK ON THE ROAD', '');
 }
 
@@ -3244,7 +3249,11 @@ function updateCamera(dt, mode) {
   camY = damp(camY, P.y, P.grounded ? 7 : 3, dt);
   const sT = clamp(Math.abs(P.vf) / 34, 0, 1); camS = damp(camS, sT, sT > camS ? 1.7 : 2.8, dt); // the speed the framing follows: trails the rig as it winds up, closes back in faster under braking
   camera.up.set(0, 1, 0);
-  if (mission && mission.house) { // jacks are down: side view of the house while the rig pulls out and the house settles
+  if ((cab.on || (lost && lost.ph === 'up')) && mode !== 4) { // towing, or backing the bed under a standing house: rig and house framed together from beyond the rig
+    const tx = cab.on ? cab.ax : lost.house.position.x, ty = cab.on ? cab.ay : lost.house.position.y + 4, tz = cab.on ? cab.az : lost.house.position.z, dx = P.x - tx, dz = P.z - tz, dd = Math.hypot(dx, dz);
+    const ux = dd > 3 ? dx / dd : Math.sin(P.h), uz = dd > 3 ? dz / dd : Math.cos(P.h), far = clamp(dd * 0.7, 9, 24);
+    camTarget.set(P.x + ux * far, camY + 5 + far * 0.4, P.z + uz * far); camera.position.lerp(camTarget, 1 - Math.exp(-5 * dt)); camLook.set((P.x + tx) / 2, (camY + ty) / 2 + 1.5, (P.z + tz) / 2);
+  } else if (mission && mission.house && mission.phase !== 'nudge') { // jacks are down: side view of the house while the rig pulls out and the house settles
     const h = mission.house.position, a = mission.pose.h + Math.PI / 2;
     camTarget.set(h.x + Math.sin(a) * 21, h.y + 7, h.z + Math.cos(a) * 21);
     camera.position.lerp(camTarget, 1 - Math.exp(-5 * dt)); camLook.set(h.x, h.y + 2.5, h.z);
@@ -3958,19 +3967,20 @@ function showPadMark(d) { // foundation outline, house footprint in truck frame,
   padMark.geometry.dispose(); padMark.geometry = b.geo(); padMark.position.set(d.x, 0.14, d.z); padMark.rotation.y = d.ry - H.front; padMark.visible = true;
 }
 function setPhaseHUD() {
-  const m = mission, T = { haul: [m.client, m.dest.label, m.reason], place: ['SET THE HOUSE', `Line up on the outline, then ${IS_TOUCH ? 'tap SET' : 'press <kbd>H</kbd>'}`, 'Front door toward the street'], lift: ['PULL OUT', 'Drive the rig clear of the house', ''], set: ['EASY DOES IT', 'Lowering onto the foundation', ''] }[m.phase];
+  const m = mission, T = { haul: [m.client, m.dest.label, m.reason], place: ['SET THE HOUSE', `Line up on the outline, then ${IS_TOUCH ? 'tap SET' : 'press <kbd>H</kbd>'}`, 'Front door toward the street'], lift: ['PULL OUT', 'Drive the rig clear of the house', ''], nudge: ['NUDGE IT', 'Push it with the rig, or stop 10 m off and tow it', 'Its middle must sit on the foundation or it tips'], set: ['EASY DOES IT', 'Lowering onto the foundation', 'Any edge off the pad sinks'] }[m.phase];
   $('m-client').textContent = T[0]; $('m-addr').innerHTML = T[1]; $('m-reason').textContent = T[2];
-  if (IS_TOUCH) $('t-ding').textContent = m.phase === 'place' ? 'SET' : 'DING';
 }
 function setKeyHUD() { // bottom-left legend, re-rendered whenever the state or mission phase changes
   if (IS_TOUCH) return;
   const ph = mission ? mission.phase : '', D = [['W ↑', 'gas'], ['S ↓', 'brake · reverse'], ['A D', 'steer'], ['Space', 'handbrake'], ['C', 'camera'], ['R', 'back on the road'], ['Esc', 'pause']];
   const rows = state === 'shop' ? [['Enter', 'LOAD UP · next level', 1], ['click', 'buy an upgrade · pick a house']]
     : state === 'pause' ? [['Esc', 'RESUME', 1], ['C', 'next camera'], ['N', 'night / day'], ['R', 'back on the road'], ['M', 'sound']]
-    : lost && lost.hook ? [['Space', 'WINCH · hold it, keep the needle in the green', 1], ['', 'let go before the cable snaps'], ['C', 'camera'], ['R', 'back on the road'], ['Esc', 'pause']]
-    : lost ? [['', 'LOAD LOST · park the rig by the bottom of the house', 1], ...D.slice(0, 3), ...D.slice(4)]
+    : lost && lost.ph === 'up' ? [['S ↓', 'BACK UNDER IT · line the bed up on the outline', 1], ['H', 'lower it onto the bed'], ...D.slice(0, 1), ...D.slice(2)]
+    : cab.on ? [['W ↑', 'TOW · creep away, keep the needle in the green', 1], ['S ↓', 'ease off before it snaps'], ['A D', 'pull from the side to swing it'], ...D.slice(3)]
+    : lost ? [['', 'LOAD LOST · park behind its bottom end, the cable hooks on', 1], ...D.slice(0, 3), ...D.slice(4)]
     : ph === 'place' ? [['H', 'SET THE HOUSE · stop on the outline', 1], ...D]
     : ph === 'lift' ? [['W ↑', 'PULL OUT · drive clear of the house', 1], ...D.slice(1)]
+    : ph === 'nudge' ? [['H', 'LOWER IT · once it sits inside the outline', 1], ['W ↑', 'nose in slowly to push it'], ['', 'or stop 10 m off: the cable hooks on, drive away to tow'], ...D.slice(1, 3), ...D.slice(4)]
     : ph === 'set' ? [['', 'HANDS OFF · lowering the house', 1], ...D.slice(4)]
     : [...D.slice(0, 4), ['H', 'doorbell'], ...D.slice(4)];
   $('hint').innerHTML = rows.map(([k, a, hot]) => `<li${hot ? ' class="hot"' : ''}>${k.split(' ').map((x) => x && `<kbd>${x}</kbd>`).join('')}<span>${a}</span></li>`).join('');
@@ -3987,21 +3997,76 @@ function newMission() {
   $('m-tab').textContent = 'LEVEL ' + jobNo; setPhaseHUD();
   toast(`LEVEL ${jobNo}: ${mission.client.toUpperCase()}`, 'green', `Haul the ${PL.house.n.toLowerCase()} to ${d.label}`);
 }
-function setHouse() { // H on the lot: jack the house up off the bed where it stands
-  const m = mission; if (!m || m.phase !== 'place' || state !== 'play' || !PL.body) return false;
+function setHouse() { // H: on the lot it jacks the house up off the bed; in the nudge phase it lowers it; under a standing lost house it loads it
+  const m = mission; if (state !== 'play') return false;
+  if (lost) return lost.ph === 'up' ? loadUp() : false;
+  if (!m || (m.phase !== 'place' && m.phase !== 'nudge')) return false;
+  if (m.phase === 'nudge') { if (touching(m.house, 1.2)) { toast('MOVE THE RIG CLEAR', 'red', 'It comes down where it stands'); return true; } if (cab.on) unhook(); m.phase = 'set'; m.t = 0; setPhaseHUD(); return true; }
+  if (!PL.body) return false;
   if (Math.abs(P.vf) > 1 || !P.grounded) { toast('COME TO A FULL STOP', ''); return true; }
-  const H = PL.house, fx = Math.sin(P.h), fz = Math.cos(P.h), cx = P.x + fx * 0.75, cz = P.z + fz * 0.75;
-  const off = Math.hypot(cx - m.dest.x, cz - m.dest.z), ang = Math.abs(wrapA(P.h - (m.dest.ry - H.front)));
-  if (off > 8) { toast('NOT OVER THE FOUNDATION', 'red', 'Get the house onto the dirt pad first'); return true; }
+  const fx = Math.sin(P.h), fz = Math.cos(P.h);
+  if (Math.hypot(P.x + fx * 0.75 - m.dest.x, P.z + fz * 0.75 - m.dest.z) > 8) { toast('NOT OVER THE FOUNDATION', 'red', 'Get the house onto the dirt pad first'); return true; }
   const b = PL.body; PL.chassis.remove(b); b.position.set(P.x, P.y + 1.45, P.z); b.rotation.set(0, P.h, 0); scene.add(b);
-  Object.assign(m, { phase: 'lift', t: 0, house: b, y0: P.y + 1.45, off, ang, pose: { x: cx, z: cz, h: P.h } });
+  Object.assign(m, { phase: 'lift', t: 0, house: b, y0: P.y + 1.45, sink: null, touch: false, pose: { x: P.x + fx * 0.75, z: P.z + fz * 0.75, h: P.h } });
   PL.body = null; applyRig(false); SFX.clank(150); setPhaseHUD();
   toast('JACKS DOWN', 'green', 'Now pull the rig out from under the house');
   return true;
 }
+function footLocal(h, wx, wz) { // a world point in the house's footprint frame (origin at the footprint centre, 0.75 m ahead of the body origin)
+  const sh = Math.sin(h.rotation.y), ch = Math.cos(h.rotation.y), dx = wx - h.position.x, dz = wz - h.position.z;
+  return [dx * ch - dz * sh, dx * sh + dz * ch - 0.75];
+}
+function touching(h, pad) { const H = PL.house, fx = Math.sin(P.h), fz = Math.cos(P.h); return [4.4, -4.3].some((o) => { const [lx, lz] = footLocal(h, P.x + fx * o, P.z + fz * o); return Math.abs(lx) < H.fp.w / 2 + pad && Math.abs(lz) < H.fp.d / 2 + pad; }); }
+function fitInfo() { // live line-up readout: the rig against a standing lost house, or the jacked-up house against its foundation
+  let off, ang; if (lost) { const b = lost.house; off = Math.hypot(P.x - b.position.x, P.z - b.position.z); ang = Math.abs(wrapA(P.h - lost.h)); }
+  else { const h = mission.house, hy = h.rotation.y; off = Math.hypot(h.position.x + 0.75 * Math.sin(hy) - mission.dest.x, h.position.z + 0.75 * Math.cos(hy) - mission.dest.z); ang = Math.abs(wrapA(hy - (mission.dest.ry - PL.house.front))); }
+  return `${Math.round(off * 3.28)} ft off · ${Math.round(ang * 180 / Math.PI)}° crooked`;
+}
+function nudge(dt) { // the house hangs on its jacks: the rig's nose or tail shoves it (a corner hit turns it), or the cable hooks the nearest corner and the rig tows it
+  const m = mission, h = m.house, H = PL.house, hw = H.fp.w / 2, hd = H.fp.d / 2, hy = h.rotation.y, sh = Math.sin(hy), ch = Math.cos(hy), fx = Math.sin(P.h), fz = Math.cos(P.h);
+  let hit = false;
+  for (const o of [4.4, -4.3]) {
+    const wx = P.x + fx * o, wz = P.z + fz * o, [lx, lz] = footLocal(h, wx, wz), ex = hw + 0.5, ez = hd + 0.5;
+    if (Math.abs(lx) >= ex || Math.abs(lz) >= ez) continue;
+    const px = ex - Math.abs(lx), pz = ez - Math.abs(lz), mx = px < pz ? -Math.sign(lx || 1) * px : 0, mz = px < pz ? 0 : -Math.sign(lz || 1) * pz; // the shove that clears the point
+    h.position.x += mx * ch + mz * sh; h.position.z += mz * ch - mx * sh; h.rotation.y += 0.5 * (lz * mx - lx * mz) / (hw * hw + hd * hd);
+    if (!hit && !m.touch && Math.abs(P.vf) > 3) onImpact(Math.abs(P.vf), wx, wz);
+    hit = true; P.vx *= 0.7; P.vz *= 0.7;
+  }
+  m.touch = hit; if (hit && cab.on) unhook();
+  const cx = h.position.x + 0.75 * sh, cz = h.position.z + 0.75 * ch; cab.cool = Math.max(0, cab.cool - dt);
+  if (!cab.on) {
+    const [qx, qz] = footLocal(h, P.x, P.z), de = Math.hypot(Math.max(0, Math.abs(qx) - hw), Math.max(0, Math.abs(qz) - hd)); // rig to the nearest wall: the cable catches from 6 to 14 m out, never nose-to-wall
+    if (hit || cab.cool || de > HOOK_R || de < 6 || Math.abs(P.vf) > 1.5 || !P.grounded) return;
+    let best = 1e9; for (const [qx, qz] of [[-hw, -hd], [hw, -hd], [-hw, hd], [hw, hd]]) { const e = Math.hypot(cx + qx * ch + qz * sh - P.x, cz - qx * sh + qz * ch - P.z); if (e < best) { best = e; cab.cx = qx; cab.cz = qz; } }
+    hookOn(cx + cab.cx * ch + cab.cz * sh, h.position.y + 0.4, cz - cab.cx * sh + cab.cz * ch, 'Drive away slowly · the hooked corner follows the cable'); return;
+  }
+  const ax = cx + cab.cx * ch + cab.cz * sh, az = cz - cab.cx * sh + cab.cz * ch, [dx, dz] = cableStep(ax, h.position.y + 0.4, az), T = cab.ten;
+  if (slackOff(dt)) return;
+  if (T >= 1) { snap(ax, h.position.y + 0.4, az); return; }
+  const v = 1.6 * Math.max(0, T - 0.3), rx = ax - cx, rz = az - cz; Object.assign(cab, { hold: 0.3, pct: fitInfo() });
+  h.position.x += v * dx * dt; h.position.z += v * dz * dt; h.rotation.y += 0.6 * Math.max(0, T - 0.3) * (rz * dx - rx * dz) / (Math.hypot(rx, rz) || 1) * dt;
+}
+function settle(dt) { // touched down: any corner hanging off the foundation sinks into soft dirt and tilts the house; its middle off the pad and it goes over
+  const m = mission, h = m.house, H = PL.house, hw = H.fp.w / 2, hd = H.fp.d / 2, fy = m.dest.ry - H.front, sf = Math.sin(fy), cf = Math.cos(fy), hy = h.rotation.y, sh = Math.sin(hy), ch = Math.cos(hy);
+  if (!m.sink) {
+    const cx = h.position.x + 0.75 * sh, cz = h.position.z + 0.75 * ch, W = hw + 0.4, D = hd + 0.4, F = (wx, wz) => { const dx = wx - m.dest.x, dz = wz - m.dest.z; return [dx * cf - dz * sf, dx * sf + dz * cf]; }; // foundation frame
+    const [ox, oz] = F(cx, cz), ex = Math.abs(ox) - W, ez = Math.abs(oz) - D;
+    if (ex > 0 || ez > 0) { // the middle hangs out: tip over the nearer foundation edge, around whichever base edge of the house faces that way
+      const dx = ex > ez ? Math.sign(ox) * cf : Math.sign(oz) * sf, dz = ex > ez ? -Math.sign(ox) * sf : Math.sign(oz) * cf, lx = dx * ch - dz * sh, lz = dx * sh + dz * ch, ax = Math.abs(lz) > Math.abs(lx) ? 1 : 0;
+      lose(h, H, h.position.x, h.position.z, hy, ax, ax ? Math.sign(lz) : -Math.sign(lx), 0.04, h.position.y, ['IT TIPPED OVER', 'Its middle was hanging off the foundation', 'FLAT ON THE LAWN'], 25);
+      m.phase = 'haul'; m.house = null; setPhaseHUD(); return;
+    }
+    const sk = [[-hw, -hd], [hw, -hd], [-hw, hd], [hw, hd]].map(([qx, qz]) => { const [px, pz] = F(cx + qx * ch + qz * sh, cz - qx * sh + qz * ch); return 1.5 * clamp(Math.max(Math.abs(px) - W, Math.abs(pz) - D, 0) / 3, 0, 1); }); // metres each corner sinks
+    const roll = Math.atan2((sk[0] + sk[2] - sk[1] - sk[3]) / 2, 2 * hw), pitch = Math.atan2((sk[2] + sk[3] - sk[0] - sk[1]) / 2, 2 * hd);
+    Object.assign(m, { sink: { roll, pitch, dy: (sk[0] + sk[1] + sk[2] + sk[3]) / 4 }, off: Math.hypot(ox, oz), ang: Math.abs(wrapA(hy - fy)) + Math.hypot(roll, pitch), pose: { x: cx, z: cz, h: hy } });
+  }
+  const e = smoothstep(0, 1.2, m.t - 1.6), S = m.sink; h.rotation.set(S.pitch * e, hy, S.roll * e); h.position.y = 0.05 - S.dy * e;
+  if (e >= 1) completeLevel();
+}
 let wasInWater = false, wrongWayT = 0, stuckT = 0, stuckHintT = -99, tipT = -99;
 function checkWarnings(dt) {
-  if (input.throttle > 0 && !input.brake && Math.abs(P.vf) < 0.6 && P.grounded) stuckT += dt; else stuckT = 0;
+  if (input.throttle > 0 && !input.brake && Math.abs(P.vf) < 0.6 && P.grounded && !cab.on && !(mission && mission.touch)) stuckT += dt; else stuckT = 0;
   if (stuckT > 2.2 && simTime - stuckHintT > 12) { stuckHintT = simTime; toast('STUCK?', '', IS_TOUCH ? 'Hold BRAKE to back up, or use Back on road in the pause menu' : 'Hold S to back up, or press R to get back on the road'); }
   if (PL.body && Math.abs(P.sr) > 0.26 && simTime - tipT > 5) { tipT = simTime; toast('TIPPING!', 'red', 'Slow down and straighten out'); }
   if (P.inWater && !wasInWater && Math.abs(P.vf) > 2) { SFX.splash(); toast('MAKING A SPLASH', ''); }
@@ -4027,11 +4092,10 @@ function updateMission(dt) {
     const h = m.house;
     if (m.phase === 'lift') {
       h.position.y = m.y0 + 1.3 * smoothstep(0, 1.2, m.t);
-      if (m.t > 1.2 && Math.hypot(h.position.x - P.x, h.position.z - P.z) > 10.5) { m.phase = 'set'; m.t = 0; setPhaseHUD(); }
-    } else {
-      h.position.y = lerp(m.y0 + 1.3, 0.05, smoothstep(0, 1.6, m.t));
-      if (m.t >= 1.6) completeLevel();
-    }
+      if (m.t > 1.2 && Math.hypot(h.position.x - P.x, h.position.z - P.z) > 10.5) { m.phase = 'nudge'; m.t = 0; setPhaseHUD(); toast('NUDGE IT INTO PLACE', 'green', `Push it with the rig or tow it, then ${IS_TOUCH ? 'tap SET' : 'press H'} to lower it`); }
+    } else if (m.phase === 'nudge') nudge(dt);
+    else if (m.t < 1.6) h.position.y = lerp(m.y0 + 1.3, 0.05, smoothstep(0, 1.6, m.t));
+    else settle(dt);
   }
 }
 const GRADES = [['PERFECT', 1.3, 1.2, 0.1], ['GREAT', 1.05, 2.5, 0.25], ['CLOSE ENOUGH', 0.85, 4.5, 0.55], ['CROOKED', 0.6, 99, 99]];
@@ -4047,7 +4111,7 @@ function completeLevel() {
   for (const o of [-3, 3]) puff(m.pose.x + fx * o, 0.4, m.pose.z + fz * o, 8, 0xc9b896, 1.5, 5, 1.4, 2.5, 0.5, 0.4);
   SFX.thud(14); SFX.jingle(); confetti(m.pose.x, 0, m.pose.z);
   toast(`${g[0]}! +${fmtMoney(pay)}`, 'big green', `${m.client} moved in at ${m.dest.label}`);
-  shopInfo = `${g[0]} placement: ${Math.round(m.off * 3.28)} ft off center, ${Math.round(m.ang * 180 / Math.PI)}° crooked. The ${H.n.toLowerCase()} paid ${fmtMoney(pay)}, tip ${fmtMoney(tip)}, curb appeal ${Math.round(appeal)}%.`;
+  shopInfo = `${g[0]} placement: ${Math.round(m.off * 3.28)} ft off center, ${Math.round(m.ang * 180 / Math.PI)}° crooked${m.sink.dy > 0.08 ? ' (an edge hung off the pad and sank)' : ''}. The ${H.n.toLowerCase()} paid ${fmtMoney(pay)}, tip ${fmtMoney(tip)}, curb appeal ${Math.round(appeal)}%.`;
   setAppeal(100); saveBest(); mission = null; shopT = 1.8;
   $('m-client').textContent = 'Level complete'; $('m-addr').textContent = 'Heading to the shop'; $('m-reason').textContent = '';
 }
@@ -4074,51 +4138,81 @@ function saveBest() { if (!arcade && earned > best.cash) { best = { cash: Math.r
 let lastImpactT = -9, lastToastHit = -9;
 function sparksAt(x, y, z, n) { for (let i = 0; i < n; i++) sparks.spawn(x, y, z, mr(-7, 7), mr(2, 9), mr(-7, 7), mr(0.25, 0.6), mr(0.25, 0.5), 0.05, 1, Math.random() < 0.5 ? 0xffc44a : 0xff8a2a, 22, 1); }
 function puff(x, y, z, n, col, s0, s1, life, spread, up, alpha = 0.4) { for (let i = 0; i < n; i++) smoke.spawn(x + mr(-spread, spread), y, z + mr(-spread, spread), mr(-1.5, 1.5), up + mr(0, 1.5), mr(-1.5, 1.5), life * mr(0.7, 1.2), s0, s1, alpha, col, 0, 1.2); }
-// ---------------- lost load: the straps give, the house goes over the side, and a winch mini-game reels it back onto the bed ----------------
-const HOOK_R = 14; // metres from the rig to the base of the fallen house: park inside this and the cable hooks on by itself
+// ---------------- lost load: the straps give, the house goes over the side, the rig tows it upright and backs the bed under it ----------------
+const HOOK_R = 14, HOLD = new Set(['fall', 'stand', 'load']); // HOOK_R: metres from the rig to the anchor inside which the cable hooks on by itself; HOLD: phases where the rig stands still
 let lost = null;
+const cab = { on: false, L0: 1, S: 1, ten: 0, cool: 0, slack: 0, hold: 0.3, pct: '', ax: 0, ay: 0, az: 0, cx: 0, cz: 0 }; // the tow cable: rest length, the stretch that reads 100 %, tension, snap cooldown, anchor
 const cable = (() => { const b = new Batch(); b.box(sub(TY(0, 0, 0, 0), 0, 0, -0.5), 0.08, 0.08, 1, 0x1c1c1c); const m = new THREE.Mesh(b.geo(), new THREE.MeshBasicMaterial({ color: 0x1c1c1c, fog: false })); m.visible = false; scene.add(m); return m; })();
-function dropLoad() { // past 0.42 rad of roll: the house leaves the bed, turning over its base edge on the lean side (body +x is world (cos h, -sin h))
-  const b = PL.body, H = PL.house, s = Math.sign(P.sr) || 1, hw = H.fp.w / 2, fx = Math.sin(P.h), fz = Math.cos(P.h), px = P.x - s * hw * fz, pz = P.z + s * hw * fx;
-  PL.chassis.remove(b); scene.add(b); PL.body = null; applyRig(false);
-  lost = { ph: 'fall', house: b, s, hw, h: P.h, px, pz, len: H.top, y0: P.y + 1.45 + P.hv, gy: surfaceAt(px - s * H.top * 0.5 * fz, pz + s * H.top * 0.5 * fx, P.y + 1.2), th0: P.sr, t: 0, prog: 0, ten: 0, hook: false, hold: false, cool: 0 };
-  P.sr = P.srv = 0;
-  toast('THE STRAPS GAVE', 'big red', `The ${H.n.toLowerCase()} is going over`);
+function hookOn(ax, ay, az, how) { // the cable is slack at hook-up: the rig's rear to the anchor is its rest length, and 11 % of that (at least 1.8 m) of stretch is the red line
+  const fx = Math.sin(P.h), fz = Math.cos(P.h); cab.L0 = Math.max(4, Math.hypot(P.x - 4.3 * fx - ax, P.y + 1.6 - ay, P.z - 4.3 * fz - az)); cab.S = Math.max(1.8, 0.11 * cab.L0);
+  Object.assign(cab, { on: true, ten: 0, slack: 0, hold: 0.3, pct: '', ax, ay, az }); SFX.clank(150); $('winch').hidden = false; $('w-sub').textContent = how;
+  toast('HOOKED ON', 'green', 'Drive away slowly: the cable pulls where the rig goes');
 }
-function hook() { lost.hook = true; SFX.clank(150); $('winch').hidden = false; $('w-sub').textContent = `Hold ${IS_TOUCH ? 'WINCH' : 'Space'} · keep the needle in the green`; if (IS_TOUCH) $('t-ding').textContent = 'WINCH'; toast('HOOKED ON', 'green', 'Reel it in: hold, and let go before the needle hits the red'); }
-function unhook(keep) { Object.assign(lost, { hook: false, hold: false, ten: 0, prog: Math.min(lost.prog, keep) }); cable.visible = false; $('winch').hidden = true; if (IS_TOUCH) $('t-ding').textContent = mission && mission.phase === 'place' ? 'SET' : 'DING'; }
-function clearLost() { if (lost) { unhook(0); scene.remove(lost.house); lost = null; } }
-function reload() { // progress reached 1: the house is back on the bed, squared up
-  const b = lost.house; clearLost(); b.position.set(0, 1.45, 0); b.rotation.set(0, 0, 0); PL.chassis.add(b); PL.body = b; applyRig(true); P.sr = P.srv = P.sp = P.spv = 0;
-  SFX.clank(150); toast('BACK ON THE BED', 'big green', 'Easy on the corners this time');
+function unhook() { cab.on = false; cab.ten = 0; cable.visible = false; $('winch').hidden = true; }
+function cableStep(ax, ay, az) { // tension = how far the rig has stretched the cable past its rest length; returns the horizontal unit direction from the anchor to the hook
+  const fx = Math.sin(P.h), fz = Math.cos(P.h), hx = P.x - 4.3 * fx, hz = P.z - 4.3 * fz, dx = hx - ax, dz = hz - az, dh = Math.hypot(dx, dz) || 1e-6, d = Math.hypot(dh, P.y + 1.6 - ay);
+  Object.assign(cab, { ax, ay, az, ten: Math.max(0, d - cab.L0) / cab.S });
+  cable.position.set(hx, P.y + 1.6, hz); cable.lookAt(_v1.set(ax, ay, az)); cable.scale.z = d; cable.visible = true;
+  return [dx / dh, dz / dh];
+}
+function slackOff(dt) { if (cab.ten <= 0 && Math.abs(P.vf) > 2) { if ((cab.slack += dt) > 1) { unhook(); toast('CABLE OFF', '', 'It went slack and dropped off the hook'); return true; } } else cab.slack = 0; return false; } // a slack cable under a moving rig drops off: the free way to go and re-park
+function snap(x, y, z) { SFX.crash(26); shake = 0.8; setAppeal(appeal - 4 * PHYS.dmg); sparksAt(x, y, z, 14); unhook(); cab.cool = 1; toast('CABLE SNAPPED!', 'red', 'Creep, and ease off when the needle climbs'); }
+function leanDir(L) { const fx = Math.sin(L.h), fz = Math.cos(L.h); return L.ax ? [L.s * fx, L.s * fz, fx, fz] : [-L.s * fz, L.s * fx, fx, fz]; } // which way the house leans (world), plus the body's forward
+function lose(b, H, x, z, h, ax, s, th0, y0, msg, dmg) { // the house (body group b at world pose x z h) goes over: ax 0 = over a long edge (toward body ±x), 1 = over an end (toward body ±z); s = which side
+  const fx = Math.sin(h), fz = Math.cos(h), ho = ax ? H.fp.d / 2 : H.fp.w / 2, ldx = ax ? s * fx : -s * fz, ldz = ax ? s * fz : s * fx, o = ax ? 0.75 : 0, px = x + o * fx + ho * ldx, pz = z + o * fz + ho * ldz; // the base edge it turns over
+  if (cab.on) unhook();
+  lost = { ph: 'fall', house: b, ax, s, ho, h, px, pz, len: H.top, ap: clamp(H.top * 0.5, 4, 16), y0, gy: surfaceAt(px + ldx * H.top * 0.5, pz + ldz * H.top * 0.5, y0), th0, th: th0, t: 0, msg, dmg, peak: 0, away: 0, bed: y0 > 1 ? 1 : 0 };
+  if (msg[0]) toast(msg[0], 'big red', msg[1]);
+}
+function dropLoad() { // past 0.42 rad of roll the straps give and the house goes over the side it leans to
+  const b = PL.body, H = PL.house; PL.chassis.remove(b); scene.add(b); PL.body = null; applyRig(false);
+  lose(b, H, P.x, P.z, P.h, 0, Math.sign(P.sr) || 1, Math.abs(P.sr), P.y + 1.45 + P.hv, ['THE STRAPS GAVE', `The ${H.n.toLowerCase()} is going over`, 'LOAD LOST!'], 35);
+  P.sr = P.srv = 0;
+}
+function losePose(th, py, k = 1) { // body origin from the pivot edge (th = lean from upright, py = pivot height); k < 1 blends from where the body sat on the bed when it let go
+  const L = lost, b = L.house, [ldx, ldz, fx, fz] = leanDir(L), o = L.ax ? 0.75 : 0;
+  const c = L.ho * (Math.cos(th) + (1 - k) * (1 - Math.cos(L.th0))), y = py + L.ho * (Math.sin(th) - (1 - k) * Math.sin(L.th0));
+  b.position.set(L.px - c * ldx - o * fx, y, L.pz - c * ldz - o * fz); b.rotation.set(L.ax ? L.s * th : 0, L.h, L.ax ? 0 : L.s * th);
+}
+function clearLost() { if (lost) { if (cab.on) unhook(); scene.remove(lost.house); lost = null; if (mission) showPadMark(mission.dest); } }
+function loadUp() { // H with the rig backed under the standing house: it comes down off its jacks onto the bed
+  const L = lost, b = L.house, off = Math.hypot(P.x - b.position.x, P.z - b.position.z), ang = Math.abs(wrapA(P.h - L.h));
+  if (L.t < 1.2) return true;
+  if (Math.abs(P.vf) > 1 || !P.grounded) { toast('COME TO A FULL STOP', ''); return true; }
+  if (off > 1.6 || ang > 0.3) { toast('LINE THE BED UP UNDER IT', 'red', fitInfo()); return true; }
+  Object.assign(L, { ph: 'load', t: 0, off, side: Math.sign((b.position.z - P.z) * Math.sin(P.h) - (b.position.x - P.x) * Math.cos(P.h)) || 1, x0: b.position.x, y0: b.position.y, z0: b.position.z, h0: L.h }); SFX.clank(150);
+  return true;
+}
+function reload() { // settled onto the bed: strapped down, sway spring live again (a sloppy line-up sets it rocking)
+  const L = lost, b = L.house, kick = 0.5 * (L.off / 1.6) * L.side; clearLost(); b.position.set(0, 1.45, 0); b.rotation.set(0, 0, 0); PL.chassis.add(b); PL.body = b; applyRig(true); P.sr = P.sp = P.spv = 0; P.srv = kick;
+  if (mission) setPhaseHUD(); SFX.clank(150); toast('BACK ON THE BED', 'big green', Math.abs(kick) > 0.25 ? 'Off centre: feel it rock' : 'Easy on the corners this time');
 }
 function updateLost(dt) {
-  const L = lost, s = L.s, b = L.house, fx = Math.sin(L.h), fz = Math.cos(L.h);
-  const pose = (th, py, k = 1) => { // origin from the pivot edge (the base edge stays put, the house turns about it); k < 1 blends from where the body sat on the bed
-    const c = s * L.hw * Math.cos(th) + (1 - k) * s * L.hw * (1 - Math.cos(L.th0)), y = py + s * L.hw * (Math.sin(th) - (1 - k) * Math.sin(L.th0));
-    b.position.set(L.px + c * fz, y, L.pz - c * fx); b.rotation.set(0, L.h, th);
-  };
+  const L = lost, b = L.house, [ldx, ldz, fx, fz] = leanDir(L), thc = Math.atan2(2 * L.ho, L.len); // thc: the balance point, where the middle of the house passes over the edge it turns on
+  L.t += dt;
   if (L.ph === 'fall') { // accelerating tip over the edge; the base drops to the ground late
-    L.t += dt; const e = Math.min(1, L.t / 1.4);
-    pose(L.th0 + (s * Math.PI / 2 - L.th0) * e * e, L.y0 - (L.y0 - L.gy) * e * e * e, e);
-    if (e >= 1) { L.ph = 'down'; SFX.crash(40); shake = 2; setAppeal(appeal - 35 * PHYS.dmg); for (let q = 0; q < L.len; q += 6) puff(L.px - s * q * fz, L.gy + 0.4, L.pz + s * q * fx, 5, 0xb8ad98, 2, 7, 1.8, 3, 1.2, 0.5); toast('LOAD LOST!', 'big red', `Park the rig by the bottom of the ${PL.house.n.toLowerCase()} and the winch hooks on`); }
-    return;
-  }
-  const d = Math.hypot(P.x - L.px, P.z - L.pz);
-  if (!L.hook) { if (d < HOOK_R && Math.abs(P.vf) < 1.5 && P.grounded) hook(); }
-  else if (d > HOOK_R + 8) unhook(0.55);
-  // the mini-game: holding winds the cable up (0.9/s), letting go slacks it (1.5/s); the house only moves while the tension sits in the green band, and at the top the cable snaps
-  L.cool = Math.max(0, L.cool - dt); L.hold = L.hook && input.winch && !L.cool;
-  L.ten = L.hold ? Math.min(1, L.ten + dt * 0.9) : Math.max(0, L.ten - dt * 1.5);
-  if (L.hold && L.ten >= 0.35 && L.ten <= 0.8) L.prog = Math.min(1, L.prog + dt * 0.17);
-  if (L.ten >= 1) { Object.assign(L, { ten: 0, cool: 0.8, prog: Math.max(0, L.prog - 0.3) }); SFX.crash(26); shake = 0.8; setAppeal(appeal - 4 * PHYS.dmg); sparksAt(b.position.x, b.position.y + 1, b.position.z, 14); toast('CABLE SNAPPED!', 'red', 'Let go before the needle reaches the red'); }
-  // pose: stands back up about the same edge, then slides across and squares up on the bed
-  const e1 = smoothstep(0, 0.55, L.prog), e2 = smoothstep(0.55, 1, L.prog);
-  if (e2 <= 0) pose(s * Math.PI / 2 * (1 - e1), L.gy);
-  else { b.position.set(lerp(L.px + s * L.hw * fz, P.x, e2), lerp(L.gy, P.y + 1.45, e2), lerp(L.pz - s * L.hw * fx, P.z, e2)); b.rotation.set(0, L.h + wrapA(P.h - L.h) * e2, 0); }
-  if (L.prog >= 1) { reload(); return; }
-  cable.visible = L.hook; // from the rear of the bed to the base of the house
-  if (L.hook) { cable.position.set(P.x - 4.3 * Math.sin(P.h), P.y + 1.6, P.z - 4.3 * Math.cos(P.h)); cable.lookAt(b.position); cable.scale.z = Math.max(0.1, cable.position.distanceTo(b.position)); }
+    const e = Math.min(1, L.t / (L.bed ? 1.4 : 1)); losePose(L.th0 + (Math.PI / 2 - L.th0) * e * e, L.y0 - (L.y0 - L.gy) * e * e * e, L.bed ? e : 1);
+    if (e >= 1) { L.ph = 'down'; L.th = Math.PI / 2; L.peak = 0; SFX.crash(40); shake = 2; setAppeal(appeal - L.dmg * PHYS.dmg); for (let q = 0; q < L.len; q += 6) puff(L.px + ldx * q, L.gy + 0.4, L.pz + ldz * q, 5, 0xb8ad98, 2, 7, 1.8, 3, 1.2, 0.5); toast(L.msg[2], 'big red', `Park behind the bottom end of the ${PL.house.n.toLowerCase()}: the cable hooks on, then tow it upright`); }
+  } else if (L.ph === 'down') { // the tow: the rig stretches the cable, the house turns up about its base edge and swings toward the rig; past the balance point it falls upright
+    b.updateWorldMatrix(true, false); const A = b.localToWorld(_v3.set(0, L.ap, 0.75)), ax = A.x, ay = A.y, az = A.z; // the sling: on the centreline, part-way up
+    cab.cool = Math.max(0, cab.cool - dt); const d = Math.hypot(P.x - L.px, P.z - L.pz); if (d > 8) L.away = 1; // the cable waits until the rig has moved off and come back to park behind the bottom end
+    if (!cab.on) { if (L.away && !cab.cool && d < HOOK_R && (P.x - L.px) * ldx + (P.z - L.pz) * ldz < -1 && Math.abs(P.vf) < 1.5 && P.grounded) hookOn(ax, ay, az, 'Creep away from the house · keep the needle in the green'); losePose(L.th, L.gy); return; }
+    const [cx, cz] = cableStep(ax, ay, az), T = cab.ten;
+    if (slackOff(dt)) return;
+    if (T >= 1) { snap(ax, ay, az); if (L.th < 1.5) Object.assign(L, { ph: 'fall', t: 0, th0: L.th, y0: L.gy, bed: 0, dmg: 3 + 10 * L.peak, msg: ['', '', 'BACK DOWN IT WENT'] }); return; }
+    const g = Math.max(0, Math.sin(L.th) - 2 * L.ho / L.len * Math.cos(L.th)), hold = 0.55 * (0.3 + 0.7 * g), Te = T * Math.max(0, -(cx * ldx + cz * ldz)); // the pull counts in full from behind the bottom end; from the side it mostly swings the house
+    L.th = clamp(L.th + (Te > hold ? -0.55 * (Te - hold) : 0.8 * (hold - Te)) * dt, 0, Math.PI / 2);
+    const rx = ax - L.px, rz = az - L.pz; L.h = wrapA(L.h + 0.18 * T * (rz * cx - rx * cz) / (Math.hypot(rx, rz) || 1) * dt); // the top swings toward the rig: pull from the side and the house turns away from standing
+    const up = (Math.PI / 2 - L.th) / (Math.PI / 2 - thc); L.peak = Math.max(L.peak, up); Object.assign(cab, { hold, pct: `${Math.round(up * 100)}% UP · ${Math.round(Math.acos(clamp(-(cx * ldx + cz * ldz), -1, 1)) * 180 / Math.PI)}° OFF LINE` });
+    if (L.th >= Math.PI / 2 && L.peak > 0.25) { SFX.thud(12); shake = 0.6; setAppeal(appeal - (2 + 6 * L.peak) * PHYS.dmg); toast('IT SANK BACK', 'red', 'Keep the needle above the band'); L.peak = 0; }
+    if (L.th <= thc) { Object.assign(L, { ph: 'stand', t: 0, th0: L.th, slam: T }); unhook(); }
+    losePose(L.th, L.gy);
+  } else if (L.ph === 'stand') { // over the balance point: gravity drops it onto its base
+    const e = Math.min(1, L.t / 0.6); losePose(L.th0 * (1 - e * e), L.gy);
+    if (e >= 1) { const hard = L.slam > 0.55; L.ph = 'up'; L.t = 0; SFX.thud(14 + 20 * L.slam); shake = 1 + L.slam; for (const o of [-3, 3]) puff(b.position.x + fx * o, L.gy + 0.4, b.position.z + fz * o, 8, 0xc9b896, 1.5, 5, 1.4, 2.5, 0.5, 0.4); if (hard) setAppeal(appeal - 6 * PHYS.dmg);
+      showPadMark({ x: b.position.x + 0.75 * fx, z: b.position.z + 0.75 * fz, ry: L.h + PL.house.front }); toast(hard ? 'SLAMMED IT DOWN' : "IT'S UP", hard ? 'red' : 'big green', hard ? 'Ease off as it goes over the top' : `Back the bed in under it, then ${IS_TOUCH ? 'tap LOAD' : 'press H'}`); }
+  } else if (L.ph === 'up') losePose(0, L.gy + 1.3 * smoothstep(0, 1.2, L.t)); // up on its jacks, waiting for the bed
+  else { const e = smoothstep(0, 1, L.t); b.position.set(lerp(L.x0, P.x, e), lerp(L.y0, P.y + 1.45, e), lerp(L.z0, P.z, e)); b.rotation.set(0, L.h0 + wrapA(P.h - L.h0) * e, 0); if (e >= 1) reload(); } // 'load': down onto the bed
 }
 function onImpact(imp, x, z) {
   if (simTime - lastImpactT < 0.22) return; lastImpactT = simTime;
@@ -4195,7 +4289,7 @@ function toast(text, cls = '', small = '') {
   box.appendChild(d); while (box.children.length > 3) box.firstChild.remove();
   setTimeout(() => d.remove(), 2100);
 }
-let hudT = 0, lastSpd = -1, lastCash = -1, lastAppeal = -1;
+let hudT = 0, fitT = 0, lastSpd = -1, lastCash = -1, lastAppeal = -1;
 function fmtDist(m) { const mi = m / 1609.34; return mi < 0.1 ? Math.max(10, Math.round((m * 3.28084) / 10) * 10) + ' FT' : mi.toFixed(1) + ' MI'; }
 function fmtClock(h) { const hh = Math.floor(h), mm = Math.floor((h % 1) * 60), ap = hh < 12 ? 'AM' : 'PM', h12 = hh % 12 === 0 ? 12 : hh % 12; return `${h12}:${String(mm).padStart(2, '0')} ${ap}`; }
 function updateHUD(dt) {
@@ -4203,7 +4297,8 @@ function updateHUD(dt) {
   if (mph !== lastSpd) { lastSpd = mph; el.spd.textContent = mph; el.speed.classList.toggle('fast', mph > 65); }
   if (Math.round(cash) !== lastCash) { lastCash = Math.round(cash); el.cash.textContent = fmtMoney(cash); }
   if (Math.round(appeal) !== lastAppeal) { lastAppeal = Math.round(appeal); el.appeal.textContent = lastAppeal + '%'; el.appealBar.style.transform = `scaleX(${appeal / 100})`; }
-  if (lost && lost.hook) { el.wten.style.left = (lost.ten * 100).toFixed(1) + '%'; el.wpct.textContent = Math.round(lost.prog * 100) + '%'; el.winch.classList.toggle('hot', lost.ten > 0.8); }
+  if (cab.on) { el.wten.style.left = (Math.min(1.06, cab.ten) * 100).toFixed(1) + '%'; el.wband.style.left = (cab.hold * 100).toFixed(0) + '%'; el.wband.style.width = ((0.85 - cab.hold) * 100).toFixed(0) + '%'; el.wpct.textContent = cab.pct; el.winch.classList.toggle('hot', cab.ten > 0.85); }
+  if ((lost && lost.ph === 'up') || (mission && mission.phase === 'nudge')) { fitT -= dt; if (fitT <= 0) { fitT = 0.15; $('m-addr').textContent = fitInfo(); } }
   if (mission) {
     const dx = mission.dest.x - P.x, dz = mission.dest.z - P.z, rel = wrapA(Math.atan2(dx, dz) - camYaw);
     el.arrow.style.transform = `rotate(${(-rel).toFixed(3)}rad)`;
@@ -4287,7 +4382,7 @@ function drawMinimap() {
 }
 
 // ---------------- input ----------------
-const keys = Object.create(null), touchIn = { left: false, right: false, gas: false, brake: false, winch: false };
+const keys = Object.create(null), touchIn = { left: false, right: false, gas: false, brake: false };
 const GAME_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyW', 'KeyA', 'KeyS', 'KeyD']);
 function readInput() {
   let st = 0, th = 0, br = 0, hb = false;
@@ -4305,7 +4400,7 @@ function readInput() {
     if (gp.buttons[2] && gp.buttons[2].pressed) hb = true;
     if (gp.buttons[3] && gp.buttons[3].pressed && !gpY) honk(); gpY = gp.buttons[3] && gp.buttons[3].pressed;
   }
-  input.steer = clamp(st, -1, 1); input.throttle = th; input.brake = br; input.hand = hb; input.winch = hb || touchIn.winch;
+  input.steer = clamp(st, -1, 1); input.throttle = th; input.brake = br; input.hand = hb;
 }
 let gpY = false;
 function cycleCam() { camMode = (camMode + 1) % CAMS.length; el.camname.textContent = CAMS[camMode].name; toast(CAMS[camMode].name.toUpperCase(), ''); }
@@ -4355,7 +4450,7 @@ function togglePause() {
 function setupUI() {
   Object.assign(el, {
     spd: $('spd'), speed: $('speed'), cash: $('cash'), appeal: $('appeal'), appealBar: $('appeal-bar'), moves: $('moves'), clock: $('clock'),
-    camname: $('camname'), arrow: $('m-arrow'), dist: $('m-dist'), tip: $('m-tip'), tipBar: $('m-tipbar'), mm: $('minimap'), mmN: $('mm-n'), winch: $('winch'), wten: $('w-ten'), wpct: $('w-pct'),
+    camname: $('camname'), arrow: $('m-arrow'), dist: $('m-dist'), tip: $('m-tip'), tipBar: $('m-tipbar'), mm: $('minimap'), mmN: $('mm-n'), winch: $('winch'), wten: $('w-ten'), wpct: $('w-pct'), wband: $('w-band'),
   });
   el.mmg = el.mm.getContext('2d');
   renderer.domElement.tabIndex = -1;
@@ -4379,7 +4474,7 @@ function setupUI() {
   if (IS_TOUCH) {
     document.body.classList.add('is-touch'); $('touch').hidden = false;
     bindHold('t-left', 'left'); bindHold('t-right', 'right'); bindHold('t-gas', 'gas'); bindHold('t-brake', 'brake');
-    bindHold('t-ding', 'winch'); $('t-ding').addEventListener('pointerdown', (e) => { e.preventDefault(); audioInit(); if (!(lost && lost.hook)) honk(); });
+    $('t-ding').addEventListener('pointerdown', (e) => { e.preventDefault(); audioInit(); honk(); });
     $('t-cam').addEventListener('pointerdown', (e) => { e.preventDefault(); cycleCam(); });
   }
   window.addEventListener('resize', onResize);
@@ -4452,7 +4547,7 @@ function frame(now) {
     }
     clouds.position.x = ((simTime * 1.5) % 600) - 300;
   }
-  const sig = state + (mission ? mission.phase : '') + (lost ? (lost.hook ? 'h' : 'l') : ''); if (sig !== keySig) { keySig = sig; setKeyHUD(); }
+  const sig = state + (mission ? mission.phase : '') + (lost ? lost.ph : '') + (cab.on ? 'c' : ''); if (sig !== keySig) { keySig = sig; setKeyHUD(); if (IS_TOUCH) $('t-ding').textContent = lost ? (lost.ph === 'up' ? 'LOAD' : 'DING') : mission && (mission.phase === 'place' || mission.phase === 'nudge') ? 'SET' : 'DING'; }
   if (state === 'play') updateHUD(dt);
   audioUpdate();
   adaptQuality(dt);
@@ -4497,11 +4592,11 @@ async function init() {
   window.claude?.hot?.snapshot?.(() => ({ cash, moves, appeal, jobNo, tod, x: P.x, y: P.y, z: P.z, h: P.h, camMode }));
   window.HS = { P, get state() { return state; }, start: startGame,
     ramps: () => ramps.map((r) => ({ isOff: r.isOff, foot: r.pts[r.pts.length - 1], up: r.pts[r.pts.length - 8], top: r.pts[0], side: SIDES.indexOf(r.side), sq: r.sq, sp: r.sp })),
-    sim: (sec, inp) => { Object.assign(input, { steer: 0, throttle: 0, brake: 0, hand: false, winch: false }, inp || {}); const n = Math.round(sec * 60); for (let i = 0; i < n; i++) step(1 / 60); return { x: +P.x.toFixed(2), y: +P.y.toFixed(2), z: +P.z.toFixed(2), h: +P.h.toFixed(3), vf: +P.vf.toFixed(2), surf: P.surface, grounded: P.grounded }; },
+    sim: (sec, inp) => { Object.assign(input, { steer: 0, throttle: 0, brake: 0, hand: false }, inp || {}); const n = Math.round(sec * 60); for (let i = 0; i < n; i++) step(1 / 60); return { x: +P.x.toFixed(2), y: +P.y.toFixed(2), z: +P.z.toFixed(2), h: +P.h.toFixed(3), vf: +P.vf.toFixed(2), surf: P.surface, grounded: P.grounded }; },
     near: (r = 8) => { const out = []; queryCols(P.x - r, P.x + r, P.z - r, P.z + r, (c) => out.push(c.t === 0 ? `circle ${c.x.toFixed(1)},${c.z.toFixed(1)} r${c.r.toFixed(2)} top${c.y1}` : c.t === 1 ? `box x${c.x0.toFixed(1)}..${c.x1.toFixed(1)} z${c.z0.toFixed(1)}..${c.z1.toFixed(1)} top${c.y1.toFixed(1)}` : `wall ${c.ax.toFixed(1)},${c.az.toFixed(1)}->${(c.ax + c.ux * c.len).toFixed(1)},${(c.az + c.uz * c.len).toFixed(1)} base${c.ay} h${c.ha.toFixed(1)}`)); return out; },
     ringLocate, surfaceAt, get cash() { return cash; }, get appeal() { return appeal; }, props: () => flyingProps.length + ' flying, ' + propsFlattened + ' flattened',
     cars: () => allCars.map((c) => ({ t: c.type, m: c.mode, x: +c.x.toFixed(1), z: +c.z.toFixed(1), y: +c.y.toFixed(1), v: +c.v.toFixed(1), k: !!c.knocked, cr: +c.crush.toFixed(2), h: c.h })), allCars, setTod: (t) => { tod = t; }, camera, get camS() { return camS; }, cam: (m) => { camMode = m; }, teleport: (x, z, h, y = 0) => { Object.assign(P, { x, z, h, y, vx: 0, vz: 0, vy: 0 }); camYaw = h; camY = y; }, input, DESTS, stats: () => ({ tris: staticTris, calls: renderer.info.render.calls, frameTris: renderer.info.render.triangles, cars: allCars.length, dests: DESTS.length }), get mission() { return mission; },
-    setHouse, closeShop, rig, HOUSES, PHYS, PL, pickHouse: (i) => { nextHouse = i; }, load: loadBody, shop: openShop, get lost() { return lost; }, drop: dropLoad, cable, touchIn, get phase() { return mission && mission.phase; }, get level() { return levelsDone; } };
+    setHouse, closeShop, rig, HOUSES, PHYS, PL, pickHouse: (i) => { nextHouse = i; }, load: loadBody, shop: openShop, get lost() { return lost; }, drop: dropLoad, cable, cab, touchIn, get phase() { return mission && mission.phase; }, get level() { return levelsDone; } };
   $('loading').hidden = true; $('title').hidden = false;
   state = 'title';
   lastT = performance.now();
