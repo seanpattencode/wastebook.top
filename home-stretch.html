@@ -117,6 +117,13 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
 .toast.green { background: var(--guide); color: var(--paper); border-color: var(--paper); }
 .toast.red { background: var(--sold); color: var(--paper); border-color: var(--paper); }
 .toast small { display: block; font: 700 13px/1.3 var(--font-body); letter-spacing: 0; margin-top: 4px; }
+.winch { left: 50%; top: 57%; transform: translateX(-50%); width: min(280px, 78vw); background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 8px; padding: 8px 10px 7px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35); display: grid; gap: 5px; }
+.winch .wl { display: flex; justify-content: space-between; font: 900 13px/1 var(--font-display); letter-spacing: 0.1em; }
+.wbar { position: relative; height: 16px; border-radius: 4px; background: #d9d9d1; border: 2px solid var(--ink); }
+.wband { position: absolute; left: 35%; width: 45%; top: 0; bottom: 0; background: var(--guide-hi); }
+.wten { position: absolute; top: -4px; bottom: -4px; width: 5px; margin-left: -2px; background: var(--ink); border-radius: 2px; }
+.winch.hot .wbar { background: var(--sold); }
+.wsub { font: 700 11px/1.3 var(--font-body); color: #4a524d; }
 @keyframes pop {
   0% { transform: scale(0.6); opacity: 0; }
   10% { transform: scale(1.06); opacity: 1; }
@@ -314,6 +321,7 @@ button:focus-visible { outline: 3px solid var(--oversize); outline-offset: 3px; 
   </div>
 
   <div class="toasts" id="toasts" aria-live="polite"></div>
+  <div class="winch" id="winch" hidden><div class="wl"><span>WINCH</span><b id="w-pct">0%</b></div><div class="wbar"><i class="wband"></i><i class="wten" id="w-ten"></i></div><div class="wsub" id="w-sub">Hold Space · keep the needle in the green</div></div>
 
   <div id="touch" hidden>
     <button class="tbtn" id="t-left" aria-label="Steer left"><svg viewBox="0 0 24 24"><path d="M15 4 L7 12 L15 20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -2864,7 +2872,7 @@ const P = {
   x: START.x, y: 0, z: START.z, h: START.h, vx: 0, vz: 0, vy: 0, yaw: 0, steer: 0,
   grounded: true, air: 0, pitch: 0, roll: 0, sp: 0, spv: 0, sr: 0, srv: 0, hv: 0, hvv: 0,
   wheel: 0, vf: 0, vfPrev: 0, slope: 0, surface: 'road', onRib: false, slip: 0, braking: false,
-  safe: { x: START.x, y: 0, z: START.z, h: START.h }, safeT: 0, bump: 0, inWater: false, cap: 0,
+  safe: { x: START.x, y: 0, z: START.z, h: START.h }, safeT: 0, bump: 0, inWater: false,
 };
 const PL = {}; // player meshes
 
@@ -3001,7 +3009,7 @@ const HOUSES = [
   { n: 'TWO-STORY COLONIAL', d: 'Tall and heavy. It sways. Big tip.', mass: 1.5, sway: 1.5, pay: 1.8, type: 1, s: 0.6, front: Math.PI / 2, chim: [5.6, 9.8, 0], o: { siding: 0xe9dfc7, roof: 0x5f6f60, door: 0x2c2c2c, shutter: 0x2b2f33, garage: false, flip: false } },
   { n: 'RANCH + GARAGE', d: 'Long, wide, slow. The biggest payday.', mass: 1.8, sway: 1.3, pay: 2.4, type: 0, s: 0.52, front: Math.PI / 2, chim: [-5.5, 6.5, -1.2], o: { siding: 0xc3d2b8, roof: 0x7a685a, door: 0xb03a2e, shutter: 0x5a4636, chimney: true, flip: false } },
   { n: 'APARTMENT BLOCK', d: 'Seven floors of tenants. Top-heavy: take corners slow.', mass: 2.4, sway: 1.8, tall: 2.2, pay: 3.2, type: 't', floors: 7, fh: 3.1, w: 18, d: 12, s: 0.55, front: Math.PI / 2, chim: [7.5, 23.2, 4.5] },
-  { n: 'SKYSCRAPER', d: 'Twenty-four floors of glass. Sways like a reed and CAN capsize.', mass: 3.2, sway: 2.4, tall: 4, pay: 6, type: 't', floors: 24, fh: 3.5, w: 15, d: 15, s: 0.5, front: 0, glass: true, chim: [5.5, 85.6, 5.5] },
+  { n: 'SKYSCRAPER', d: 'Twenty-four floors of glass. Sways like a reed and CAN fall off the bed.', mass: 3.2, sway: 2.4, tall: 4, pay: 6, type: 't', floors: 24, fh: 3.5, w: 15, d: 15, s: 0.5, front: 0, glass: true, chim: [5.5, 85.6, 5.5] },
 ];
 function buildTower(T, H) { // apartment block or glass skyscraper: slab, window grid, parapet, bulkhead (+ spire); returns buildHouse-style extents
   const { w: W, d: D, fh } = H, Ht = H.floors * fh, b = (k) => B(k, T.x, T.z);
@@ -3041,15 +3049,15 @@ function buildBody(hi) {
   PL.chassis.add(body); PL.body = body; PL.house = H; PL.chimney = fur.chimney;
   H.fp = fur.fp; H.top = fur.top;
 }
-function loadBody(i) { if (PL.body) PL.chassis.remove(PL.body); buildBody(i); applyRig(true); } // swap the load on the bed (title menu, test hook)
+function loadBody(i) { clearLost(); if (PL.body) PL.chassis.remove(PL.body); buildBody(i); applyRig(true); } // swap the load on the bed (title menu, test hook)
 
 // ---------------- driving physics ----------------
-const input = { steer: 0, throttle: 0, brake: 0, hand: false };
+const input = { steer: 0, throttle: 0, brake: 0, hand: false, winch: false };
 const PHYS = { accel: 8.2, brake: 24, rev: 6.5, vrev: 9, grav: 20, grip: 1, sway: 1, dmg: 1 };
 const PCIRC = [1.7, -1.7], PR = 2.95;
 
 function updatePlayer(dt) {
-  if (P.cap) { input.steer = input.throttle = input.brake = 0; input.hand = true; } // on its side: dead until R
+  if (lost && (lost.ph === 'fall' || lost.hold)) { input.steer = input.throttle = input.brake = 0; input.hand = true; } // the load is going over, or the winch is reeling: the rig holds still
   const fx = Math.sin(P.h), fz = Math.cos(P.h), rx = -fz, rz = fx;
   let vf = P.vx * fx + P.vz * fz, vl = P.vx * rx + P.vz * rz;
   const st = input.steer;
@@ -3116,12 +3124,11 @@ function updatePlayer(dt) {
   const vfNow = P.vx * Math.sin(P.h) + P.vz * Math.cos(P.h);
   const aLong = clamp((vfNow - P.vfPrev) / dt, -40, 40); P.vfPrev = vfNow; P.vf = vfNow;
   const aLat = clamp(vfNow * P.yaw, -30, 30);
-  // roll: a tall load (H.tall) rides a softer, under-damped spring that gravity amplifies; past 0.42 rad the straps give and the rig goes over
+  // roll: a tall load (H.tall) rides a softer, under-damped spring that gravity amplifies; past 0.42 rad the straps give and the load goes over the side (dropLoad)
   const T = PL.body && PL.house.tall || 1, kR = 90 / (T * T), kE = kR * (1 - 0.68 * (1 - 1 / T));
   const tP = clamp(aLong * 0.0042 * PHYS.sway, -0.09, 0.12), tR = clamp(aLat * 0.0042 * PHYS.sway, -0.14 * T, 0.14 * T) * (kR / kE);
   P.spv += (-90 * (P.sp - tP) - 8 * P.spv) * dt; P.sp += P.spv * dt;
-  if (P.cap) { P.sr = damp(P.sr, P.cap * 0.35, 6, dt); P.srv = 0; }
-  else { P.srv += (-kE * (P.sr - tR) - 8 / (T * T) * P.srv) * dt; P.sr += P.srv * dt; if (PL.body && Math.abs(P.sr) > 0.42) capsize(); }
+  P.srv += (-kE * (P.sr - tR) - 8 / (T * T) * P.srv) * dt; P.sr += P.srv * dt; if (PL.body && Math.abs(P.sr) > 0.42) dropLoad();
   if (P.surface === 'grass' && P.grounded && spd > 4) { P.hvv += (Math.random() - 0.5) * spd * 0.09; P.spv += (Math.random() - 0.5) * spd * 0.012; if (T > 1) P.srv += (Math.random() - 0.5) * spd * 0.004 * (T - 1); }
   P.hvv += (-160 * P.hv - 10 * P.hvv) * dt; P.hv += P.hvv * dt;
   P.wheel += (vfNow * dt) / 0.75;
@@ -3182,7 +3189,7 @@ function resetToRoad() {
   if (blockedAt(P.x, P.z, 3)) { // nudge along the heading until clear
     for (let k = 1; k < 30 && blockedAt(P.x, P.z, 3); k++) { P.x = s.x + Math.sin(s.h) * k * 2; P.z = s.z + Math.cos(s.h) * k * 2; }
   }
-  if (P.cap) { P.cap = 0; P.sr = P.srv = P.roll = 0; setKeyHUD(); }
+  if (lost && lost.hook) unhook(0.55);
   camYaw = P.h; camY = P.y; toast('BACK ON THE ROAD', '');
 }
 
@@ -3200,10 +3207,9 @@ function updatePlayerVisual(dt, t) {
     const hl = c(terrainAt(P.x - rx * 2.5, P.z - rz * 2.5, y + 1)), hr = c(terrainAt(P.x + rx * 2.5, P.z + rz * 2.5, y + 1));
     tp = Math.atan2(hf - hb, 6); tr = Math.atan2(hl - hr, 5);
   } else tp = clamp(Math.atan2(P.vy, Math.max(8, Math.abs(P.vf))) * 0.6, -0.35, 0.35);
-  if (P.cap) tr += P.cap * 1.25; // capsized: the chassis lies on its side, pivoting on the outer wheels
-  P.pitch = damp(P.pitch, tp, P.grounded ? 12 : 3, dt); P.roll = damp(P.roll, tr, P.cap ? 2.5 : 10, dt);
+  P.pitch = damp(P.pitch, tp, P.grounded ? 12 : 3, dt); P.roll = damp(P.roll, tr, 10, dt);
   PL.chassis.rotation.x = -P.pitch; PL.chassis.rotation.z = P.roll;
-  PL.chassis.position.y = (P.inWater ? -0.55 + Math.sin(t * 2) * 0.05 : 0) + (P.cap ? 1.3 * Math.abs(Math.sin(P.roll)) : 0);
+  PL.chassis.position.y = P.inWater ? -0.55 + Math.sin(t * 2) * 0.05 : 0;
   if (PL.body) { PL.body.rotation.x = P.sp; PL.body.rotation.z = P.sr; PL.body.position.y = 1.45 + P.hv; }
   for (const w of PL.wheels) { w.spin.rotation.x = P.wheel; w.steer.rotation.y = w.front ? P.steer * 0.42 : 0; }
   // brake lights
@@ -3961,7 +3967,8 @@ function setKeyHUD() { // bottom-left legend, re-rendered whenever the state or 
   const ph = mission ? mission.phase : '', D = [['W ↑', 'gas'], ['S ↓', 'brake · reverse'], ['A D', 'steer'], ['Space', 'handbrake'], ['C', 'camera'], ['R', 'back on the road'], ['Esc', 'pause']];
   const rows = state === 'shop' ? [['Enter', 'LOAD UP · next level', 1], ['click', 'buy an upgrade · pick a house']]
     : state === 'pause' ? [['Esc', 'RESUME', 1], ['C', 'next camera'], ['N', 'night / day'], ['R', 'back on the road'], ['M', 'sound']]
-    : P.cap ? [['R', 'RIGHT THE RIG · it capsized', 1], ['C', 'camera'], ['Esc', 'pause']]
+    : lost && lost.hook ? [['Space', 'WINCH · hold it, keep the needle in the green', 1], ['', 'let go before the cable snaps'], ['C', 'camera'], ['R', 'back on the road'], ['Esc', 'pause']]
+    : lost ? [['', 'LOAD LOST · park the rig by the bottom of the house', 1], ...D.slice(0, 3), ...D.slice(4)]
     : ph === 'place' ? [['H', 'SET THE HOUSE · stop on the outline', 1], ...D]
     : ph === 'lift' ? [['W ↑', 'PULL OUT · drive clear of the house', 1], ...D.slice(1)]
     : ph === 'set' ? [['', 'HANDS OFF · lowering the house', 1], ...D.slice(4)]
@@ -3981,7 +3988,7 @@ function newMission() {
   toast(`LEVEL ${jobNo}: ${mission.client.toUpperCase()}`, 'green', `Haul the ${PL.house.n.toLowerCase()} to ${d.label}`);
 }
 function setHouse() { // H on the lot: jack the house up off the bed where it stands
-  const m = mission; if (!m || m.phase !== 'place' || state !== 'play') return false;
+  const m = mission; if (!m || m.phase !== 'place' || state !== 'play' || !PL.body) return false;
   if (Math.abs(P.vf) > 1 || !P.grounded) { toast('COME TO A FULL STOP', ''); return true; }
   const H = PL.house, fx = Math.sin(P.h), fz = Math.cos(P.h), cx = P.x + fx * 0.75, cz = P.z + fz * 0.75;
   const off = Math.hypot(cx - m.dest.x, cz - m.dest.z), ang = Math.abs(wrapA(P.h - (m.dest.ry - H.front)));
@@ -3996,7 +4003,7 @@ let wasInWater = false, wrongWayT = 0, stuckT = 0, stuckHintT = -99, tipT = -99;
 function checkWarnings(dt) {
   if (input.throttle > 0 && !input.brake && Math.abs(P.vf) < 0.6 && P.grounded) stuckT += dt; else stuckT = 0;
   if (stuckT > 2.2 && simTime - stuckHintT > 12) { stuckHintT = simTime; toast('STUCK?', '', IS_TOUCH ? 'Hold BRAKE to back up, or use Back on road in the pause menu' : 'Hold S to back up, or press R to get back on the road'); }
-  if (PL.body && !P.cap && Math.abs(P.sr) > 0.26 && simTime - tipT > 5) { tipT = simTime; toast('TIPPING!', 'red', 'Slow down and straighten out'); }
+  if (PL.body && Math.abs(P.sr) > 0.26 && simTime - tipT > 5) { tipT = simTime; toast('TIPPING!', 'red', 'Slow down and straighten out'); }
   if (P.inWater && !wasInWater && Math.abs(P.vf) > 2) { SFX.splash(); toast('MAKING A SPLASH', ''); }
   wasInWater = P.inWater;
   wrongWayT -= dt;
@@ -4013,7 +4020,7 @@ function updateMission(dt) {
   const m = mission;
   if (m.phase === 'haul' || m.phase === 'place') {
     m.left -= dt;
-    const on = Math.hypot(m.dest.x - P.x, m.dest.z - P.z) < 15 && P.y < 3;
+    const on = !!PL.body && Math.hypot(m.dest.x - P.x, m.dest.z - P.z) < 15 && P.y < 3;
     if (on !== (m.phase === 'place')) { m.phase = on ? 'place' : 'haul'; setPhaseHUD(); if (on) toast('ON THE LOT', 'green', `Line up on the yellow outline, then ${IS_TOUCH ? 'tap SET' : 'press H'}`); }
   } else {
     m.t += dt;
@@ -4067,11 +4074,51 @@ function saveBest() { if (!arcade && earned > best.cash) { best = { cash: Math.r
 let lastImpactT = -9, lastToastHit = -9;
 function sparksAt(x, y, z, n) { for (let i = 0; i < n; i++) sparks.spawn(x, y, z, mr(-7, 7), mr(2, 9), mr(-7, 7), mr(0.25, 0.6), mr(0.25, 0.5), 0.05, 1, Math.random() < 0.5 ? 0xffc44a : 0xff8a2a, 22, 1); }
 function puff(x, y, z, n, col, s0, s1, life, spread, up, alpha = 0.4) { for (let i = 0; i < n; i++) smoke.spawn(x + mr(-spread, spread), y, z + mr(-spread, spread), mr(-1.5, 1.5), up + mr(0, 1.5), mr(-1.5, 1.5), life * mr(0.7, 1.2), s0, s1, alpha, col, 0, 1.2); }
-function capsize() { // the straps gave: the rig goes over on its side; R (resetToRoad) rights it
-  P.cap = Math.sign(P.sr) || 1; P.srv = 0;
-  SFX.crash(40); shake = 2; setAppeal(appeal - 35 * PHYS.dmg);
-  sparksAt(P.x, P.y + 1, P.z, 30); puff(P.x, P.y + 0.5, P.z, 20, 0xb8ad98, 2, 7, 1.8, 5, 1.2, 0.5);
-  toast('CAPSIZED!', 'big red', `The ${PL.house.n.toLowerCase()} went over. ${IS_TOUCH ? 'Use Back on road in the pause menu' : 'Press R to right the rig'}`); setKeyHUD();
+// ---------------- lost load: the straps give, the house goes over the side, and a winch mini-game reels it back onto the bed ----------------
+const HOOK_R = 14; // metres from the rig to the base of the fallen house: park inside this and the cable hooks on by itself
+let lost = null;
+const cable = (() => { const b = new Batch(); b.box(sub(TY(0, 0, 0, 0), 0, 0, -0.5), 0.08, 0.08, 1, 0x1c1c1c); const m = new THREE.Mesh(b.geo(), new THREE.MeshBasicMaterial({ color: 0x1c1c1c, fog: false })); m.visible = false; scene.add(m); return m; })();
+function dropLoad() { // past 0.42 rad of roll: the house leaves the bed, turning over its base edge on the lean side (body +x is world (cos h, -sin h))
+  const b = PL.body, H = PL.house, s = Math.sign(P.sr) || 1, hw = H.fp.w / 2, fx = Math.sin(P.h), fz = Math.cos(P.h), px = P.x - s * hw * fz, pz = P.z + s * hw * fx;
+  PL.chassis.remove(b); scene.add(b); PL.body = null; applyRig(false);
+  lost = { ph: 'fall', house: b, s, hw, h: P.h, px, pz, len: H.top, y0: P.y + 1.45 + P.hv, gy: surfaceAt(px - s * H.top * 0.5 * fz, pz + s * H.top * 0.5 * fx, P.y + 1.2), th0: P.sr, t: 0, prog: 0, ten: 0, hook: false, hold: false, cool: 0 };
+  P.sr = P.srv = 0;
+  toast('THE STRAPS GAVE', 'big red', `The ${H.n.toLowerCase()} is going over`);
+}
+function hook() { lost.hook = true; SFX.clank(150); $('winch').hidden = false; $('w-sub').textContent = `Hold ${IS_TOUCH ? 'WINCH' : 'Space'} · keep the needle in the green`; if (IS_TOUCH) $('t-ding').textContent = 'WINCH'; toast('HOOKED ON', 'green', 'Reel it in: hold, and let go before the needle hits the red'); }
+function unhook(keep) { Object.assign(lost, { hook: false, hold: false, ten: 0, prog: Math.min(lost.prog, keep) }); cable.visible = false; $('winch').hidden = true; if (IS_TOUCH) $('t-ding').textContent = mission && mission.phase === 'place' ? 'SET' : 'DING'; }
+function clearLost() { if (lost) { unhook(0); scene.remove(lost.house); lost = null; } }
+function reload() { // progress reached 1: the house is back on the bed, squared up
+  const b = lost.house; clearLost(); b.position.set(0, 1.45, 0); b.rotation.set(0, 0, 0); PL.chassis.add(b); PL.body = b; applyRig(true); P.sr = P.srv = P.sp = P.spv = 0;
+  SFX.clank(150); toast('BACK ON THE BED', 'big green', 'Easy on the corners this time');
+}
+function updateLost(dt) {
+  const L = lost, s = L.s, b = L.house, fx = Math.sin(L.h), fz = Math.cos(L.h);
+  const pose = (th, py, k = 1) => { // origin from the pivot edge (the base edge stays put, the house turns about it); k < 1 blends from where the body sat on the bed
+    const c = s * L.hw * Math.cos(th) + (1 - k) * s * L.hw * (1 - Math.cos(L.th0)), y = py + s * L.hw * (Math.sin(th) - (1 - k) * Math.sin(L.th0));
+    b.position.set(L.px + c * fz, y, L.pz - c * fx); b.rotation.set(0, L.h, th);
+  };
+  if (L.ph === 'fall') { // accelerating tip over the edge; the base drops to the ground late
+    L.t += dt; const e = Math.min(1, L.t / 1.4);
+    pose(L.th0 + (s * Math.PI / 2 - L.th0) * e * e, L.y0 - (L.y0 - L.gy) * e * e * e, e);
+    if (e >= 1) { L.ph = 'down'; SFX.crash(40); shake = 2; setAppeal(appeal - 35 * PHYS.dmg); for (let q = 0; q < L.len; q += 6) puff(L.px - s * q * fz, L.gy + 0.4, L.pz + s * q * fx, 5, 0xb8ad98, 2, 7, 1.8, 3, 1.2, 0.5); toast('LOAD LOST!', 'big red', `Park the rig by the bottom of the ${PL.house.n.toLowerCase()} and the winch hooks on`); }
+    return;
+  }
+  const d = Math.hypot(P.x - L.px, P.z - L.pz);
+  if (!L.hook) { if (d < HOOK_R && Math.abs(P.vf) < 1.5 && P.grounded) hook(); }
+  else if (d > HOOK_R + 8) unhook(0.55);
+  // the mini-game: holding winds the cable up (0.9/s), letting go slacks it (1.5/s); the house only moves while the tension sits in the green band, and at the top the cable snaps
+  L.cool = Math.max(0, L.cool - dt); L.hold = L.hook && input.winch && !L.cool;
+  L.ten = L.hold ? Math.min(1, L.ten + dt * 0.9) : Math.max(0, L.ten - dt * 1.5);
+  if (L.hold && L.ten >= 0.35 && L.ten <= 0.8) L.prog = Math.min(1, L.prog + dt * 0.17);
+  if (L.ten >= 1) { Object.assign(L, { ten: 0, cool: 0.8, prog: Math.max(0, L.prog - 0.3) }); SFX.crash(26); shake = 0.8; setAppeal(appeal - 4 * PHYS.dmg); sparksAt(b.position.x, b.position.y + 1, b.position.z, 14); toast('CABLE SNAPPED!', 'red', 'Let go before the needle reaches the red'); }
+  // pose: stands back up about the same edge, then slides across and squares up on the bed
+  const e1 = smoothstep(0, 0.55, L.prog), e2 = smoothstep(0.55, 1, L.prog);
+  if (e2 <= 0) pose(s * Math.PI / 2 * (1 - e1), L.gy);
+  else { b.position.set(lerp(L.px + s * L.hw * fz, P.x, e2), lerp(L.gy, P.y + 1.45, e2), lerp(L.pz - s * L.hw * fx, P.z, e2)); b.rotation.set(0, L.h + wrapA(P.h - L.h) * e2, 0); }
+  if (L.prog >= 1) { reload(); return; }
+  cable.visible = L.hook; // from the rear of the bed to the base of the house
+  if (L.hook) { cable.position.set(P.x - 4.3 * Math.sin(P.h), P.y + 1.6, P.z - 4.3 * Math.cos(P.h)); cable.lookAt(b.position); cable.scale.z = Math.max(0.1, cable.position.distanceTo(b.position)); }
 }
 function onImpact(imp, x, z) {
   if (simTime - lastImpactT < 0.22) return; lastImpactT = simTime;
@@ -4156,6 +4203,7 @@ function updateHUD(dt) {
   if (mph !== lastSpd) { lastSpd = mph; el.spd.textContent = mph; el.speed.classList.toggle('fast', mph > 65); }
   if (Math.round(cash) !== lastCash) { lastCash = Math.round(cash); el.cash.textContent = fmtMoney(cash); }
   if (Math.round(appeal) !== lastAppeal) { lastAppeal = Math.round(appeal); el.appeal.textContent = lastAppeal + '%'; el.appealBar.style.transform = `scaleX(${appeal / 100})`; }
+  if (lost && lost.hook) { el.wten.style.left = (lost.ten * 100).toFixed(1) + '%'; el.wpct.textContent = Math.round(lost.prog * 100) + '%'; el.winch.classList.toggle('hot', lost.ten > 0.8); }
   if (mission) {
     const dx = mission.dest.x - P.x, dz = mission.dest.z - P.z, rel = wrapA(Math.atan2(dx, dz) - camYaw);
     el.arrow.style.transform = `rotate(${(-rel).toFixed(3)}rad)`;
@@ -4239,7 +4287,7 @@ function drawMinimap() {
 }
 
 // ---------------- input ----------------
-const keys = Object.create(null), touchIn = { left: false, right: false, gas: false, brake: false };
+const keys = Object.create(null), touchIn = { left: false, right: false, gas: false, brake: false, winch: false };
 const GAME_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyW', 'KeyA', 'KeyS', 'KeyD']);
 function readInput() {
   let st = 0, th = 0, br = 0, hb = false;
@@ -4257,7 +4305,7 @@ function readInput() {
     if (gp.buttons[2] && gp.buttons[2].pressed) hb = true;
     if (gp.buttons[3] && gp.buttons[3].pressed && !gpY) honk(); gpY = gp.buttons[3] && gp.buttons[3].pressed;
   }
-  input.steer = clamp(st, -1, 1); input.throttle = th; input.brake = br; input.hand = hb;
+  input.steer = clamp(st, -1, 1); input.throttle = th; input.brake = br; input.hand = hb; input.winch = hb || touchIn.winch;
 }
 let gpY = false;
 function cycleCam() { camMode = (camMode + 1) % CAMS.length; el.camname.textContent = CAMS[camMode].name; toast(CAMS[camMode].name.toUpperCase(), ''); }
@@ -4307,7 +4355,7 @@ function togglePause() {
 function setupUI() {
   Object.assign(el, {
     spd: $('spd'), speed: $('speed'), cash: $('cash'), appeal: $('appeal'), appealBar: $('appeal-bar'), moves: $('moves'), clock: $('clock'),
-    camname: $('camname'), arrow: $('m-arrow'), dist: $('m-dist'), tip: $('m-tip'), tipBar: $('m-tipbar'), mm: $('minimap'), mmN: $('mm-n'),
+    camname: $('camname'), arrow: $('m-arrow'), dist: $('m-dist'), tip: $('m-tip'), tipBar: $('m-tipbar'), mm: $('minimap'), mmN: $('mm-n'), winch: $('winch'), wten: $('w-ten'), wpct: $('w-pct'),
   });
   el.mmg = el.mm.getContext('2d');
   renderer.domElement.tabIndex = -1;
@@ -4331,7 +4379,7 @@ function setupUI() {
   if (IS_TOUCH) {
     document.body.classList.add('is-touch'); $('touch').hidden = false;
     bindHold('t-left', 'left'); bindHold('t-right', 'right'); bindHold('t-gas', 'gas'); bindHold('t-brake', 'brake');
-    $('t-ding').addEventListener('pointerdown', (e) => { e.preventDefault(); audioInit(); honk(); });
+    bindHold('t-ding', 'winch'); $('t-ding').addEventListener('pointerdown', (e) => { e.preventDefault(); audioInit(); if (!(lost && lost.hook)) honk(); });
     $('t-cam').addEventListener('pointerdown', (e) => { e.preventDefault(); cycleCam(); });
   }
   window.addEventListener('resize', onResize);
@@ -4363,6 +4411,7 @@ function adaptQuality(dt) {
 function step(h) {
   simTime += h;
   updatePlayer(h);
+  if (lost) updateLost(h);
   updateTraffic(h);
   updateProps(h);
   updateMission(h);
@@ -4403,7 +4452,7 @@ function frame(now) {
     }
     clouds.position.x = ((simTime * 1.5) % 600) - 300;
   }
-  const sig = state + (mission ? mission.phase : ''); if (sig !== keySig) { keySig = sig; setKeyHUD(); }
+  const sig = state + (mission ? mission.phase : '') + (lost ? (lost.hook ? 'h' : 'l') : ''); if (sig !== keySig) { keySig = sig; setKeyHUD(); }
   if (state === 'play') updateHUD(dt);
   audioUpdate();
   adaptQuality(dt);
@@ -4448,11 +4497,11 @@ async function init() {
   window.claude?.hot?.snapshot?.(() => ({ cash, moves, appeal, jobNo, tod, x: P.x, y: P.y, z: P.z, h: P.h, camMode }));
   window.HS = { P, get state() { return state; }, start: startGame,
     ramps: () => ramps.map((r) => ({ isOff: r.isOff, foot: r.pts[r.pts.length - 1], up: r.pts[r.pts.length - 8], top: r.pts[0], side: SIDES.indexOf(r.side), sq: r.sq, sp: r.sp })),
-    sim: (sec, inp) => { Object.assign(input, { steer: 0, throttle: 0, brake: 0, hand: false }, inp || {}); const n = Math.round(sec * 60); for (let i = 0; i < n; i++) step(1 / 60); return { x: +P.x.toFixed(2), y: +P.y.toFixed(2), z: +P.z.toFixed(2), h: +P.h.toFixed(3), vf: +P.vf.toFixed(2), surf: P.surface, grounded: P.grounded }; },
+    sim: (sec, inp) => { Object.assign(input, { steer: 0, throttle: 0, brake: 0, hand: false, winch: false }, inp || {}); const n = Math.round(sec * 60); for (let i = 0; i < n; i++) step(1 / 60); return { x: +P.x.toFixed(2), y: +P.y.toFixed(2), z: +P.z.toFixed(2), h: +P.h.toFixed(3), vf: +P.vf.toFixed(2), surf: P.surface, grounded: P.grounded }; },
     near: (r = 8) => { const out = []; queryCols(P.x - r, P.x + r, P.z - r, P.z + r, (c) => out.push(c.t === 0 ? `circle ${c.x.toFixed(1)},${c.z.toFixed(1)} r${c.r.toFixed(2)} top${c.y1}` : c.t === 1 ? `box x${c.x0.toFixed(1)}..${c.x1.toFixed(1)} z${c.z0.toFixed(1)}..${c.z1.toFixed(1)} top${c.y1.toFixed(1)}` : `wall ${c.ax.toFixed(1)},${c.az.toFixed(1)}->${(c.ax + c.ux * c.len).toFixed(1)},${(c.az + c.uz * c.len).toFixed(1)} base${c.ay} h${c.ha.toFixed(1)}`)); return out; },
     ringLocate, surfaceAt, get cash() { return cash; }, get appeal() { return appeal; }, props: () => flyingProps.length + ' flying, ' + propsFlattened + ' flattened',
     cars: () => allCars.map((c) => ({ t: c.type, m: c.mode, x: +c.x.toFixed(1), z: +c.z.toFixed(1), y: +c.y.toFixed(1), v: +c.v.toFixed(1), k: !!c.knocked, cr: +c.crush.toFixed(2), h: c.h })), allCars, setTod: (t) => { tod = t; }, camera, get camS() { return camS; }, cam: (m) => { camMode = m; }, teleport: (x, z, h, y = 0) => { Object.assign(P, { x, z, h, y, vx: 0, vz: 0, vy: 0 }); camYaw = h; camY = y; }, input, DESTS, stats: () => ({ tris: staticTris, calls: renderer.info.render.calls, frameTris: renderer.info.render.triangles, cars: allCars.length, dests: DESTS.length }), get mission() { return mission; },
-    setHouse, closeShop, rig, HOUSES, PHYS, PL, pickHouse: (i) => { nextHouse = i; }, load: loadBody, shop: openShop, get phase() { return mission && mission.phase; }, get level() { return levelsDone; } };
+    setHouse, closeShop, rig, HOUSES, PHYS, PL, pickHouse: (i) => { nextHouse = i; }, load: loadBody, shop: openShop, get lost() { return lost; }, drop: dropLoad, cable, touchIn, get phase() { return mission && mission.phase; }, get level() { return levelsDone; } };
   $('loading').hidden = true; $('title').hidden = false;
   state = 'title';
   lastT = performance.now();
