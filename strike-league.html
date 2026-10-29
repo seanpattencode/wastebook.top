@@ -209,7 +209,7 @@ label.sl output{min-width:40px; text-align:right; color:var(--ink); font-weight:
    <div><b>Shift</b> sprint</div><div><b>Space</b> jump</div><div><b>R</b> reload</div>
    <div><b>Esc</b> pause</div><div><b>Touch</b> stick + buttons</div>
   </div>
-  <div class="foot">Online: two players, one per team. In 3v3, bots fill the other slots. The host chooses the mode and teams.</div>
+  <div class="foot">Online: two players, one per team. In 3v3, bots fill the other slots. Take turns choosing each game; the host picks first.</div>
  </div>
 </div>
 
@@ -239,6 +239,13 @@ label.sl output{min-width:40px; text-align:right; color:var(--ink); font-weight:
   <div class="kick">FULL TIME</div>
   <h1 id="endTitle">Blue wins</h1>
   <div id="endScore">3 — 1</div>
+  <div id="nextGame" class="hidden">
+   <p id="nextPicker"></p>
+   <fieldset id="nextPick" class="rowopt" style="border:0;padding:0">
+    <label>Game <select id="nextMode"><option value="assault">Assault</option><option value="soccer">Stadium Soccer</option></select></label>
+    <label>Teams <select id="nextSize"><option value="1">1 v 1</option><option value="3">3 v 3</option></select></label>
+   </fieldset>
+  </div>
   <div class="stats" id="endStats"></div>
   <div class="btnrow" style="margin-top:16px">
    <button class="btn" id="rematchBtn" style="flex:1.4">Rematch</button>
@@ -1150,6 +1157,8 @@ function goalScored(team){
 }
 function endMatch(team){
  G.state='matchend';
+ if(NET.side===0)NET.nextAt=performance.now()+10000;
+ nextMenu();
  if(document.pointerLockElement)document.exitPointerLock();
  endTitle.textContent=`${TI[team].name} wins`;
  endTitle.style.color=TI[team].hex;
@@ -1168,6 +1177,7 @@ function endMatch(team){
  fxConfetti(_a.set(0,4,0),TI[team].col,100,10);
 }
 function startMatch(mode,size){
+ NET.mode=mode;NET.size=size;
  if(NET.side===0){NET.match++;netSend({k:'start',mode,size,match:NET.match});}
  AU.resume();
  G={mode,size,state:'count',t:0,score:[0,0],round:1,timer:ROUND_T,
@@ -1468,9 +1478,8 @@ function netSend(d){
 }
 function netClose(){
  const p=NET.peer;NET.peer=NET.conn=null;NET.side=-1;NET.gen=(NET.gen||0)+1;
- p?.destroy();NET.reload=false;NET.at=0;location.hash='';$('mpMeter').textContent='';
- $('restartBtn').disabled=$('rematchBtn').disabled=false;
- $('rematchBtn').textContent='Rematch';
+ p?.destroy();NET.reload=false;NET.match=0;location.hash='';$('mpMeter').textContent='';
+ $('restartBtn').disabled=false;show($('rematchBtn'));
 }
 function netFail(s){toMenu();$('mpStatus').textContent=s;}
 function netOpen(code){
@@ -1500,10 +1509,9 @@ function netOpen(code){
 function wire(c){
  if(NET.conn){c.on('open',()=>{c.send({k:'full'});setTimeout(()=>c.close(),200);});return;}
  NET.conn=c;
- c.on('open',()=>{if(c!==NET.conn)return;NET.seen=performance.now();NET.echo=0;NET.seq=0;NET.rx=-1;
+ c.on('open',()=>{if(c!==NET.conn)return;NET.seen=performance.now();NET.seq=0;NET.rx=-1;
   if(NET.side===0){hide($('mpWait'));startMatch(NET.mode,NET.size);}
-  $('restartBtn').disabled=$('rematchBtn').disabled=NET.side===1;
-  $('rematchBtn').textContent=NET.side===1?'Waiting for host rematch':'Rematch';
+  $('restartBtn').disabled=true;hide($('rematchBtn'));
  });
  c.on('data',d=>{if(c===NET.conn)receive(d);});
  c.on('close',()=>{if(c===NET.conn)netFail('Opponent left. Create or join a room.');});
@@ -1518,8 +1526,10 @@ function receive(d){
   startMatch(d.mode,d.size);IN.fire=false;return;
  }
  if(!G.human||d.match!==NET.match)return;
- if(d.stamp)NET.echo=d.stamp;if(d.echo)NET.ping=performance.now()-d.echo;
- if(NET.side===0&&d.k==='input'){
+ if(d.stamp)netSend({echo:d.stamp});if(d.echo)NET.ping=performance.now()-d.echo;
+ if(d.k==='pick'&&G.state==='matchend'&&(NET.side===1||NET.match%2===1)&&['assault','soccer'].includes(d.mode)&&[1,3].includes(d.size)){
+  NET.mode=d.mode;NET.size=d.size;nextMenu();if(NET.side===0)netSend(d);
+ }else if(NET.side===0&&d.k==='input'){
   const [x,z,y,p,j,f,s,r]=d.i,a=G.actors[G.size];
   if(![x,z,y,p].every(Number.isFinite))return;
   Object.assign(a.input,{x:clamp(x,-1,1),z:clamp(z,-1,1),jump:a.input.jump||!!j,fire:!!f,sprint:!!s});
@@ -1551,14 +1561,27 @@ function receive(d){
 function netTick(t,work){
  if(!NET.conn?.open||!G.human)return;
  if(t-NET.seen>10000){netFail('Opponent timed out. Create or join a room.');return;}
- if(t-NET.at<50)return;NET.at=t;
- const stamp=t,echo=NET.echo,h=G.human;
- if(NET.side===0)netSend({k:'state',q:++NET.seq,stamp,echo,g:GF.map(k=>G[k]),score:G.score,
+ if(G.state==='matchend'){
+  if(NET.side===0){G.stateT=(NET.nextAt-performance.now())/1000;if(G.stateT<=0){startMatch(NET.mode,NET.size);return;}}
+  $('nextPicker').textContent=`${NET.side===NET.match%2?'Your':TI[NET.match%2].name+"'s"} turn to choose · next game in ${Math.ceil(G.stateT)}s`;
+ }
+ const stamp=performance.now(),h=G.human;
+ if(NET.side===0)netSend({k:'state',q:++NET.seq,stamp,g:GF.map(k=>G[k]),score:G.score,
   a:G.actors.map(a=>[a.pos.toArray(),a.vel.toArray(),AF.map(k=>a[k])]),ball:G.ball&&[G.ball.pos.toArray(),G.ball.vel.toArray()]});
- else{const i=h.input;netSend({k:'input',stamp,echo,i:[i.x,i.z,h.yaw,h.pitch,i.jump,i.fire,i.sprint,NET.reload]});i.jump=false;NET.reload=false;}
- $('mpMeter').textContent=`Room ${NET.code} · ${TI[NET.side].name} · round trip ${NET.ping.toFixed(1)} ms · frame work ${work.toFixed(3)} ms`;
+ else{const i=h.input;netSend({k:'input',stamp,i:[i.x,i.z,h.yaw,h.pitch,i.jump,i.fire,i.sprint,NET.reload]});i.jump=false;NET.reload=false;}
+ $('mpMeter').textContent=`Room ${NET.code} · ${TI[NET.side].name} · network RTT ${NET.ping.toFixed(1)} ms · frame work ${work.toFixed(3)} ms`;
 }
-function rematch(){if(NET.side!==1){AU.ui();startMatch(G.mode,G.size);if(!IN.touch)lockPointer();}}
+function rematch(){if(NET.side<0){AU.ui();startMatch(G.mode,G.size);if(!IN.touch)lockPointer();}}
+function nextMenu(){
+ $('nextGame').classList.toggle('hidden',NET.side<0);
+ $('nextPick').disabled=NET.side!==NET.match%2;
+ $('nextMode').value=NET.mode;$('nextSize').value=NET.size;
+}
+$('nextPick').onchange=()=>{
+ if(G.state!=='matchend'||NET.side!==NET.match%2)return;
+ NET.mode=$('nextMode').value;NET.size=+$('nextSize').value;
+ netSend({k:'pick',mode:NET.mode,size:NET.size});
+};
 $('mpCreate').onclick=()=>netOpen();
 $('mpJoin').onclick=()=>netOpen($('mpCode').value.trim().toUpperCase());
 $('mpCancel').onclick=toMenu;
