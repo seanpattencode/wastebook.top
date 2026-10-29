@@ -298,7 +298,7 @@ const BOTNAMES=[['NOVA','BOLT','ACE'],['REX','VYPR','TANKO']];
 const P={R:0.45,H:1.78,EYE:1.6,WALK:7.2,SPRINT:10.2,JUMP:8.4,G:23};
 const GUN={CD:0.11,MAG:30,RELOAD:1.35,RANGE:150,DMG_BODY:14,DMG_HEAD:30,DMG_LEG:10};
 const BALLC={R:0.62,G:24,IMP:8.8,MAXV:34};
-const FLD={F:34,W:22,GW:11,GH:3.6,GD:3.2};
+const FLD={F:34,W:22,H:6,GW:11,GH:3.6,GD:3.2};
 FLD.RZ=FLD.W;
 FLD.RX=FLD.F/Math.sqrt(1-Math.pow(FLD.GW/2/FLD.RZ,2));
 const YRD={X:23,Z:17};
@@ -559,6 +559,7 @@ function buildStadium(){
  // goals
  const postMat=new THREE.MeshStandardMaterial({color:0xf2f6ff,roughness:.4});
  const nmat=new THREE.MeshBasicMaterial({map:netTex(),transparent:true,opacity:.5,side:THREE.DoubleSide,depthWrite:false});
+ box((F+GD)*2,.1,W*2,nmat,0,FLD.H+.05,0,{col:false,cast:false});
  G.goals=[];
  for(const s of[-1,1]){
   const gx=s*F;
@@ -764,6 +765,7 @@ class Ball{
   this.vel.y-=BALLC.G*dt;
   this.vel.x*=1-0.1*dt;this.vel.z*=1-0.1*dt;
   this.pos.addScaledVector(this.vel,dt);
+  if(this.pos.y+this.r>FLD.H){this.pos.y=FLD.H-this.r;this.vel.y=-Math.abs(this.vel.y)*.85;}
   if(this.pos.y<this.r){
    this.pos.y=this.r;
    if(this.vel.y<0){const imp=-this.vel.y;
