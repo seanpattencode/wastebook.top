@@ -92,6 +92,7 @@ h1.title{
  gap:6px 16px; font-size:13px; color:var(--sub);
 }
 .ctrls b{color:var(--ink); font-weight:700}
+:focus{outline:3px solid var(--gold);outline-offset:-3px}
 .foot{margin-top:14px; font-size:12px; color:var(--sub)}
 label.sl{display:flex; align-items:center; gap:12px; margin:10px 0; font-size:14px; color:var(--sub); font-weight:600}
 label.sl input{flex:1; accent-color:var(--accent)}
@@ -210,6 +211,7 @@ label.sl output{min-width:40px; text-align:right; color:var(--ink); font-weight:
    <div><b>Esc</b> pause</div><div><b>Touch</b> stick + buttons</div>
   </div>
   <div class="foot">Online: two players, one per team. In 3v3, bots fill the other slots. Take turns choosing each game; the host picks first.</div>
+  <div class="foot">Xbox: press a controller button. Left stick move · right stick aim · RT fire · A jump · X reload · hold LS/LB sprint · Menu pause. Menus: D-pad navigate, left/right adjust, A select, B back.</div>
  </div>
 </div>
 
@@ -351,25 +353,61 @@ const AU={ctx:null,master:null,noise:null,crowd:null,crowdG:null,vol:0.8,
 };
 
 const IN={k:Object.create(null),mdx:0,mdy:0,fire:false,lock:false,touch:false,jx:0,jz:0,jumpQ:false};
+const PAD={x:0,z:0,fire:false,run:false,active:false,held:[]};
+function padTick(dt){
+ const p=document.hasFocus()&&(navigator.getGamepads?.()||[]).find(p=>p?.connected&&p.mapping==='standard');
+ PAD.x=PAD.z=PAD.fire=PAD.run=0;
+ if(!p){if(PAD.active){PAD.active=false;pauseGame();}PAD.held=[];return;}
+ const down=p.buttons.map(b=>b.pressed),hit=down.map((v,i)=>v&&!PAD.held[i]);PAD.held=down;
+ if(down.some(Boolean)||p.axes.some(v=>Math.abs(v)>.18))PAD.active=true;
+ if(!PAD.active)return;
+ const menu=[...document.querySelectorAll('.screen:not(.hidden)')].pop();
+ if(hit[9]){if(menu===pauseScreen)resumeGame();else if(!menu)pauseGame();return;}
+ if(menu){
+  const els=[...menu.querySelectorAll('button,input:not([readonly]),select')].filter(e=>!e.matches(':disabled')&&e.getClientRects().length);
+  const n=Math.max(0,els.indexOf(document.activeElement)),e=els[n];
+  if(!e)return;e.focus();
+  const dir=hit[15]?1:hit[14]?-1:0;
+  if(dir&&(e.tagName==='SELECT'||e.type==='range')){
+   if(e.tagName==='SELECT'){e.selectedIndex=(e.selectedIndex+dir+e.length)%e.length;e.dispatchEvent(new Event('change',{bubbles:true}));}
+   else{e.stepUp(dir);e.dispatchEvent(new Event('input',{bubbles:true}));}
+  }else{
+   const step=hit[13]||hit[15]?1:hit[12]||hit[14]?-1:0;
+   if(step)els[(n+step+els.length)%els.length].focus();
+   if(hit[0])e.click();
+  }
+  if(hit[1]){if(menu===pauseScreen)resumeGame();else if(menu!==menuScreen)toMenu();}
+  return;
+ }
+ if(G.human){
+  const a=i=>Math.sign(p.axes[i]||0)*Math.max(0,(Math.abs(p.axes[i]||0)-.18)/.82);
+  PAD.x=a(0);PAD.z=-a(1);PAD.fire=down[7];PAD.run=down[10]||down[4];
+  if(hit[0])IN.jumpQ=true;
+  if(hit[2])reloadGun();
+  G.human.yaw-=a(2)*dt*2.5*SET.sens;
+  G.human.pitch=clamp(G.human.pitch-a(3)*dt*2.5*SET.sens,-1.45,1.45);
+ }
+}
 const NET={side:-1,match:0,ping:0};
-addEventListener('keydown',e=>{IN.k[e.code]=true;
+function reloadGun(){if(G.state==='playing'){if(NET.side===1)NET.reload=true;else G.human.startReload();}}
+addEventListener('keydown',e=>{PAD.active=false;IN.k[e.code]=true;
  if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
  if(e.code==='Space'&&!e.repeat)IN.jumpQ=true;
- if(e.code==='KeyR'&&G&&G.state==='playing'&&G.human){if(NET.side===1)NET.reload=true;else G.human.startReload();}
+ if(e.code==='KeyR')reloadGun();
  if(e.code==='Escape'&&G&&(G.state==='paused'||!pauseScreen.classList.contains('hidden')))resumeGame();
 });
 addEventListener('keyup',e=>{IN.k[e.code]=false;});
 addEventListener('mousemove',e=>{if(IN.lock){IN.mdx+=e.movementX;IN.mdy+=e.movementY;}});
-addEventListener('mousedown',e=>{if(e.button!==0||e.target.closest('.screen'))return;
+addEventListener('mousedown',e=>{PAD.active=false;if(e.button!==0||e.target.closest('.screen'))return;
  if(G&&(G.state==='playing'||G.state==='count')&&!IN.lock&&!IN.touch)lockPointer();
  IN.fire=true;});
 addEventListener('mouseup',e=>{if(e.button===0)IN.fire=false;});
 addEventListener('contextmenu',e=>e.preventDefault());
 document.addEventListener('pointerlockchange',()=>{
  IN.lock=document.pointerLockElement===renderer.domElement;
- if(!IN.lock&&G&&(G.state==='playing'||G.state==='count')&&!IN.touch)pauseGame();
+ if(!IN.lock&&G&&(G.state==='playing'||G.state==='count')&&!IN.touch&&!PAD.active)pauseGame();
 });
-function lockPointer(){try{const p=renderer.domElement.requestPointerLock();if(p&&p.catch)p.catch(()=>{});}catch(e){}}
+function lockPointer(){if(!PAD.active)try{const p=renderer.domElement.requestPointerLock();if(p&&p.catch)p.catch(()=>{});}catch(e){}}
 
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
 renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
@@ -1263,11 +1301,11 @@ function humanControls(){
   if(IN.k['KeyS']||IN.k['ArrowDown'])z-=1;
   if(IN.k['KeyD']||IN.k['ArrowRight'])x+=1;
   if(IN.k['KeyA']||IN.k['ArrowLeft'])x-=1;
-  x+=IN.jx;z+=IN.jz;
+  x+=IN.jx+PAD.x;z+=IN.jz+PAD.z;
  }
  h.input.x=clamp(x,-1,1);h.input.z=clamp(z,-1,1);
- h.input.sprint=play&&(IN.k['ShiftLeft']||IN.k['ShiftRight']||Math.hypot(IN.jx,IN.jz)>.92);
- h.input.fire=play&&IN.fire;
+ h.input.sprint=play&&(IN.k['ShiftLeft']||IN.k['ShiftRight']||PAD.run||Math.hypot(IN.jx,IN.jz)>.92);
+ h.input.fire=play&&(IN.fire||PAD.fire);
  if(IN.jumpQ){if(play)h.input.jump=true;IN.jumpQ=false;}
 }
 function humanCamera(dt){
@@ -1317,7 +1355,7 @@ function hudTick(dt){
  }else timerEl.textContent=`First to ${G.target}`;
  const mvf=Math.hypot(h.vel.x,h.vel.z)>2?5:0;
  crossh.style.setProperty('--gap',(6+h.bloom*430+mvf+(h.grounded?0:6))+'px');
- if(IN.touch||!['playing','count'].includes(G.state)||IN.lock)hide(lockHint);else show(lockHint);
+ if(IN.touch||PAD.active||!['playing','count'].includes(G.state)||IN.lock)hide(lockHint);else show(lockHint);
  if(G.mode==='assault'&&!h.alive&&G.state==='playing'){
   setBig('ELIMINATED',.1,'#ff7a84');
   setSub(`Respawning in ${Math.max(1,Math.ceil(h.respawnT))}…`,.1);
@@ -1390,6 +1428,7 @@ function frame(){
  requestAnimationFrame(frame);
  const t=performance.now();
  const dt=Math.min(.05,clock.getDelta());
+ padTick(dt);
  if(G){G.t+=dt;tick(dt);}
  renderer.render(scene,camera);
  netTick(t,performance.now()-t);
