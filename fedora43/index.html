@@ -1,0 +1,4 @@
+<title>Fedora 43 in the browser</title><style>a{color:#9cf}</style><body bgcolor=#000 style="font-size:32px;color:#aaa">
+<a href="vm.html?cpu=x86_64&url=fedora43-kernel.cfg&mem=256&net_url=">Fedora 43 on its own kernel 6.17.1</a> · ext4 disk, about 30 s to bash<br>
+<a href="vm.html?cpu=x86_64&url=fedora43.cfg&mem=256&net_url=">Fedora 43 userland on Bellard's kernel</a> · 9p root, about 3 s<br>
+<small>x86_64 emulator © Fabrice Bellard, <a href=https://bellard.org/jslinux/>JSLinux</a>. Fedora 43 container rootfs; its kernel needs nopti here, its ld.so vendor check is patched cAMD→cX86 so glibc reads CPUID leaf 1.</small>
