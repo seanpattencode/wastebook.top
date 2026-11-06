@@ -1,4 +1,35 @@
-<title>Fedora 43 in the browser</title><style>a{color:#9cf}</style><body bgcolor=#000 style="font-size:32px;color:#aaa">
-<a href="vm.html?cpu=x86_64&url=fedora43-kernel.cfg&mem=256&net_url=">Fedora 43 on its own kernel 6.17.1</a> · ext4 disk, about 30 s to bash<br>
-<a href="vm.html?cpu=x86_64&url=fedora43.cfg&mem=256&net_url=">Fedora 43 userland on Bellard's kernel</a> · 9p root, about 3 s<br>
-<small>x86_64 emulator © Fabrice Bellard, <a href=https://bellard.org/jslinux/>JSLinux</a>. Fedora 43 container rootfs; its kernel needs nopti here, its ld.so vendor check is patched cAMD→cX86 so glibc reads CPUID leaf 1.</small>
+<!doctype html><meta charset=utf-8><title>Fedora 43</title><link rel=stylesheet href=style.css>
+<style>#ms,#foot{color:#888;font:13px monospace;margin:4px 8px}#ms{color:#9cf}#foot a{color:#9cf}</style>
+<script>
+// Fedora 43 x86_64 in Bellard's JSLinux emulator, resumed from a snapshot: the non-zero 64 KB pages of the wasm heap plus the emulator's
+// JS file buffers, written by this page's save() through ~/wastebook/*-jslinux-snap.py. Design: Sean's z jslinux -s. ?cold boots fedora43.cfg.
+const T=performance.now.bind(performance),q=new URLSearchParams(location.search),BASE=new URL('.',location).href,SNAP=new URL('snap-dd451417.bin',location).href;let tS;
+const S=q.has('cold')?null:(async()=>{let r,c;try{c=await caches.open('f43');r=await c.match(SNAP)}catch{}
+ if(!r){r=await fetch(SNAP);if(!r.ok)return null;if(c)try{for(const x of await c.keys())x.url!=SNAP&&c.delete(x);c.put(SNAP,r.clone())}catch{}}
+ const b=await new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();tS=T();const s=new Uint8Array(b),J=new DataView(b).getUint32(0,true);return{s,o:4+J,H:JSON.parse(new TextDecoder().decode(s.subarray(4,4+J)))}})();
+const WP=fetch('x86_64emu-wasm.wasm');
+</script>
+<div id=term_wrap><div id=term_container></div></div><pre id=ms></pre><div id=foot>Fedora 43 x86_64 on <a href=https://bellard.org/jslinux/>Fabrice Bellard's JSLinux</a> emulator (his kernel, Fedora's userland over 9p), resumed from a snapshot. Cold boots: <a href="?cold">this page</a> · <a href="vm.html?cpu=x86_64&url=fedora43-kernel.cfg&mem=256&net_url=">Fedora's own kernel 6.17.1</a> (about 30 s)</div>
+<script src=term.js></script><script>
+var net_state=null,dl=0,update_downloading=f=>dl=f,term=new Term({cols:80,rows:30,scrollback:1e4,fontSize:15});
+const w=term.write.bind(term),say=s=>ms.textContent+=s+'\n';let log='',held=null,n=0,A,k,up=0,SB='';
+term.write=s=>{w(s);log+=s;if(!up&&log.includes('bash-5.3# '))up=say(`cold boot: prompt at ${T().toFixed(0)} ms`)||1};
+// the emulator fetches with absolute URLs, so a snapshot keeps the origin it was made on: map it to this page's
+const RW=u=>SB&&typeof u=='string'&&u.startsWith(SB)?BASE+u.slice(SB.length):u,XO=XMLHttpRequest.prototype.open,FO=fetch;
+XMLHttpRequest.prototype.open=function(m,u,...r){return XO.call(this,m,RW(u),...r)};fetch=(u,...r)=>FO(RW(u),...r);
+var Module={instantiateWasm(info,cb){A=info.a;k=Object.keys(A).find(k=>A[k]===_emscripten_async_call);
+ A[k]=(f,a,t)=>held?held.push([f,a,t]):(n++,setTimeout(()=>{n--;callUserCallback(()=>getWasmTableEntry(f)(a))},t));
+ Promise.all([WebAssembly.instantiateStreaming(WP,info),S]).then(([{instance:i},s])=>{if(s){const m=Object.values(i.exports).find(x=>x instanceof WebAssembly.Memory);m.grow((s.H.mem-m.buffer.byteLength)/65536)}cb(i)})},
+ preRun(){term.setKeyHandler(s=>{for(const c of s)Module._console_queue_char(c.charCodeAt(0))})},
+ async onRuntimeInitialized(){const s=await S;if(!s)return Module.ccall('vm_start',null,['string',,'string','string',,,,'string'],[BASE+'fedora43.cfg',256,q.get('cmdline')||'','',0,0,0,'']);
+  let{H,o}=s;SB=H.base;for(const[p,c]of H.R)HEAPU8.set(s.s.subarray(o,o+=c<<16),p<<16);
+  Browser.fbuf_table={};for(const[h,l]of H.fb)Browser.fbuf_table[h]=s.s.subarray(o,o+=l);Browser.fbuf_next_handle=H.next;
+  const d=H.now-T();performance.now=()=>T()+d;w(log=H.log);up=1;for(const c of H.held)A[k](...c);
+  say(`restored: running at ${T().toFixed(0)} ms (${(o/1e6).toFixed(1)} MB image ready at ${tS.toFixed(0)} ms)`)}};
+async function save(){const t=T();held=[];while(n||dl)await new Promise(r=>setTimeout(r,1));const L=HEAPU8.length,Q=[];
+ for(let z=1<<25;z>=4096;z>>=1)for(let p;(p=Module._malloc(z))&&Q.push(p)&&HEAPU8.length==L;)HEAPU8.fill(0,p,p+z);Q.forEach(Module._free);const M=HEAPU8,u=new Uint32Array(M.buffer),R=[];
+ for(let p=0;p<M.length>>16;p++){let i=p<<14,e=i+16384;while(i<e&&!u[i])i++;if(i<e){const r=R.at(-1);r&&r[0]+r[1]==p?r[1]++:R.push([p,1])}}
+ const F=Browser.fbuf_table,ks=Object.keys(F),j=new TextEncoder().encode(JSON.stringify({mem:M.length,R,held,now:performance.now(),next:Browser.fbuf_next_handle,fb:ks.map(h=>[+h,F[h].length]),log,base:BASE}));
+ const b=new Blob([new Uint32Array([j.length]),j,...R.map(([p,c])=>M.subarray(p<<16,p+c<<16)),...ks.map(h=>F[h])]),p=T()-t,c=held;held=null;for(const x of c)A[k](...x);
+ await FO('snap',{method:'POST',body:b});say(`saved: VM paused ${p.toFixed(0)} ms, ${(b.size/1e6).toFixed(1)} MB`)}
+term.open(term_container)</script><script src=x86_64emu-wasm.js></script>
