@@ -3,7 +3,7 @@
 <script>
 // Fedora 43 x86_64 in Bellard's JSLinux emulator, resumed from a snapshot: the non-zero 64 KB pages of the wasm heap plus the emulator's
 // JS file buffers, written by this page's save() through ~/wastebook/*-jslinux-snap.py. Design: Sean's z jslinux -s. ?cold boots fedora43.cfg.
-const T=performance.now.bind(performance),q=new URLSearchParams(location.search),BASE=new URL('.',location).href,SNAP=new URL('snap-dd451417.bin',location).href;let tS;
+const T=performance.now.bind(performance),q=new URLSearchParams(location.search),BASE=new URL('.',location).href,SNAP=new URL('snap-aa28748f.bin',location).href;let tS;
 const S=q.has('cold')?null:(async()=>{let r,c;try{c=await caches.open('f43');r=await c.match(SNAP)}catch{}
  if(!r){r=await fetch(SNAP);if(!r.ok)return null;if(c)try{for(const x of await c.keys())x.url!=SNAP&&c.delete(x);c.put(SNAP,r.clone())}catch{}}
  const b=await new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();tS=T();const s=new Uint8Array(b),J=new DataView(b).getUint32(0,true);return{s,o:4+J,H:JSON.parse(new TextDecoder().decode(s.subarray(4,4+J)))}})();
