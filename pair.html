@@ -1,0 +1,7 @@
+<pre id=o></pre><script src=https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js></script><script>
+// #CODE = that room, first in hosts; bare = quick match: the lobby holder waits and the next arrival hands it a fresh code (twig tactics pattern)
+K='wbtop-';L=m=>o.textContent+=m+'\n'
+W=c=>{c.on('open',()=>c.send('hi'));c.on('data',d=>L('paired, got '+d))}
+R=C=>{location.hash=C;L(location.href);let p=new Peer(K+C);p.on('connection',W);p.on('error',()=>{p=new Peer;p.on('open',()=>W(p.connect(K+C)))})}
+if(C=location.hash.slice(1))R(C);else{L('finding a partner');l=new Peer(K+'LOBBY');l.on('connection',c=>c.on('data',d=>{l.destroy();R(d)}));l.on('error',()=>{C=Math.random().toString(36).slice(2,6);m=new Peer;m.on('open',()=>{c=m.connect(K+'LOBBY');c.on('open',()=>{c.send(C);R(C)})})})}
+</script>
