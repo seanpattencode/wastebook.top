@@ -3,9 +3,9 @@
 function net(){
 // other divers are drawn as the world's own manta rays, each one overwriting a manta instance; R nt Io I are the game's camera state, GPU queue, manta buffer and world data at the pinned commit
 const K='wbtop-abyss-',M=new Float32Array(8),G=[]
-let S=[],me=0,host,cs=[],room='',used=0
+let S=[],me=0,host,cs=[],room='',used=0,T
 // the manta shader takes an orbit, so a fixed spot and heading is an orbit frozen at angle t around a centre one metre back
-const put=(k,p)=>{const t=Math.atan2(-Math.sin(p[3]),-Math.cos(p[3])/.75);M.set([p[0]-Math.cos(t),p[1]-2.5,p[2]-.75*Math.sin(t),1,t,1e-9,2.2,Math.PI/2-2*t]);nt.writeBuffer(Io,k*32,M)}
+const put=(k,p)=>{const t=Math.atan2(-Math.sin(p[3]),-Math.cos(p[3])/.75);M.set([p[0]-Math.cos(t),p[1]-2.5,p[2]-.75*Math.sin(t),1,t,1e-9,1.4,Math.PI/2-2*t]);nt.writeBuffer(Io,k*32,M)}
 const draw=()=>{requestAnimationFrame(draw);let n=0
  S.forEach((s,i)=>{if(!s||i==me||n>4)return G[i]=0;const g=G[i]||(G[i]=s.slice());for(let j=0;j<3;j++)g[j]+=(s[j]-g[j])*.2;g[3]+=((s[3]-g[3]+9.42478)%6.28319-3.14159)*.2;put(5-n++,g)})
  for(let k=n;k<used;k++)nt.writeBuffer(Io,(5-k)*32,I.mantas,(5-k)*8,8)
@@ -13,9 +13,20 @@ const draw=()=>{requestAnimationFrame(draw);let n=0
 // #CODE = that room: the first diver in claims the id and relays everyone's position, later divers connect to it
 const join=C=>{room=C;location.hash=C;let p=new Peer(K+C)
  p.on('connection',c=>{const g=[1,2,3,4,5].find(i=>!cs[i]);if(!g)return c.close();cs[g]=c;c.on('data',d=>S[g]=d);c.on('close',()=>cs[g]=S[g]=0)})
- p.on('error',e=>{if(e.type!='unavailable-id')return;p=new Peer;p.on('open',()=>{host=p.connect(K+C,{serialization:'json'});host.on('data',d=>{me=d[0];S=d[1]});host.on('close',()=>{host=0;S=[]})})})}
-setInterval(()=>{const s=[R[0],R[1],R[2],R[3]];if(host)host.open&&host.send(s);else{S[0]=s;cs.forEach((c,g)=>c&&c.open&&c.send([g,S]))}},66)
-const s=document.createElement('script');s.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';s.onload=()=>location.hash&&join(location.hash.slice(1));document.head.append(s)
+ p.on('error',e=>{if(e.type!='unavailable-id')return;p=new Peer;p.on('open',()=>{host=p.connect(K+C);host.on('data',d=>{me=d[0];S=d[1]});host.on('close',()=>{host=me=0;S=[]})})})}
+setInterval(()=>{const s=[R[0],R[1],R[2],R[3]];if(host)host.send(s);else{S[0]=s;cs.forEach((c,g)=>c&&c.send([g,S]))}
+ if(room)T.textContent=S.filter(x=>x).length+' in '+room},66)
+const s=document.createElement('script');s.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';document.head.append(s)
+s.onload=()=>{
+ // the menu row is a copy of the detail row, same id so its styles apply
+ const q=document.getElementById('q'),row=q.cloneNode(1),[t,bq,bi,bx]=row.children,code=()=>Math.random().toString(36).slice(2,6)
+ T=t;bx.remove();q.after(row);bq.className=bi.className='';T.textContent='Alone';bq.textContent='Quick match';bi.textContent='Invite link'
+ bi.onclick=()=>{bq.l?.destroy();room||join(code());navigator.clipboard?.writeText(location.href);bi.textContent='Link copied'}
+ // quick match: the first diver holds a lobby id, the next one hands it a fresh room code and both go there
+ bq.onclick=()=>{if(room||bq.l)return;T.textContent='Finding…';const l=bq.l=new Peer(K+'LOBBY');l.on('connection',c=>c.on('data',d=>{l.destroy();join(d)}));l.on('error',()=>{const C=code(),m=new Peer;m.on('open',()=>{const c=m.connect(K+'LOBBY');c.on('open',()=>{c.send(C);join(C)})})})}
+ location.hash&&join(location.hash.slice(1))}
+// a different #CODE typed or pasted into this tab means that room: start over there
+onhashchange=()=>location.hash.slice(1)!=room&&location.reload()
 draw();window.__net=()=>({room,me,S});window.__cam=(...a)=>a.forEach((v,i)=>R[i]=v)
 }
 fetch('https://cdn.jsdelivr.net/gh/Noniv/abyssal-garden@a596354eff400d458bc2aeb9bdf5e0a9734b2bcf/index.html').then(r=>r.arrayBuffer()).then(async b=>{
