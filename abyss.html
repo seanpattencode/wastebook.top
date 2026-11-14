@@ -1,0 +1,7 @@
+<script>
+// Abyssal Garden (c) 2026 Maksymilian Dendura, MIT, https://github.com/Noniv/abyssal-garden: loaded unmodified from his repo at a pinned commit, hash checked before it runs
+fetch('https://cdn.jsdelivr.net/gh/Noniv/abyssal-garden@a596354eff400d458bc2aeb9bdf5e0a9734b2bcf/index.html').then(r=>r.arrayBuffer()).then(async b=>{
+h=[...new Uint8Array(await crypto.subtle.digest('SHA-256',b))].map(x=>x.toString(16).padStart(2,0)).join('')
+if(!h.startsWith('ac151ea4a84092e5'))throw h
+document.open();document.write(new TextDecoder().decode(b));document.close()})
+</script>
