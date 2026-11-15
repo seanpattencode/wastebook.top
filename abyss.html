@@ -1,6 +1,8 @@
 <script>
 // Abyssal Garden (c) 2026 Maksymilian Dendura, MIT, https://github.com/Noniv/abyssal-garden: loaded unmodified from his repo at a pinned commit, hash checked by the browser; net() is appended inside its closure
-function RB(c,d){const g=c.getContext('2d');let T,n=0
+function RB(c,d){
+// 2D stand-in for the canvas's WebGPU context: the last pass draws into a texture, each frame is read back and painted (Chrome on Linux NVIDIA cannot show a WebGPU canvas, crbug 40218893)
+const g=c.getContext('2d');let T,n=0
 return{configure(){T=d.createTexture({size:[c.width,c.height],format:navigator.gpu.getPreferredCanvasFormat(),usage:17})},
 getCurrentTexture(){const t=T,w=t.width,h=t.height,R=w*4+255&~255;n<3&&queueMicrotask(()=>{n++;const b=d.createBuffer({size:R*h,usage:9}),e=d.createCommandEncoder()
  e.copyTextureToBuffer({texture:t},{buffer:b,bytesPerRow:R},[w,h]);d.queue.submit([e.finish()])
@@ -35,6 +37,9 @@ s.onload=()=>{
 onhashchange=()=>location.hash.slice(1)!=room&&location.reload()
 draw();window.__net=()=>({room,me,S});window.__cam=(...a)=>a.forEach((v,i)=>R[i]=v)
 }
-fetch('https://cdn.jsdelivr.net/gh/Noniv/abyssal-garden@a596354eff400d458bc2aeb9bdf5e0a9734b2bcf/index.html',{integrity:'sha256-rBUepKhAkuUpuYrCH+7ceQXBcKeVn2vW2CnvG4XlZ2c='}).then(r=>r.text()).then(t=>{if(localStorage.abyssRB)t=t.replace('tt.getContext("webgpu")','RB(tt,Y)').replace('(async()=>{','(async()=>{'+RB+';')
+fetch('https://cdn.jsdelivr.net/gh/Noniv/abyssal-garden@a596354eff400d458bc2aeb9bdf5e0a9734b2bcf/index.html',{integrity:'sha256-rBUepKhAkuUpuYrCH+7ceQXBcKeVn2vW2CnvG4XlZ2c='}).then(r=>r.text()).then(t=>{
+// the first time the device dies on that bug, remember it and reload, keeping the detail level; later loads draw through RB
+t=t.replace('t.reason!=="destroyed"&&(','if(!localStorage.abyssRB&&/ImportMemory|AllocateMemory/.test(t.message))return localStorage.abyssRB=1,location.reload();t.reason!=="destroyed"&&(')
+if(localStorage.abyssRB)t=t.replace('tt.getContext("webgpu")','RB(tt,Y)').replace('(async()=>{','(async()=>{'+RB+';')
 document.open();document.write(t.replace('})().catch(',';('+net+')()})().catch('));document.close()})
 </script>
