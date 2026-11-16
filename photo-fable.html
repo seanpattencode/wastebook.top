@@ -1,6 +1,6 @@
-<meta name=viewport content=width=device-width><input type=file id=f> <input placeholder=code onchange=G(value)><pre id=o></pre><script src=https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js></script><script>
-K='wbfable-';L=m=>o.innerHTML+=m+'\n';P=i=>new Peer(i).on('error',e=>L(e.type))
-G=C=>{L('getting '+C);p=P().on('open',()=>{x=p.connect(K+C).on('data',d=>{L('<img width=100% src='+URL.createObjectURL(new Blob([d]))+'>');x.send(1)})})}
-f.onchange=()=>{location.hash=C=(Math.random()+'').slice(2,8);L(location.href+'\ncode '+C+'\nkeep this page open until delivered');p=P(K+C).on('connection',x=>x.on('open',()=>x.send(f.files[0])).on('data',()=>L('delivered')))}
+<meta name=viewport content=width=device-width><input type=file id=f> <input placeholder=code onchange="G(value,T=N())"><pre id=o></pre><script src=https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js></script><script>
+T=0;N=_=>performance.now();K='wbfable-';L=m=>o.innerHTML+=m+' '+(N()-T).toFixed(3)+' ms\n';P=i=>new Peer(i).on('error',e=>L(e.type))
+G=C=>{p=P().on('open',()=>{x=p.connect(K+C).on('data',d=>{L('<img width=100% src='+URL.createObjectURL(new Blob([d]))+'>');x.send(1)})});L('getting '+C)}
+f.onchange=()=>{T=N();location.hash=C=(Math.random()+'').slice(2,8);p=P(K+C).on('connection',x=>x.on('open',()=>x.send(f.files[0])).on('data',()=>L('delivered')));L(location.href+'\ncode '+C+'\nkeep this page open until delivered')}
 if(C=location.hash.slice(1))G(C)
 </script>
