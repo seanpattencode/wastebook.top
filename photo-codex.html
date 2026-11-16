@@ -1,6 +1,7 @@
 <meta name=viewport content="width=device-width">
-<p id=s>Keep sender open.</p><form id=f>Camera<input type=file accept=image/* capture=environment><br>File<input type=file accept=image/*></form><a id=l style=word-break:break-all></a><img id=i style=max-width:100%>
+<p id=s>Keep sender open.</p><div id=f><button id=cam>Camera</button><button onclick=file.click()>File</button><input id=file type=file accept=image/* hidden></div><video id=v autoplay playsinline hidden style=max-width:100%></video><canvas id=x hidden></canvas><a id=l style=word-break:break-all></a><img id=i style=max-width:100%>
 <script src=https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js></script><script>
 function go(d){f.hidden=true;t=performance.now();p=new Peer;p.on('error',e=>s.textContent=e.message);p.on('open',id=>{if(d){l.href='#'+id;l.textContent=l.href}else p.connect(location.hash.slice(1)).on('data',d=>i.src=URL.createObjectURL(new Blob([d])))});p.on('connection',c=>c.on('open',()=>c.send(d)))}
 f.onchange=e=>go(e.target.files[0]);if(location.hash)go();i.onload=()=>s.textContent='Received '+(performance.now()-t).toFixed(1)+' ms'
+cam.onclick=async()=>{cam.disabled=true;try{if(v.srcObject){x.width=v.videoWidth;x.height=v.videoHeight;x.getContext('2d').drawImage(v,0,0);x.toBlob(b=>go(new File([b],'photo.jpg',{type:'image/jpeg'})),'image/jpeg');v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null;v.hidden=true;cam.textContent='Camera'}else{v.srcObject=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});v.hidden=false;await v.play();cam.textContent='Take photo'}}catch(e){s.textContent=e.message}cam.disabled=false}
 </script>
