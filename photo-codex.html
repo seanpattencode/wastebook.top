@@ -6,10 +6,10 @@
 let F,t;const C=new Map,p=new Peer('pcx-'+crypto.randomUUID().slice(0,6).toUpperCase());n.value=navigator.platform;
 const list=()=>peers.textContent=[...C.values()].join('\n')||'No devices connected';
 function show(d){t=performance.now();URL.revokeObjectURL(i.src);i.src=URL.createObjectURL(new Blob([d]))}
-function go(d){if(d){F=d;show(d);for(const c of C.keys())c.send(d)}}
+function go(d){if(d){F=d;show(d);C.forEach((_,c)=>c.send(d))}}
 function wire(c){c.on('open',()=>{C.set(c,c.peer);list();c.send(n.value);if(F)c.send(F)});c.on('data',d=>{if(typeof d=='string'){C.set(c,d+' '+c.peer.slice(-6));list()}else show(d)});c.on('close',()=>{C.delete(c);list()});c.on('iceStateChanged',s=>s=='disconnected'&&c.close())}
-p.on('error',e=>s.textContent=e);p.on('connection',wire);p.on('open',id=>{code.textContent=id.slice(4);l.href=location.href.split('#')[0]+'#'+code.textContent;l.textContent=l.href;join.disabled=copy.disabled=false;if(location.hash){j.value=location.hash;join.click()}});
+p.on('error',e=>s.textContent=e);p.on('connection',wire);p.on('open',id=>{code.textContent=id=id.slice(4);l.href=location.href.split('#')[0]+'#'+id;l.textContent=l.href;join.disabled=copy.disabled=false;if(location.hash){j.value=location.hash;join.click()}});
 join.onclick=()=>{const id='pcx-'+j.value.split('#').pop().trim().toUpperCase();if(id!=p.id&&!p.connections[id]?.length)wire(p.connect(id))};file.onchange=()=>{go(file.files[0]);file.value=''};i.onload=()=>s.textContent='Display '+(performance.now()-t).toFixed(1)+' ms';
-cam.onclick=async()=>{cam.disabled=true;try{if(v.srcObject){x.width=v.videoWidth;x.height=v.videoHeight;x.getContext('2d').drawImage(v,0,0);x.toBlob(go,'image/jpeg');v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null;v.hidden=true;cam.textContent='Camera'}else{v.srcObject=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});v.hidden=false;await v.play();cam.textContent='Take photo & send'}}catch(e){s.textContent=e}cam.disabled=false}
-copy.onclick=()=>navigator.clipboard.writeText(l.href).then(()=>s.textContent='Link copied',e=>s.textContent=e);n.onchange=()=>{for(const c of C.keys())c.send(n.value)};onpagehide=()=>p.destroy();
+cam.onclick=async()=>{cam.disabled=true;try{if(v.srcObject){x.width=v.videoWidth;x.height=v.videoHeight;x.getContext('2d').drawImage(v,0,0);x.toBlob(go,'image/jpeg');v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null;v.hidden=true;cam.textContent='Camera'}else{v.srcObject=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});v.hidden=false;await v.play();v.scrollIntoView();cam.textContent='Take photo & send'}}catch(e){s.textContent=e}cam.disabled=false}
+copy.onclick=()=>navigator.clipboard.writeText(l.href).then(()=>s.textContent='Link copied',e=>s.textContent=e);n.onchange=()=>C.forEach((_,c)=>c.send(n.value));onpagehide=()=>p.destroy();
 </script>
