@@ -1,6 +1,6 @@
-<meta name=viewport content="width=device-width"><title>Photo Codex</title>
-<p id=s>Pick a photo. Keep this tab open.</p><form id=f>Camera<input type=file accept=image/* capture=environment>File<input type=file accept=image/*></form><a id=l></a><img id=i style=max-width:100%>
+<meta name=viewport content="width=device-width">
+<p id=s>Keep sender open.</p><form id=f>Camera<input type=file accept=image/* capture=environment><br>File<input type=file accept=image/*></form><a id=l style=word-break:break-all></a><img id=i style=max-width:100%>
 <script src=https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js></script><script>
-p=new Peer;p.on('error',e=>s.textContent=e.message);
-p.on('open',id=>{if(location.hash){f.hidden=true;c=p.connect(location.hash.slice(1));c.on('data',d=>i.src=URL.createObjectURL(new Blob([d])))}else f.onchange=e=>{f.hidden=true;l.href='#'+id;l.textContent=l.href;p.on('connection',c=>c.on('open',()=>c.send(e.target.files[0])))}})
+function go(d){f.hidden=true;t=performance.now();p=new Peer;p.on('error',e=>s.textContent=e.message);p.on('open',id=>{if(d){l.href='#'+id;l.textContent=l.href}else p.connect(location.hash.slice(1)).on('data',d=>i.src=URL.createObjectURL(new Blob([d])))});p.on('connection',c=>c.on('open',()=>c.send(d)))}
+f.onchange=e=>go(e.target.files[0]);if(location.hash)go();i.onload=()=>s.textContent='Received '+(performance.now()-t).toFixed(1)+' ms'
 </script>
