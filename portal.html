@@ -1,4 +1,4 @@
-<body style="margin:0;background:#000;display:flex;justify-content:space-between;height:100vh"><style>video{width:43%;object-fit:cover}#s{transform:scaleX(-1)}</style><video id=r autoplay playsinline></video><video id=s autoplay playsinline muted></video><script src=https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js></script><script>
+<body bgcolor=#000 style=margin:0;display:flex;height:100vh><style>video{width:43%;object-fit:cover}#s{margin-left:14%;transform:scaleX(-1)}</style><video id=r autoplay playsinline></video><video id=s autoplay playsinline muted><script src=https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js></script><script>
 navigator.mediaDevices.getUserMedia({video:1,audio:1}).then(m=>{s.srcObject=m
 K='portal'+location.hash.slice(1)
 S=c=>c.on('stream',x=>r.srcObject=x)
